@@ -10,6 +10,8 @@ class Histogram:
     def __init__(self, locus: Locus):
         self.locus = locus
         self.repeat_lengths: Dict[float, int] = defaultdict(lambda: 0)  # key = repeat length; value = supporting reads
+        self.rounded_repeats = defaultdict(lambda: 0)
+        self.built_rounded = False  # whether rounded repeat lengths has been built yet
 
     def calculate_repeat_length(self, read: AlignedSegment) -> float:
         read_position = read.reference_start+1
@@ -35,21 +37,42 @@ class Histogram:
             repeat_length = self.calculate_repeat_length(read)
             self.repeat_lengths[repeat_length]+=1
 
-    def round_repeat_lengths(self) -> None:
-        # round all repeat lengths in histogram to nearest integer
+    def build_rounded(self):
         for length in self.repeat_lengths.keys():
-            if not length.is_integer():
-                self.repeat_lengths[round(length)] += self.repeat_lengths[length]
-                del self.repeat_lengths[length]
+            self.rounded_repeats[round(length)] += self.repeat_lengths[length]
+        self.built_rounded = True
 
-    def filter_by_support(self, support_threshold):
+    @property
+    def rounded_repeat_lengths(self) -> defaultdict:
+        # round all repeat lengths in histogram to nearest integer
+        if not self.built_rounded:
+            self.build_rounded()
+        return self.rounded_repeats
+
+    def filter_by_support(self, support_threshold, rounded=False) -> defaultdict:
         # returns default dictionary with all lengths with at least support_threshold reads supporting it
+        # rounded - return rounded dict()
+        if rounded:
+            original = self.rounded_repeat_lengths
+        else:
+            original = self.repeat_lengths
         filtered = defaultdict(lambda: 0)
-        for length in self.repeat_lengths:
-            if self.repeat_lengths[length] >= support_threshold:
-                filtered += self.repeat_lengths[length]
+        for length in original:
+            if original[length] >= support_threshold:
+                filtered[length] += original[length]
         return filtered
 
     def __str__(self):
-        raise NotImplementedError
+        ret = []
+        sorted_lengths = sorted(self.repeat_lengths.keys())
+        for length in sorted_lengths:
+            ret.append(f"{length}_{self.repeat_lengths[length]}, ")
+        if len(sorted_lengths) != 0:
+            ret[-1] = ret[-1][:-2]  # strip comma from last length
+        return "".join(ret)
 
+    def __eq__(self, other):
+        for length in self.repeat_lengths:
+            if not self.repeat_lengths[length] == other.repeat_lengths[length]:
+                return False
+        return len(self.repeat_lengths.keys()) == len(self.repeat_lengths.keys())

@@ -1,99 +1,110 @@
-from typing import List
 import scipy.stats as stats
 import numpy as np
+from icecream import ic
 
 from src.SingleFileAnalysis.AlleleSet import AlleleSet
 from src.SingleFileAnalysis.Histogram import Histogram
 
-
-def get_ZIJ_matrix(current_ZIJ, repeat_lengths: np.array, random_repeat_lengths, frequencies, num_allele: int, noise_table) -> np.matrix:
-    for length in repeat_lengths:
-        for j in range(num_allele):
-            current_ZIJ[length, j] = noise_table[random_repeat_lengths[j], length] * frequencies[j] / np.sum(
-                noise_table[random_repeat_lengths[:], length] * frequencies[:] + 1e-10)
-    return current_ZIJ
+ic.configureOutput(includeContext=True)
 
 
-def allele_maximum_likelihood(histogram: Histogram, num_allele: int, noise_table: np.array) -> AlleleSet:
-    # gets  all lengths with at least 5 read support
-    repeat_lengths = np.array(list(histogram.repeat_lengths.keys()))
-    supported_repeat_lengths = np.array(list(histogram.filter_by_support(5).keys()))
-    max_log_likelihood = -1e9
-    for _ in range(10):
-        # randomly select num_alles repeat lengths
-        random_repeat_lengths = supported_repeat_lengths[np.random.permutation(supported_repeat_lengths.size)[0:num_allele]]
-        new_frequencies = np.zeros(num_allele)
-        frequencies = np.ones(num_allele) / num_allele
-        Z_i_j = np.zeros([44, num_allele])
-        new_theta = np.zeros(num_allele)
-        change = 1e6
-        prev_log_likelihood = 1e6
-        while change > 1e-5:
-            Z_i_j = get_ZIJ_matrix(Z_i_j, repeat_lengths, random_repeat_lengths, frequencies, num_allele, noise_table)
+class AllelesMaximumLikelihood:
+    def __init__(self, histogram: Histogram, num_alleles: int, noise_table: np.matrix, required_read_support: int = 5):
+        # gets  all lengths with at least 5 read support
+        self.histogram = histogram
+        self.repeat_lengths = np.array(list(histogram.rounded_repeat_lengths.keys()))  # convert to arrays for performance reasons
+        self.num_reads = np.array(list(histogram.rounded_repeat_lengths.values()))
+        self.supported_repeat_lengths = np.array(list(histogram.filter_by_support(required_read_support, rounded=True).keys()))
+        self.num_alleles = num_alleles
+        self.noise_table = noise_table
+        self.max_log_likelihood = -1e9
+        self.best_alleles = np.array([])
+        self.best_frequencies = np.array([])
 
-            # Step 2: From the Z_i_j's estimate the new frequencies.
-            for j in range(num_allele):
-                new_frequencies[j] = np.sum(Z_i_j[repeat_lengths, j] * num_reads) / np.sum(num_reads)
+    def reset_intermediates(self):
+        self.random_repeat_lengths = self.supported_repeat_lengths[
+            np.random.permutation(self.supported_repeat_lengths.size)[0:self.num_alleles]]
 
-            # Step number 2. Maximize the new Thetas
-            Theta_new_temp = np.zeros(supported_repeat_lengths.size)
-            for j in range(num_allele):
-                for k in range(supported_repeat_lengths.size):
-                    Test_theta = supported_repeat_lengths[k]
-                    Theta_new_temp[k] = sum(Z_i_j[repeat_lengths, j] * np.log(
-                        noise_table[Test_theta, repeat_lengths] + 1e-10) * num_reads)
-                new_theta[j] = supported_repeat_lengths[Theta_new_temp.argmax()]
+        self.new_frequencies = np.zeros(self.num_alleles)
+        self.frequencies = np.ones(self.num_alleles) / self.num_alleles
+        self.Z_i_j = np.zeros([44, self.num_alleles])
+        self.new_theta = np.zeros(self.num_alleles)
+        self.change = 1e6
+        self.prev_log_likelihood = 1e6
 
-            for j in range(num_allele):
-                random_repeat_lengths[j] = new_theta[j]
-                frequencies[j] = new_frequencies[j]
+    def update_ZIJ(self):
+        for length in self.repeat_lengths:
+            for j in range(self.num_alleles):
+                self.Z_i_j[length, j] = self.noise_table[self.random_repeat_lengths[j], length] * self.frequencies[j] / np.sum(self.noise_table[self.random_repeat_lengths[:], length] * self.frequencies[:] + 1e-10)
 
-            # Calcualte the likelihood
-            # L(Theta|D)=P(D|Theta)=PI_i(d_i|Theta)=PI_i(SUM_j(f[j]*p(d_i|theta_j))).
-            # In our case we can combine all the reads with the same number of repeats thus:
-            log_likelihood = 0
-            for k in np.arange(repeat_lengths.size):
-                log_likelihood += num_reads[k] * np.log(
-                    sum(frequencies * noise_table[random_repeat_lengths, repeat_lengths[k]]) + 1e-10)
-            if log_likelihood > max_log_likelihood:
-                max_log_likelihood = log_likelihood
-                best_alleles = random_repeat_lengths
-                best_frequencies = frequencies
-            change = np.abs(prev_log_likelihood - log_likelihood)
-            prev_log_likelihood = log_likelihood
-    return AlleleSet(log_likelihood=max_log_likelihood, repeat_lengths=best_alleles, frequencies=best_frequencies)
+    def estimate_new_frequencies(self):
+        for k in range(self.num_alleles):
+            self.new_frequencies[k] = np.sum(self.Z_i_j[self.repeat_lengths, k] * self.num_reads) / np.sum(self.num_reads)
+
+    def maximize_new_thetas(self):
+        Theta_new_temp = np.zeros(self.supported_repeat_lengths.size)
+        for j in range(self.num_alleles):
+            for k in range(self.supported_repeat_lengths.size):
+                Test_theta = self.supported_repeat_lengths[k]
+                Theta_new_temp[k] = sum(self.Z_i_j[self.repeat_lengths, j] * np.log(
+                    self.noise_table[Test_theta, self.repeat_lengths] + 1e-10) * self.num_reads)
+            self.new_theta[j] = self.supported_repeat_lengths[Theta_new_temp.argmax()]
+
+    def update_frequencies(self):
+        for k in range(self.num_alleles):
+            self.random_repeat_lengths[k] = self.new_theta[k]
+            self.frequencies[k] = self.new_frequencies[k]
+
+    def get_log_likelihood(self) -> float:
+        log_likelihood = 0
+        for k in range(self.repeat_lengths.size):
+            log_likelihood += self.num_reads[k] * np.log(np.sum(self.frequencies * self.noise_table[self.random_repeat_lengths, self.repeat_lengths[k]]) + 1e-10)
+        return log_likelihood
+
+    def update_guess(self) -> float:
+        log_likelihood = self.get_log_likelihood()
+        if log_likelihood > self.max_log_likelihood:
+            self.max_log_likelihood = log_likelihood
+            self.best_alleles = self.random_repeat_lengths
+            self.best_frequencies = self.frequencies
+        change = np.abs(self.prev_log_likelihood - log_likelihood)
+        self.prev_log_likelihood = log_likelihood
+        return change
+
+    def get_alleles(self):
+        for _ in range(10):
+            self.reset_intermediates()
+            while self.change > 1e-5:
+                self.update_ZIJ()
+                self.estimate_new_frequencies()
+                self.maximize_new_thetas()
+                self.update_frequencies()
+                self.change = self.update_guess()
+
+        return AlleleSet(histogram=self.histogram, log_likelihood=self.max_log_likelihood,
+                         repeat_lengths = self.best_alleles, frequencies=self.best_frequencies)
 
 
 def find_alleles(histogram: Histogram, supported_repeat_lengths: int, noise_table) -> AlleleSet:
-    first_allele_set = allele_maximum_likelihood(histogram, 1, noise_table)
-    second_allele_set = allele_maximum_likelihood(histogram, 2, noise_table)
-    distribution_2_alleles = 2 * (second_allele_set.log_likelihood - first_allele_set.log_likelihood)
-    if distribution_2_alleles > 0:
-        p_value_2_alleles = stats.chi2.pdf(distribution_2_alleles, 2)
-        if p_value_2_alleles > 0.05:
-            return first_allele_set
-        elif supported_repeat_lengths == 2:
-            return second_allele_set
-        else:
-            third_allele_set = allele_maximum_likelihood(histogram, 3, noise_table)
-            distribution_3_alleles = 2 * (third_allele_set.log_likelihood - second_allele_set.log_likelihood)
-            p_value_3_alleles = stats.chi2.pdf(distribution_3_alleles, 2)
-            if p_value_3_alleles > 0.05:
-                return second_allele_set
-            elif supported_repeat_lengths == 3:
-                return third_allele_set
+    lesser_alleles_set = AllelesMaximumLikelihood(histogram, 1, noise_table).get_alleles()
+    for i in range(2, 5):
+        greater_alleles_set = AllelesMaximumLikelihood(histogram, i, noise_table).get_alleles()
+        likelihood_increase = 2 * (greater_alleles_set.log_likelihood - lesser_alleles_set.log_likelihood)
+        if likelihood_increase > 0:
+            p_value_i_alleles = stats.chi2.pdf(likelihood_increase, 2)
+            if p_value_i_alleles > 0.05:
+                return lesser_alleles_set
+            elif supported_repeat_lengths == i:
+                return greater_alleles_set
             else:
-                fourth_allele_set = allele_maximum_likelihood(histogram, 4, noise_table)
-                distribution_4_alleles = 2 * (fourth_allele_set.log_likelihood - third_allele_set.log_likelihood)
-                p_value_4_alleles = stats.chi2.pdf(distribution_4_alleles, 2)
-                if p_value_4_alleles > 0.05:
-                    return third_allele_set
-                else:
-                    return fourth_allele_set
-    return first_allele_set
+                lesser_alleles_set = greater_alleles_set
+        else:  # should only ever occur on first time through (ie. 1 and 2 allele sets)
+            return lesser_alleles_set
+    return lesser_alleles_set
 
 
-def repeat_threshold(ms_length):
+def repeat_threshold(ms_length: int):
+    # number of repeats necessary for microsatellite of given length
     if ms_length == 1:
         return 5
     elif ms_length == 2:
@@ -102,19 +113,17 @@ def repeat_threshold(ms_length):
         return 3
 
 
-def passes_filter(motif_length: int, repeat_size: float, supporting_reads: int):
-    return 5 <= supporting_reads and repeat_size < 40 and repeat_size < repeat_threshold(motif_length)
+def passes_filter(motif_length: int, repeat_size: float, supporting_reads: int, required_read_support: int):
+    return required_read_support <= supporting_reads and repeat_threshold(motif_length) < repeat_size < 40
 
 
-def calculate_alleles(histogram: Histogram, noise_table):
+def calculate_alleles(histogram: Histogram, noise_table, required_read_support=5):
     # supported repeat = repeat length 5<=
-    supported_repeat_lengths = np.array([repeat_size for repeat_size in histogram.repeat_lengths if
-                                         passes_filter(len(histogram.locus.pattern), repeat_size, histogram.repeat_lengths[repeat_size])])
+    supported_repeat_lengths = np.array([repeat_size for repeat_size in histogram.rounded_repeat_lengths if
+                                         passes_filter(len(histogram.locus.pattern), repeat_size, histogram.rounded_repeat_lengths[repeat_size], required_read_support)])
     if supported_repeat_lengths.size == 0:
         return AlleleSet(histogram, log_likelihood=-1, repeat_lengths=[], frequencies=[-1])
     elif supported_repeat_lengths.size == 1:
-        return AlleleSet(histogram=histogram,  log_likelihood=0, repeat_lengths=list(supported_repeat_lengths), frequencies=[1])
+        return AlleleSet(histogram=histogram,  log_likelihood=0, repeat_lengths=list(supported_repeat_lengths), frequencies=np.array([1]))
     else:
         return find_alleles(histogram, supported_repeat_lengths.size, noise_table)
-
-
