@@ -38,8 +38,9 @@ def get_chunks(cores: int, batch_start: int, batch_end: int) -> List[Chunk]:
     return chunks
 
 
-def write_results(output_prefix: str, results: List[str]):
+def write_results(output_prefix: str, results: List[str], header):
     with open(f"{output_prefix}.csv", 'w+') as output_file:
+        output_file.write(header)
         output_file.write("\n".join(results))
 
 
@@ -54,7 +55,8 @@ def run_single_allelic(BAM: str, loci: List[Locus], batch_start: int,
                                                  args=(BAM, loci, chunks[i].start, chunks[i].end, flanking, noise_table)))
         processes.close()
         processes.join()
-    write_results(output_prefix + "_all", combine_results(results))
+    header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tHISTOGRAM\tLog_Likelihood\tALLELES"
+    write_results(output_prefix + "_all", combine_results(results), header)
 
 
 def format_alleles(allelic_data: List[AlleleSet]):
@@ -88,7 +90,8 @@ def run_single_histogram(BAM: str, loci: List[Locus], batch_start: int,
             results.append(processes.apply_async(partial_single_histogram, args=(BAM, loci, chunks[i].start, chunks[i].end, flanking)))
         processes.close()
         processes.join()
-    write_results(output_prefix+"_hist", combine_results(results))
+    header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tHISTOGRAM"
+    write_results(output_prefix+"_hist", combine_results(results), header)
 
 
 def format_histograms(histograms: List[Histogram]):
