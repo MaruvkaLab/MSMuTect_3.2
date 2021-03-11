@@ -48,9 +48,9 @@ class ReadsFetcher:
                     or read.flag & FLAG_OPTIONS.DUPLICATE_READ or read.flag & FLAG_OPTIONS.SUPPLEMENTARY_ALG or not read.cigartuples)
 
     def get_next_mapped_read(self) -> AlignedSegment:
-        cur_read = next(self.reads_iterator)
+        cur_read = next(self.reads_iterator, None)
         while cur_read is not None:
-            if cur_read.cigartuples is None or cur_read.reference_end is None:  # unaligned
+            if cur_read.cigartuples is None or cur_read.reference_end is None or cur_read.reference_start is None:  #  unaligned
                 cur_read = next(self.reads_iterator, None)
             else:
                 return cur_read
@@ -80,7 +80,7 @@ class ReadsFetcher:
 
     def get_reads(self, chromosome, start: int, end: int) -> List[AlignedSegment]:
         chromosome = self.strip_chromosome(chromosome)
-        if chromosome != self.chromosome or abs(start - self.last_unmapped_read.reference_start) > 6000:
+        if chromosome != self.chromosome or self.last_unmapped_read is None or abs(start - self.last_unmapped_read.reference_start) > 6000:
             self.reset_iterator(chromosome, start)
         mapped_reads = self.backtrack_reads(start, end)
         cur_read = self.last_unmapped_read

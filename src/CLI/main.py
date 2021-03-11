@@ -18,13 +18,17 @@ def load_loci(loci_file: str) -> List[Locus]:
 def run_msmutect(args: argparse.Namespace):
     validate_input(args)  # will exit with error message if invalid combination of flags is given
     loci = load_loci(args.loci_file)
+    if not(args.batch_end):
+        batch_end = len(loci)
+    else:
+        batch_end = args.batch_end
     if args.single_file:
         if args.allele:
             run_single_allelic(args.single_file, loci, args.batch_start-1,
-                               args.batch_end, args.cores, args.flanking, args.output_prefix)
+                               batch_end, args.cores, args.flanking, args.output_prefix)
         elif args.histogram:
             run_single_histogram(args.single_file, loci, args.batch_start-1,
-                               args.batch_end, args.cores, args.flanking, args.output_prefix)
+                               batch_end, args.cores, args.flanking, args.output_prefix)
 
 
 if __name__ == "__main__":
