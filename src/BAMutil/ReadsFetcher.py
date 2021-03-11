@@ -16,7 +16,7 @@ class ReadsFetcher:
         self.chromosome = start_chromosome
         self.chromosome_prefix = self.get_prefix()
         self.last_extracted_reads = []
-        self.reads_iterator: IteratorRowRegion = self.BAM_handle.fetch(f"{self.chromosome_prefix}{self.chromosome}", start=10_000)
+        self.reads_iterator: IteratorRowRegion = self.BAM_handle.fetch(f"{self.chromosome_prefix}{self.chromosome}", start=10_000, multiple_iterators=True)
         self.last_unmapped_read: AlignedSegment = self.get_next_mapped_read()  #  will hold last non mapped read to previous query so will not be lost in the iterator
 
     def get_prefix(self) -> str:
@@ -24,7 +24,7 @@ class ReadsFetcher:
         prefixes = ['', 'chr', 'Chr']
         for prefix in prefixes:
             try:
-                _ = self.BAM_handle.fetch(f"{prefix}{self.chromosome}", start=10_000)
+                _ = self.BAM_handle.fetch(f"{prefix}{self.chromosome}", start=10_000, multiple_iterators=True)
                 return prefix
             except ValueError:  # different prefix
                 continue
@@ -33,7 +33,7 @@ class ReadsFetcher:
         # changes chromosome and gets new iterator using .bai index file
         self.chromosome = chromosome
         self.reads_iterator: IteratorRowRegion = self.BAM_handle.fetch(f"{self.chromosome_prefix}{chromosome}",
-                                                                       start=start)
+                                                                       start=start, multiple_iterators=True)
         self.last_unmapped_read = self.get_next_mapped_read()
         self.last_extracted_reads = []
 
