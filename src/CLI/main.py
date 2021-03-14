@@ -2,32 +2,25 @@ import argparse, csv
 from typing import List
 
 from src.FullAnalyses.SingleFileBatches import run_single_allelic, run_single_histogram
-from src.SingleFileAnalysis.Locus import Locus
 from InputHandler import create_parser, validate_input
 
 
-def load_loci(loci_file: str) -> List[Locus]:
-    loci = []
-    loci_iterator = csv.reader(open(loci_file), dialect="excel-tab")
-    for locus in loci_iterator:
-        loci.append(Locus(chromosome=locus[0], start=int(locus[3]), end=int(locus[4]), pattern=locus[12],
-                          repeats=float(locus[6])))
-    return loci
+def count_lines(file: str):
+    return sum(1 for _ in open(file, 'rb'))
 
 
 def run_msmutect(args: argparse.Namespace):
     validate_input(args)  # will exit with error message if invalid combination of flags is given
-    loci = load_loci(args.loci_file)
-    if not(args.batch_end):
-        batch_end = len(loci)
-    else:
+    if args.batch_end:
         batch_end = args.batch_end
+    else:  # slight performance hit ~ 1 sec / 2*10^6 loci
+        batch_end = count_lines(args.loci_file)
     if args.single_file:
-        if args.allele:
-            run_single_allelic(args.single_file, loci, args.batch_start-1,
+        if args.histogram:
+            run_single_histogram(args.single_file, args.loci_file, args.batch_start-1,
                                batch_end, args.cores, args.flanking, args.output_prefix)
-        elif args.histogram:
-            run_single_histogram(args.single_file, loci, args.batch_start-1,
+        else:
+            run_single_allelic(args.single_file, args.loci_file, args.batch_start-1,
                                batch_end, args.cores, args.flanking, args.output_prefix)
 
 

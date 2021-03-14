@@ -2,7 +2,7 @@ from typing import Dict, List
 from collections import defaultdict
 from pysam import AlignedSegment
 
-from src.BAMutil.CigarOptions import CIGAR_OPTIONS
+from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
 from src.SingleFileAnalysis.Locus import Locus
 
 

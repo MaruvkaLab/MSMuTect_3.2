@@ -7,3 +7,6 @@ class Locus:
         self.end = end
         self.pattern = pattern
         self.repeats = repeats
+
+    def __str__(self):
+        return f"{self.chromosome}\t{self.start}\t{self.end}\t{self.pattern}\t{self.repeats}"

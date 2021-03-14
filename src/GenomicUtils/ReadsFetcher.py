@@ -2,7 +2,7 @@ from typing import List
 from pysam import AlignmentFile, AlignedSegment
 from pysam.libcalignmentfile import IteratorRowRegion
 
-from src.BAMutil.AlignmentFlags import FLAG_OPTIONS
+from src.GenomicUtils.AlignmentFlags import FLAG_OPTIONS
 
 
 class ReadsFetcher:

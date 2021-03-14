@@ -20,5 +20,5 @@ class AlleleSet:
             ret.append(f"{self.repeat_lengths[i]}_{self.frequencies[i]}, ")
         if len(ret) != 0:
             ret[-1] = ret[-1][:-2]  # strip comma from last length
-        return "".join(ret)
+        return str(self.log_likelihood) + "\t" + "".join(ret)
 
