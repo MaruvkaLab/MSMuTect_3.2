@@ -64,8 +64,7 @@ class ReadsFetcher:
             cur_read = self.get_next_mapped_read()
             if cur_read is None:  # reads iterator is exhausted
                 break
-        self.last_unmapped_read = cur_read
-        return mapped_reads
+        return self.remember_return(mapped_reads, cur_read)
 
     @staticmethod
     def strip_chromosome(chromosome: str):
@@ -78,6 +77,12 @@ class ReadsFetcher:
             numeric_filter = filter(str.isdigit, chromosome)
             return "".join(numeric_filter)
 
+    def remember_return(self, mapped_reads: List[AlignedSegment], last_read: AlignedSegment) -> List[AlignedSegment]:
+        #  logs reads for use in for next reads fetch and returns them
+        self.last_unmapped_read = last_read
+        self.last_extracted_reads = mapped_reads
+        return mapped_reads
+
     def get_reads(self, chromosome, start: int, end: int) -> List[AlignedSegment]:
         chromosome = self.strip_chromosome(chromosome)
         if chromosome != self.chromosome or self.last_unmapped_read is None or abs(start - self.last_unmapped_read.reference_start) > 6000:
@@ -86,13 +91,12 @@ class ReadsFetcher:
         cur_read = self.last_unmapped_read
         while cur_read is not None:
             if start < cur_read.reference_start + 1:
-                self.last_unmapped_read = cur_read
-                return mapped_reads
+                return self.remember_return(mapped_reads, cur_read)
             elif cur_read.reference_start + 1 <= start and end <= cur_read.reference_end + 1:
                 return self.add_all_mapped(mapped_reads, cur_read, start, end)
             else:
                 cur_read = self.get_next_mapped_read()
-        return mapped_reads
+        return self.remember_return(mapped_reads, cur_read)
 
 
 

@@ -47,6 +47,8 @@ def validate_input(arguments: argparse.Namespace):
         exit_on("Batch Start must be equal to or greater than 1")
     elif arguments.cores <= 0:
         exit_on("Cores must be equal to or greater than 1")
+    elif arguments.flanking < 0:
+        exit_on("Flanking must be equal to or greater than 0")
     elif not os.path.exists(arguments.loci_file):
         exit_on("Loci file path does not exist")
 
