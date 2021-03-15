@@ -3,7 +3,7 @@ from collections import defaultdict
 from pysam import AlignedSegment
 
 from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
-from src.SingleFileAnalysis.Locus import Locus
+from src.IndelCalling.Locus import Locus
 
 
 class Histogram:
@@ -76,3 +76,5 @@ class Histogram:
             if not self.repeat_lengths[length] == other.repeat_lengths[length]:
                 return False
         return len(self.repeat_lengths.keys()) == len(self.repeat_lengths.keys())
+
+

@@ -1,7 +1,7 @@
 import csv
 from typing import List
 
-from src.SingleFileAnalysis.Locus import Locus
+from src.IndelCalling.Locus import Locus
 
 
 class LociManager:

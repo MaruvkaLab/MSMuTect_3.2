@@ -1,7 +1,7 @@
 from typing import List
 import numpy as np
 
-from src.SingleFileAnalysis.Histogram import Histogram
+from src.IndelCalling.Histogram import Histogram
 
 
 class AlleleSet:

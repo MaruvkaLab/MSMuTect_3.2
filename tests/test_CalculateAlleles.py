@@ -1,7 +1,7 @@
 import unittest, numpy as np
 
 from tests.test_utils.generate_histograms import get_histograms
-from src.SingleFileAnalysis.CalculateAlleles import *
+from src.IndelCalling.CallAlleles import *
 
 
 class TestCalcAlleles(unittest.TestCase):

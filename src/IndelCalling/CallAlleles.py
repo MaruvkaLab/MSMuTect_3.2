@@ -2,8 +2,8 @@ import scipy.stats as stats
 import numpy as np
 from icecream import ic
 
-from src.SingleFileAnalysis.AlleleSet import AlleleSet
-from src.SingleFileAnalysis.Histogram import Histogram
+from src.IndelCalling.AlleleSet import AlleleSet
+from src.IndelCalling.Histogram import Histogram
 
 ic.configureOutput(includeContext=True)
 

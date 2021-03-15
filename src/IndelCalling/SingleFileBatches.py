@@ -7,10 +7,10 @@ from multiprocessing import Pool
 
 from src.GenomicUtils.LocusFile import LociManager
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
-from src.SingleFileAnalysis.Histogram import Histogram
-from src.SingleFileAnalysis.AlleleSet import AlleleSet
-from src.SingleFileAnalysis.Locus import Locus
-from src.SingleFileAnalysis.CalculateAlleles import calculate_alleles
+from src.IndelCalling.Histogram import Histogram
+from src.IndelCalling.AlleleSet import AlleleSet
+from src.IndelCalling.Locus import Locus
+from src.IndelCalling.CallAlleles import calculate_alleles
 
 Chunk = namedtuple("Chunk", ["start", "end"])
 

@@ -1,7 +1,7 @@
 import unittest, math, time
 import numpy as np
 
-from src.MutationCalling.FisherTest import Fisher
+from src.IndelCalling.FisherTest import Fisher
 
 
 class TestHistogram(unittest.TestCase):

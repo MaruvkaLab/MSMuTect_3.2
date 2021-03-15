@@ -1,8 +1,8 @@
 from typing import List
 from collections import defaultdict
 
-from src.SingleFileAnalysis.Locus import Locus
-from src.SingleFileAnalysis.Histogram import Histogram
+from src.IndelCalling.Locus import Locus
+from src.IndelCalling.Histogram import Histogram
 
 
 def convert_dict_default(original_dict) -> defaultdict:

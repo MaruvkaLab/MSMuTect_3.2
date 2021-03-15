@@ -1,7 +1,7 @@
 import unittest
 
 from tests.test_utils import generate_histograms
-from src.SingleFileAnalysis.Histogram import Histogram
+from src.IndelCalling.Histogram import Histogram
 
 
 class TestHistogram(unittest.TestCase):
