@@ -98,9 +98,9 @@ def partial_mutations_pair(loci: List[Locus], normal: str, tumor: str, flanking:
     normal_alleles: List[AlleleSet] = get_allele_set(loci, normal, flanking, noise_table)
     fisher_calculator = Fisher()
     possibly_mutated: List[PairResults] = [] # also holds loci that have characteristics similar to mutated loci
+    tumor_reads_fetcher = ReadsFetcher(AlignmentFile(tumor), loci[0].chromosome)
     for current_normal_alleles in normal_alleles:
         if is_possible_mutation(current_normal_alleles):
-            tumor_reads_fetcher = ReadsFetcher(AlignmentFile(tumor), loci[0].chromosome)
             current_tumor_alleles = get_tumor_alleles(tumor_reads_fetcher, current_normal_alleles.histogram.locus, flanking, noise_table)
             possibly_mutated.append(PairResults(normal_alleles=current_normal_alleles, tumor_alleles=current_tumor_alleles,
                                                 decision=call_verified_locus(current_normal_alleles, current_tumor_alleles,

@@ -1,11 +1,15 @@
 import numpy as np
 from collections import namedtuple
 from scipy.stats import binom
-
+from icecream import ic
+import sys
 from src.IndelCalling.FisherTest import Fisher
 from src.IndelCalling.MutationCall import MutationCall
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Histogram import Histogram
+
+ic.configureOutput(includeContext=True)
+
 
 # used for generating sets for fisher test.
 # ex. (5.0_4, 6.0_5) and (3.0_2, 5.0_1) -> first_set = [0, 4, 5], second_set = [2, 0, 1]
@@ -21,9 +25,11 @@ def cdf_test(first_allele_reads: int, second_allele_reads: int, p_equal: float =
 
 
 def check_normal_alleles(normal_alleles: AlleleSet, p_equal=0.3) -> int:
-    if len(normal_alleles.repeat_lengths) < 2:
+    if len(normal_alleles.repeat_lengths) == 0:
+        return MutationCall.NO_NORMAL_ALLELES
+    elif len(normal_alleles.repeat_lengths) == 1:
         return MutationCall.MUTATION # not that it is neccesarily a mutation yet; however it may be
-    elif len(normal_alleles.repeat_lengths)==2:
+    elif len(normal_alleles.repeat_lengths) == 2:
         first_allele = normal_alleles.repeat_lengths[0]
         second_allele = normal_alleles.repeat_lengths[1]
         first_allele_reads = normal_alleles.histogram.repeat_lengths[first_allele]
@@ -33,11 +39,13 @@ def check_normal_alleles(normal_alleles: AlleleSet, p_equal=0.3) -> int:
         return MutationCall.TOO_MANY_ALLELES
 
 
-def log_likelihood(histogram: Histogram, alleles: AlleleSet, probability_table):
+def log_likelihood(histogram: Histogram, alleles: AlleleSet, probability_table) -> float:
     L_k_log = 0
     rounded_histogram = histogram.rounded_repeat_lengths
+    if alleles.repeat_lengths.size == 0:
+        return -1_000_000.0
     for length in rounded_histogram.keys():
-        L_k_log+=rounded_histogram[length]*np.log(sum(alleles.frequencies*probability_table[alleles.repeat_lengths, length]))
+            L_k_log+=rounded_histogram[length]*np.log(sum(alleles.frequencies*probability_table[alleles.repeat_lengths, length]) + 1e-6)
     return L_k_log
 
 

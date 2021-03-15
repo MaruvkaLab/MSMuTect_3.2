@@ -1,5 +1,9 @@
 import argparse, sys, os
 
+from icecream import ic
+
+ic.configureOutput(includeContext=True)
+
 
 def create_parser() -> argparse.ArgumentParser:
     # :return: creates parser with all command line arguments arguments
@@ -25,12 +29,14 @@ def create_parser() -> argparse.ArgumentParser:
 
 def exit_on(message: str, status: int = 1):
     # print message, and exit
-    print(message)
+    print("ERROR: " + message)
     sys.exit(status)
 
 
 def validate_bams(arguments: argparse.Namespace):
-    if not ((bool(arguments.tumor_file) and bool(arguments.normal_file)) != bool(arguments.single_file)): #  XOR
+    if (bool(arguments.tumor_file) or bool(arguments.normal_file)) == bool(arguments.single_file): #  XOR
+        exit_on("Provide Single file, or both Normal and Tumor file")
+    elif bool(arguments.tumor_file) != bool(arguments.normal_file):
         exit_on("Provide Single file, or both Normal and Tumor file")
     elif arguments.single_file:
         if not os.path.exists(arguments.single_file):
@@ -41,6 +47,7 @@ def validate_bams(arguments: argparse.Namespace):
 
 
 def validate_input(arguments: argparse.Namespace):
+    validate_bams(arguments)
     if not os.path.exists(arguments.loci_file):
         exit_on("Provided loci file does not exist")
     elif arguments.batch_start <= 0:
