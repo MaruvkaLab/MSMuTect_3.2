@@ -16,8 +16,8 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-H", "--histogram", help="Output a Histogram File", action='store_true')
     parser.add_argument("-A", "--allele", help="Output allele file", action='store_true')
     parser.add_argument("-m", "--mutation", help="Output mutation file", action='store_true')
-    parser.add_argument("-f", "--flanking", help="Length of flanking on both sides of an accepted read", default=10)
-    #parser.add_argument("-r", "--removed_bases", help="Number of bases to be removed at the end of the read.", default=0)
+    parser.add_argument("-F", "--flanking", help="Length of flanking on both sides of an accepted read", default=10)
+    parser.add_argument("-f", "--force", help="overwrite pre-existing files", action='store_true')
     parser.add_argument("-E", "--exclude", help="The probability that a read will be randomly excluded while processing loci", default=0)
 
     return parser
@@ -51,4 +51,11 @@ def validate_input(arguments: argparse.Namespace):
         exit_on("Flanking must be equal to or greater than 0")
     elif not os.path.exists(arguments.loci_file):
         exit_on("Loci file path does not exist")
+    elif arguments.single_file and not arguments.force:
+        if arguments.histogram:
+            if os.path.exists(arguments.output_prefix + ".hist.csv"):
+                exit_on("Files would be overwritten by this run. To force overwrite, use -f flag")
+        else:
+            if os.path.exists(arguments.output_prefix + ".all.csv"):
+                exit_on("Files would be overwritten by this run. To force overwrite, use -f flag")
 

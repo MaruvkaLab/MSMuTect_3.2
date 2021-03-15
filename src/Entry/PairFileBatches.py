@@ -7,7 +7,7 @@ from src.IndelCalling.Locus import Locus
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Histogram import Histogram
 from src.IndelCalling.CallAlleles import calculate_alleles
-from src.IndelCalling.CallMutations import call_mutations
+from src.IndelCalling.CallMutations import call_mutations, is_possible_mutation, call_verified_locus
 from src.IndelCalling.FisherTest import Fisher
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.GenomicUtils.LocusFile import LociManager
@@ -71,26 +71,41 @@ def partial_full_pair(loci: List[Locus], normal: str, tumor: str, flanking: int,
             for i in range(len(normal_alleles))]
 
 
-def run_mutations_pair(tumor: str, normal: str, loci_file: str, batch_start: int,
+def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
                        batch_end: int, cores: int, flanking: int, output_prefix: str):
-    pass
-
-
-def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
-                       batch_end: int, cores: int, flanking: int, output_prefix: str) -> None:
     loci_iterator = LociManager(loci_file, batch_start)
     noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
-    results = BatchUtil.run_batch(partial_single_allelic, [BAM, flanking, noise_table], loci_iterator,  (batch_end - batch_start)//10_000, 10_000, cores)
-    results += BatchUtil.run_batch(partial_single_allelic, [BAM, flanking, noise_table], loci_iterator,  1, (batch_end - batch_start)%10_000, cores)
-    header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tHISTOGRAM\tLog_Likelihood\tALLELES"
-    BatchUtil.write_results(output_prefix + ".all", results, header)
+    results: List[PairResults] = BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table],
+                                                     loci_iterator,
+                                                     (batch_end - batch_start) // 10_000, 10_000, cores)
+    results += BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table], loci_iterator, 1,
+                                   (batch_end - batch_start) % 10_000, cores)
+    mutation_header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tDECISION\tNORMAL_HISTOGRAM\tTUMOR_HISTOGRAM\tNORMAL_LOG_LIKELIHOOD\tTUMOR_LOG_LIKELIHOOD\tNORMAL_ALLELES\tTUMOR_ALLELES"
+    BatchUtil.write_results(output_prefix + ".partial.mut", format_full_mutations(results), mutation_header)
 
 
-def partial_single_allelic(loci: List[Locus], BAM: str, flanking: int, noise_table) -> List[str]:
-    BAM_handle = AlignmentFile(BAM, "rb")
-    allelic_results: List[AlleleSet] = []
+def get_tumor_alleles(reads_fetcher: ReadsFetcher, locus: Locus, flanking: int, noise_table) -> AlleleSet:
+    histogram = Histogram(locus)
+    reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
+    histogram.add_reads(reads)
+    current_alleles = calculate_alleles(histogram, noise_table)
+    return current_alleles
+
+
+def partial_mutations_pair(loci: List[Locus], normal: str, tumor: str, flanking: int, noise_table) -> List[PairResults]:
     if len(loci) == 0:
         return []
-    reads_fetcher = ReadsFetcher(BAM_handle, loci[0].chromosome)
+    # normal and tumor get their own reads fetchers since Pysam Alignment files has somewhat unpredictable behavior
+    normal_alleles: List[AlleleSet] = get_allele_set(loci, normal, flanking, noise_table)
+    fisher_calculator = Fisher()
+    possibly_mutated: List[PairResults] = [] # also holds loci that have characteristics similar to mutated loci
+    for current_normal_alleles in normal_alleles:
+        if is_possible_mutation(current_normal_alleles):
+            tumor_reads_fetcher = ReadsFetcher(AlignmentFile(tumor), loci[0].chromosome)
+            current_tumor_alleles = get_tumor_alleles(tumor_reads_fetcher, current_normal_alleles.histogram.locus, flanking, noise_table)
+            possibly_mutated.append(PairResults(normal_alleles=current_normal_alleles, tumor_alleles=current_tumor_alleles,
+                                                decision=call_verified_locus(current_normal_alleles, current_tumor_alleles,
+                                                                             noise_table, fisher_calculator)))
+    return possibly_mutated
 
-    return BatchUtil.format_alleles(allelic_results)
+
