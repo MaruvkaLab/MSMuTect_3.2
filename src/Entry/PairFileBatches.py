@@ -77,9 +77,9 @@ def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int
     noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
     results: List[PairResults] = BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table],
                                                      loci_iterator,
-                                                     (batch_end - batch_start) // 10_000, 10_000, cores)
+                                                     (batch_end - batch_start) // 100_000, 100_000, cores)
     results += BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table], loci_iterator, 1,
-                                   (batch_end - batch_start) % 10_000, cores)
+                                   (batch_end - batch_start) % 100_000, cores)
     mutation_header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tDECISION\tNORMAL_HISTOGRAM\tTUMOR_HISTOGRAM\tNORMAL_LOG_LIKELIHOOD\tTUMOR_LOG_LIKELIHOOD\tNORMAL_ALLELES\tTUMOR_ALLELES"
     BatchUtil.write_results(output_prefix + ".partial.mut", format_full_mutations(results), mutation_header)
 
@@ -95,7 +95,6 @@ def get_tumor_alleles(reads_fetcher: ReadsFetcher, locus: Locus, flanking: int, 
 def partial_mutations_pair(loci: List[Locus], normal: str, tumor: str, flanking: int, noise_table) -> List[PairResults]:
     if len(loci) == 0:
         return []
-    # normal and tumor get their own reads fetchers since Pysam Alignment files has somewhat unpredictable behavior
     normal_alleles: List[AlleleSet] = get_allele_set(loci, normal, flanking, noise_table)
     fisher_calculator = Fisher()
     possibly_mutated: List[PairResults] = [] # also holds loci that have characteristics similar to mutated loci

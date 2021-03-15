@@ -1,6 +1,7 @@
 import argparse
 
 from src.Entry.SingleFileBatches import run_single_allelic, run_single_histogram
+from src.Entry.PairFileBatches import run_full_pair, run_mutations_pair
 from InputHandler import create_parser, validate_input
 
 
@@ -12,7 +13,7 @@ def run_msmutect(args: argparse.Namespace):
     validate_input(args)  # will exit with error message if invalid combination of flags is given
     if args.batch_end:
         batch_end = args.batch_end
-    else:  # slight performance hit ~ 1 sec / 2*10^6 loci
+    else:  # slight performance hit: ~ 1 sec / 2*10^6 loci
         batch_end = count_lines(args.loci_file)
     if args.single_file:
         if args.histogram:
@@ -35,9 +36,11 @@ def run_msmutect(args: argparse.Namespace):
                                batch_end, args.cores, args.flanking, args.output_prefix + ".tumor")
         else:
             if args.histogram or args.allele:
-                run_full_pair()
+                run_full_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start, batch_end,
+                              args.cores, args.flanking, args.output_prefix)
             else:
-                run_mutations_pair()
+                run_mutations_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start, batch_end,
+                              args.cores, args.flanking, args.output_prefix)
 
 
 if __name__ == "__main__":

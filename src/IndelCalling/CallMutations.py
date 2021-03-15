@@ -68,7 +68,7 @@ def passes_AIC(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table,
 
 
 def passes_fisher(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, fisher_calculator: Fisher, fisher_threshold: float = 0.031) -> bool:
-    reads_sets = hist2vecs(normal_alleles.histogram, tumor_alleles.histogram)
+    reads_sets = hist2vecs(tumor_alleles.histogram, normal_alleles.histogram)  # order is important for Fisher test
     one_sided_fisher = fisher_calculator.test(reads_sets.first_set, reads_sets.second_set)
     return one_sided_fisher < fisher_threshold
 
