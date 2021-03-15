@@ -122,8 +122,8 @@ def calculate_alleles(histogram: Histogram, noise_table, required_read_support=5
     supported_repeat_lengths = np.array([repeat_size for repeat_size in histogram.rounded_repeat_lengths if
                                          passes_filter(len(histogram.locus.pattern), repeat_size, histogram.rounded_repeat_lengths[repeat_size], required_read_support)])
     if supported_repeat_lengths.size == 0:
-        return AlleleSet(histogram, log_likelihood=-1, repeat_lengths=[], frequencies=[-1])
+        return AlleleSet(histogram, log_likelihood=-1, repeat_lengths=np.array([]), frequencies=[-1])
     elif supported_repeat_lengths.size == 1:
-        return AlleleSet(histogram=histogram,  log_likelihood=0, repeat_lengths=list(supported_repeat_lengths), frequencies=np.array([1]))
+        return AlleleSet(histogram=histogram,  log_likelihood=0, repeat_lengths=np.array(list(supported_repeat_lengths)), frequencies=np.array([1]))
     else:
         return find_alleles(histogram, supported_repeat_lengths.size, noise_table)

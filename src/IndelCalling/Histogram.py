@@ -10,7 +10,7 @@ class Histogram:
     def __init__(self, locus: Locus):
         self.locus = locus
         self.repeat_lengths: Dict[float, int] = defaultdict(lambda: 0)  # key = repeat length; value = supporting reads
-        self.rounded_repeats = defaultdict(lambda: 0)
+        self._rounded_repeats = defaultdict(lambda: 0)
         self.built_rounded = False  # whether rounded repeat lengths has been built yet
 
     def calculate_repeat_length(self, read: AlignedSegment) -> float:
@@ -39,7 +39,7 @@ class Histogram:
 
     def build_rounded(self):
         for length in self.repeat_lengths.keys():
-            self.rounded_repeats[round(length)] += self.repeat_lengths[length]
+            self._rounded_repeats[round(length)] += self.repeat_lengths[length]
         self.built_rounded = True
 
     @property
@@ -47,7 +47,7 @@ class Histogram:
         # round all repeat lengths in histogram to nearest integer
         if not self.built_rounded:
             self.build_rounded()
-        return self.rounded_repeats
+        return self._rounded_repeats
 
     def filter_by_support(self, support_threshold, rounded=False) -> defaultdict:
         # returns default dictionary with all lengths with at least support_threshold reads supporting it

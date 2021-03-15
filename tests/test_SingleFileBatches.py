@@ -1,5 +1,5 @@
 import unittest
-from src.IndelCalling.SingleFileBatches import *
+from src.Entry.SingleFileBatches import *
 
 
 class TestSingleFileBatches(unittest.TestCase):

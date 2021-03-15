@@ -1,6 +1,6 @@
 import argparse
 
-from src.IndelCalling.SingleFileBatches import run_single_allelic, run_single_histogram
+from src.Entry.SingleFileBatches import run_single_allelic, run_single_histogram
 from InputHandler import create_parser, validate_input
 
 
