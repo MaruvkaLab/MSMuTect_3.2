@@ -27,8 +27,8 @@ def format_full_mutations(pairs: List[PairResults]) -> List[str]:
                     {str(pair.tumor_alleles.histogram)}\t \
                     {str(pair.normal_alleles.log_likelihood)}\t \
                     {str(pair.tumor_alleles.log_likelihood)}\t \
-                    {str(pair.normal_alleles.repeat_lengths)}\t \
-                    {str(pair.tumor_alleles.repeat_lengths)}" for pair in pairs]
+                    {str(pair.normal_alleles.get_str_alleles())}\t \
+                    {str(pair.tumor_alleles.get_str_alleles())}" for pair in pairs]
     return output_lines
 
 

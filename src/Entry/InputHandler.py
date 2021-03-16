@@ -1,8 +1,5 @@
 import argparse, sys, os
 
-from icecream import ic
-
-ic.configureOutput(includeContext=True)
 
 
 def create_parser() -> argparse.ArgumentParser:

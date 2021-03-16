@@ -27,6 +27,5 @@ class TestHistogram(unittest.TestCase):
         fisher = Fisher()
         self.assertAlmostEqual(fisher.test(np.array([1, 11], dtype=object), np.array([9, 3], dtype=object)), 0.001346076)
 
-
 if __name__ == '__main__':
     unittest.main()

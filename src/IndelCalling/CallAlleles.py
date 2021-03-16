@@ -1,11 +1,8 @@
 import scipy.stats as stats
 import numpy as np
-from icecream import ic
 
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Histogram import Histogram
-
-ic.configureOutput(includeContext=True)
 
 
 class AllelesMaximumLikelihood:

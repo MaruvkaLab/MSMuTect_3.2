@@ -41,11 +41,14 @@ class AlleleSet:
     def __eq__(self, other):
         return self.histogram == other.histogram and self.log_likelihood == other.log_likelihood and bool((self.frequencies == other.frequencies).all())
 
-    def __str__(self):
+    def get_str_alleles(self):
         ret = []
         for i in range(len(self.repeat_lengths)):
             ret.append(f"{self.repeat_lengths[i]}_{self.frequencies[i]}, ")
         if len(ret) != 0:
             ret[-1] = ret[-1][:-2]  # strip comma from last length
-        return str(self.log_likelihood) + "\t" + "".join(ret)
+        return "".join(ret)
+
+    def __str__(self):
+        return str(self.log_likelihood) + "\t" + self.get_str_alleles()
 
