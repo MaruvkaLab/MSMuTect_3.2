@@ -40,12 +40,12 @@ class ReadsFetcher:
     def backtrack_reads(self, start: int, end: int) -> List[AlignedSegment]:
         # get reads that map from the last query
         return [read for read in self.last_extracted_reads
-                if read.reference_start + 1 <= start and end <= read.reference_end]
+                if read.reference_start + 1 <= start and end <= read.reference_end + 1]
 
     @staticmethod
     def simple_filter(read: AlignedSegment) -> bool:
         return not (read.flag & FLAG_OPTIONS.SECONDARY_ALG or read.flag & FLAG_OPTIONS.POOR_QUALITY
-                    or read.flag & FLAG_OPTIONS.DUPLICATE_READ or read.flag & FLAG_OPTIONS.SUPPLEMENTARY_ALG or not read.cigartuples)
+                    or read.flag & FLAG_OPTIONS.DUPLICATE_READ or read.flag & FLAG_OPTIONS.SUPPLEMENTARY_ALG)
 
     def get_next_mapped_read(self) -> AlignedSegment:
         cur_read = next(self.reads_iterator, None)
