@@ -1,7 +1,6 @@
 import argparse, sys, os
 
 
-
 def create_parser() -> argparse.ArgumentParser:
     # :return: creates parser with all command line arguments arguments
     MSMuTect_intro = "MSMuTect\n Version 3.2\n Authors: Avraham Kahan, Yossi Maruvka and Gaia Frant"
@@ -70,6 +69,8 @@ def validate_input(arguments: argparse.Namespace):
     validate_output_files(arguments)
     if not os.path.exists(arguments.loci_file):
         exit_on("Provided loci file does not exist")
+    if arguments.mutation and arguments.single_file:
+        exit_on("Pair of files must be provided to call mutations")
     elif arguments.batch_start <= 0:
         exit_on("Batch Start must be equal to or greater than 1")
     elif arguments.cores <= 0:
@@ -78,6 +79,3 @@ def validate_input(arguments: argparse.Namespace):
         exit_on("Flanking must be equal to or greater than 0")
     elif not os.path.exists(arguments.loci_file):
         exit_on("Loci file path does not exist")
-
-
-

@@ -8,7 +8,7 @@ class Fisher:
         self.already_computed[0] = 1
         self.already_computed[1] = 1
 
-    def factorial(self, n: int):
+    def factorial(self, n: int) -> float:
         if self.already_computed[n] != -1:
             return self.already_computed[n]
         else:
@@ -16,7 +16,7 @@ class Fisher:
             self.already_computed[n] = answer
             return answer
 
-    def choose(self, n: int, k: int):
+    def choose(self, n: int, k: int) -> float:
         answer = self.factorial(n)/(self.factorial(k)*self.factorial(n-k))
         return answer
 

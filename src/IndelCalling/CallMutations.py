@@ -35,13 +35,14 @@ def check_normal_alleles(normal_alleles: AlleleSet, p_equal=0.3) -> int:
         return MutationCall.TOO_MANY_ALLELES
 
 
-def log_likelihood(histogram: Histogram, alleles: AlleleSet, probability_table) -> float:
+def log_likelihood(histogram: Histogram, alleles: AlleleSet, noise_table) -> float:
     L_k_log = 0
     rounded_histogram = histogram.rounded_repeat_lengths
     if alleles.repeat_lengths.size == 0:
         return -1_000_000.0
     for length in rounded_histogram.keys():
-            L_k_log+=rounded_histogram[length]*np.log(sum(alleles.frequencies*probability_table[alleles.repeat_lengths, length]) + 1e-6)
+        if length < 40:
+            L_k_log+=rounded_histogram[length]*np.log(sum(alleles.frequencies*noise_table[alleles.repeat_lengths, length]) + 1e-6)
     return L_k_log
 
 

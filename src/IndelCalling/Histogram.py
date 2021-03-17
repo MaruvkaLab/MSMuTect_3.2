@@ -49,7 +49,7 @@ class Histogram:
             self.build_rounded()
         return self._rounded_repeats
 
-    def filter_by_support(self, support_threshold, rounded=False) -> defaultdict:
+    def filter_by_support(self, support_threshold: int, rounded=False) -> defaultdict:
         # returns default dictionary with all lengths with at least support_threshold reads supporting it
         # rounded - return rounded dict()
         if rounded:
@@ -58,8 +58,19 @@ class Histogram:
             original = self.repeat_lengths
         filtered = defaultdict(lambda: 0)
         for length in original:
-            if original[length] >= support_threshold:
+            if support_threshold <= original[length]:
                 filtered[length] += original[length]
+        return filtered
+
+    def filter_by_repeats(self, repeat_minimum: int, repeat_maximum: int, rounded=False):
+        if rounded:
+            original = self.rounded_repeat_lengths
+        else:
+            original = self.repeat_lengths
+        filtered = defaultdict(lambda: 0)
+        for length in original:
+            if not (repeat_minimum <= length <= repeat_maximum):
+                filtered[length]+=original[length]
         return filtered
 
     def __str__(self):
