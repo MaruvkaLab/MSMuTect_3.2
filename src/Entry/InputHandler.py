@@ -20,7 +20,6 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-F", "--flanking", help="Length of flanking on both sides of an accepted read", default=10)
     parser.add_argument("-f", "--force", help="overwrite pre-existing files", action='store_true')
     parser.add_argument("-E", "--exclude", help="The probability that a read will be randomly excluded while processing loci", default=0)
-
     return parser
 
 
@@ -43,8 +42,32 @@ def validate_bams(arguments: argparse.Namespace):
             exit_on("Provided Normal or Tumor BAM path does not exist")
 
 
+def validate_output_files(arguments: argparse.Namespace):
+    overwrite_files_mssg = "Files would be overwritten by this run. To force overwrite, use -f flag"
+    if arguments.force:
+        return
+    elif arguments.single_file:
+        if arguments.histogram:
+            if os.path.exists(arguments.output_prefix + ".hist.csv"):
+                exit_on(overwrite_files_mssg)
+        else:
+            if os.path.exists(arguments.output_prefix + ".all.csv"):
+                exit_on(overwrite_files_mssg)
+    else:
+        if arguments.histogram or arguments.allele:
+            if os.path.exists(arguments.output_prefix + ".normal.all.csv") or os.path.exists(arguments.output_prefix + ".tumor.all.csv"):
+                exit_on(overwrite_files_mssg)
+            if arguments.mutations:
+                if os.path.exists(arguments.output_prefix + ".full.mut.csv"):
+                    exit_on(overwrite_files_mssg)
+        elif arguments.mutations:
+            if os.path.exists(arguments.output_prefix + ".partial.mut.csv"):
+                exit_on(overwrite_files_mssg)
+
+
 def validate_input(arguments: argparse.Namespace):
     validate_bams(arguments)
+    validate_output_files(arguments)
     if not os.path.exists(arguments.loci_file):
         exit_on("Provided loci file does not exist")
     elif arguments.batch_start <= 0:
@@ -55,11 +78,6 @@ def validate_input(arguments: argparse.Namespace):
         exit_on("Flanking must be equal to or greater than 0")
     elif not os.path.exists(arguments.loci_file):
         exit_on("Loci file path does not exist")
-    elif arguments.single_file and not arguments.force:
-        if arguments.histogram:
-            if os.path.exists(arguments.output_prefix + ".hist.csv"):
-                exit_on("Files would be overwritten by this run. To force overwrite, use -f flag")
-        else:
-            if os.path.exists(arguments.output_prefix + ".all.csv"):
-                exit_on("Files would be overwritten by this run. To force overwrite, use -f flag")
+
+
 
