@@ -60,7 +60,7 @@ def validate_output_files(arguments: argparse.Namespace):
             if arguments.mutations:
                 if os.path.exists(arguments.output_prefix + ".full.mut.csv"):
                     exit_on(overwrite_files_mssg)
-        elif arguments.mutations:
+        elif arguments.mutation:
             if os.path.exists(arguments.output_prefix + ".partial.mut.csv"):
                 exit_on(overwrite_files_mssg)
 
