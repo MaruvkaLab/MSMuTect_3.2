@@ -57,7 +57,7 @@ def validate_output_files(arguments: argparse.Namespace):
         if arguments.histogram or arguments.allele:
             if os.path.exists(arguments.output_prefix + ".normal.all.csv") or os.path.exists(arguments.output_prefix + ".tumor.all.csv"):
                 exit_on(overwrite_files_mssg)
-            if arguments.mutations:
+            if arguments.mutation:
                 if os.path.exists(arguments.output_prefix + ".full.mut.csv"):
                     exit_on(overwrite_files_mssg)
         elif arguments.mutation:
