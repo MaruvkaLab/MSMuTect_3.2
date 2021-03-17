@@ -23,6 +23,7 @@ class Fisher:
     def test(self, first_set: np.array, second_set: np.array):
         p_value = 1
         for i in range(first_set.size):
-            p_value *= self.choose(first_set[i] + second_set[i], first_set[i])
+            # casted to int, so if number is too large for numpy int 64 bits
+            p_value *= self.choose(int(first_set[i] + second_set[i]), int(first_set[i]))
         p_value /= self.choose(np.sum(first_set)+np.sum(second_set), np.sum(first_set))
         return p_value
