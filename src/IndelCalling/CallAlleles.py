@@ -82,10 +82,10 @@ class AllelesMaximumLikelihood:
                          repeat_lengths = self.best_alleles, frequencies=self.best_frequencies)
 
 
-def find_alleles(histogram: Histogram, supported_repeat_lengths: int, noise_table) -> AlleleSet:
-    lesser_alleles_set = AllelesMaximumLikelihood(histogram, 1, noise_table).get_alleles()
+def find_alleles(histogram: Histogram, supported_repeat_lengths: np.array, noise_table) -> AlleleSet:
+    lesser_alleles_set = AllelesMaximumLikelihood(histogram, supported_repeat_lengths, noise_table).get_alleles()
     for i in range(2, 5):
-        greater_alleles_set = AllelesMaximumLikelihood(histogram, i, noise_table).get_alleles()
+        greater_alleles_set = AllelesMaximumLikelihood(histogram, supported_repeat_lengths, noise_table).get_alleles()
         likelihood_increase = 2 * (greater_alleles_set.log_likelihood - lesser_alleles_set.log_likelihood)
         if likelihood_increase > 0:
             p_value_i_alleles = stats.chi2.pdf(likelihood_increase, 2)
@@ -123,4 +123,4 @@ def calculate_alleles(histogram: Histogram, noise_table, required_read_support=5
     elif supported_repeat_lengths.size == 1:
         return AlleleSet(histogram=histogram,  log_likelihood=0, repeat_lengths=np.array(list(supported_repeat_lengths)), frequencies=np.array([1]))
     else:
-        return find_alleles(histogram, supported_repeat_lengths.size, noise_table)
+        return find_alleles(histogram, supported_repeat_lengths, noise_table)
