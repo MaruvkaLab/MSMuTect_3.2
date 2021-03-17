@@ -1,14 +1,10 @@
 import numpy as np
 from collections import namedtuple
 from scipy.stats import binom
-from icecream import ic
-import sys
 from src.IndelCalling.FisherTest import Fisher
 from src.IndelCalling.MutationCall import MutationCall
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Histogram import Histogram
-
-ic.configureOutput(includeContext=True)
 
 
 # used for generating sets for fisher test.
