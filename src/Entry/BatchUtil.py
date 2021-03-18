@@ -9,11 +9,6 @@ from src.IndelCalling.AlleleSet import AlleleSet
 Chunk = namedtuple("Chunk", ["start", "end"])
 
 
-from icecream import ic
-
-ic.configureOutput(includeContext=True)
-
-
 def get_noise_table_path() -> str:
     script_dir = os.path.dirname(os.path.realpath(__file__))
     noise_table_path = script_dir + os.path.sep + '..' + os.path.sep + '..' + os.path.sep + 'data/noise_table.csv'
