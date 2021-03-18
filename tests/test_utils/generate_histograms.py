@@ -37,9 +37,13 @@ def get_histograms() -> List[Histogram]:
     histogram_6 = Histogram(locus_6)
     histogram_6.repeat_lengths = convert_dict_default({14.0:30, 13.0:32, 15.0:2})
     ret.append(histogram_6)
+    # __________________________ Pair of loci [6, 7]
     locus_7 = Locus("1", 232435, 232445, "A", 11.0)
     histogram_7 = Histogram(locus_7)
     histogram_7.repeat_lengths = convert_dict_default({11.0: 77, 10.0: 24, 12.0: 5, 9.0: 2})
     ret.append(histogram_7)
+    histogram_8 = Histogram(locus_7)
+    histogram_8.repeat_lengths = convert_dict_default({11.0: 22, 10.0: 55, 12.0: 5, 8.0: 2})
+    ret.append(histogram_8)
     return ret
 

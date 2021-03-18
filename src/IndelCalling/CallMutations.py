@@ -55,6 +55,7 @@ def hist2vecs(histogram_a: Histogram, histogram_b: Histogram) -> ComparedSets:
     for length in combined_lengths:
         first_set[i] = histogram_a.rounded_repeat_lengths[length]
         second_set[i] = histogram_b.rounded_repeat_lengths[length]
+        i+=1
     return ComparedSets(first_set=first_set, second_set=second_set)
 
 
