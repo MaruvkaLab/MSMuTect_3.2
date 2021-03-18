@@ -9,6 +9,11 @@ from src.IndelCalling.AlleleSet import AlleleSet
 Chunk = namedtuple("Chunk", ["start", "end"])
 
 
+from icecream import ic
+
+ic.configureOutput(includeContext=True)
+
+
 def get_noise_table_path() -> str:
     script_dir = os.path.dirname(os.path.realpath(__file__))
     noise_table_path = script_dir + os.path.sep + '..' + os.path.sep + '..' + os.path.sep + 'data/noise_table.csv'
@@ -35,11 +40,21 @@ def get_batch_sizes(total_batch_size: int, cores: int) -> List[int]:
     return batch_sizes
 
 
-def extract_results(results) -> list:
+def extract_results(results) -> List[str]:
     # extracts results from multiproccessing
     combined = []
     for result in results:
         combined += result.get()
+    return combined
+
+
+def extract_NX3_results(results) -> List[List[str]]:
+    combined: List[List[str]] = [[], [], []]
+    for result in results:
+        current_row = result.get()
+        combined[0]+=current_row[0]
+        combined[1]+=current_row[1]
+        combined[2]+=current_row[2]
     return combined
 
 
@@ -50,23 +65,25 @@ def write_results(output_prefix: str, results: List[str], header):
         output_file.write("\n".join(results))
 
 
-def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int) -> list:
+def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int,
+              extract_function=extract_results) -> list:
     """
     :param batch_function: function to run on given loci. First argument must be list of loci
     :param args: other args to feed function
     :return: results from given function
     """
     results = []
-    for i in range((total_batch_size//1_000_000)+1):
-        batch_sizes = get_batch_sizes(min(1_000_000, total_batch_size - i*1_000_000), cores)  # min is for last run through loop
-        with Pool(processes=cores) as processes:
+    per = 10_000
+    for i in range((total_batch_size//per)+1):
+        batch_sizes = get_batch_sizes(min(per, total_batch_size - i*per), cores)  # min is for last run through loop
+        with Pool(processes=cores) as threads:
             for j in range(cores):
                 current_loci = loci_iterator.get_batch(batch_sizes[j])
-                results.append(processes.apply_async(batch_function,
+                results.append(threads.apply_async(batch_function,
                                     args=([current_loci]+args)))
-            processes.close()
-            processes.join()
-    return extract_results(results)
+            threads.close()
+            threads.join()
+    return extract_function(results)
 
 
 def format_alleles(allelic_data: List[AlleleSet]) -> List[str]:

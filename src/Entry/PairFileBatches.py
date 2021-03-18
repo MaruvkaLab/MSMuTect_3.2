@@ -28,7 +28,7 @@ def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
     loci_iterator = LociManager(loci_file, batch_start)
     noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
     results: List[List[str]] = BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table], loci_iterator,
-                                  (batch_end - batch_start), cores)
+                                  (batch_end - batch_start), cores, BatchUtil.extract_NX3_results)
     allelic_header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tHISTOGRAM\tLOG_LIKELIHOOD\tALLELES\tMUTATION_CALL"
     BatchUtil.write_results(output_prefix + ".normal.all", results[0], allelic_header)
     BatchUtil.write_results(output_prefix + ".tumor.all", results[1], allelic_header)
