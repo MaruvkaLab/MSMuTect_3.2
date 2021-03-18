@@ -68,7 +68,7 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
     :return: results from given function
     """
     results = []
-    per = 10_000
+    per = 100_000
     for i in range((total_batch_size//per)+1):
         batch_sizes = get_batch_sizes(min(per, total_batch_size - i*per), cores)  # min is for last run through loop
         with Pool(processes=cores) as threads:
