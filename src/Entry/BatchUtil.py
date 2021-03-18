@@ -26,6 +26,15 @@ def get_chunks(cores: int, batch_start: int, batch_end: int) -> List[Chunk]:
     return chunks
 
 
+def get_batch_sizes(total_batch_size: int, cores: int) -> List[int]:
+    batch_sizes = []
+    normal_batch = total_batch_size // cores
+    for i in range(cores - 1):
+        batch_sizes.append(normal_batch)
+    batch_sizes.append(total_batch_size - (len(batch_sizes) * normal_batch))
+    return batch_sizes
+
+
 def extract_results(results) -> list:
     # extracts results from multiproccessing
     combined = []
@@ -41,21 +50,20 @@ def write_results(output_prefix: str, results: List[str], header):
         output_file.write("\n".join(results))
 
 
-def run_batch(batch_function, args: list, loci_iterator: LociManager, cycles: int, batch_size: int, cores: int) -> list:
+def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int) -> list:
     """
     :param batch_function: function to run on given loci. First argument must be list of loci
     :param args: other args to feed function
-    :return: results from those loci
+    :return: results from given function
     """
-    # runs batches for all loci in chunks of 10,000 (doesn't take care of last:  (total_loci mod 10k)   loci
-    chunks = get_chunks(cores, 0, batch_size)
     results = []
-    for i in range(cycles):
-        current_loci = loci_iterator.get_batch(batch_size)
+    for i in range((total_batch_size//1_000_000)+1):
+        batch_sizes = get_batch_sizes(min(1_000_000, total_batch_size - i*1_000_000), cores)  # min is for last run through loop
         with Pool(processes=cores) as processes:
             for j in range(cores):
+                current_loci = loci_iterator.get_batch(batch_sizes[j])
                 results.append(processes.apply_async(batch_function,
-                                    args=([current_loci[chunks[j].start:chunks[j].end]]+args)))
+                                    args=([current_loci]+args)))
             processes.close()
             processes.join()
     return extract_results(results)

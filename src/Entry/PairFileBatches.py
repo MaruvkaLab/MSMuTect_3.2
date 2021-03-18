@@ -28,9 +28,7 @@ def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
     loci_iterator = LociManager(loci_file, batch_start)
     noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
     results: List[List[str]] = BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table], loci_iterator,
-                                  (batch_end - batch_start) // 10_000, 10_000, cores)
-    results += BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table], loci_iterator, 1,
-                                   (batch_end - batch_start) % 10_000, cores)
+                                  (batch_end - batch_start), cores)
     allelic_header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tHISTOGRAM\tLOG_LIKELIHOOD\tALLELES\tMUTATION_CALL"
     BatchUtil.write_results(output_prefix + ".normal.all", results[0], allelic_header)
     BatchUtil.write_results(output_prefix + ".tumor.all", results[1], allelic_header)
@@ -53,7 +51,7 @@ def get_allele_set(loci: List[Locus], BAM: str, flanking: int, noise_table) -> L
 
 def partial_full_pair(loci: List[Locus], normal: str, tumor: str, flanking: int, noise_table) -> List[List[str]]:
     if len(loci) == 0:
-        return []
+        return [[], [], []]
     normal_alleles: List[AlleleSet] = get_allele_set(loci, normal, flanking, noise_table)
     tumor_alleles: List[AlleleSet] = get_allele_set(loci, tumor, flanking, noise_table)
     fisher_calculator = Fisher()
@@ -67,9 +65,7 @@ def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int
     noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
     results: List[str] = BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table],
                                                      loci_iterator,
-                                                     (batch_end - batch_start) // 100_000, 100_000, cores)
-    results += BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table], loci_iterator, 1,
-                                   (batch_end - batch_start) % 100_000, cores)
+                                                     (batch_end - batch_start), cores)
     mutation_header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tDECISION\tNORMAL_HISTOGRAM\tTUMOR_HISTOGRAM\tNORMAL_LOG_LIKELIHOOD\tTUMOR_LOG_LIKELIHOOD\tNORMAL_ALLELES\tTUMOR_ALLELES"
     BatchUtil.write_results(output_prefix + ".partial.mut", results, mutation_header)
 
