@@ -6,7 +6,7 @@ from src.IndelCalling.Histogram import Histogram
 
 
 class AllelesMaximumLikelihood:
-    def __init__(self, histogram: Histogram, supported_lengths: np.array, noise_table: np.matrix, required_read_support: int = 5):
+    def __init__(self, histogram: Histogram, supported_lengths: np.array, noise_table: np.matrix, required_read_support: int = 6):
         # gets  all lengths with at least 5 read support
         self.histogram = histogram
         self.repeat_lengths = np.array(list(histogram.rounded_repeat_lengths.keys()))  # convert to arrays for performance reasons

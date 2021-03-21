@@ -4,7 +4,6 @@ from collections import namedtuple
 from multiprocessing import Pool
 
 from src.GenomicUtils.LocusFile import LociManager
-from src.IndelCalling.AlleleSet import AlleleSet
 
 Chunk = namedtuple("Chunk", ["start", "end"])
 
@@ -81,8 +80,4 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
     return extract_function(results)
 
 
-def format_alleles(allelic_data: List[AlleleSet]) -> List[str]:
-    output_lines = [
-        f"{datum.histogram.locus.chromosome}\t{datum.histogram.locus.start}\t{datum.histogram.locus.end}\t{datum.histogram.locus.pattern}\t{datum.histogram.locus.repeats}\t{str(datum.histogram)}\t{str(datum)}"
-        for datum in allelic_data]
-    return output_lines
+

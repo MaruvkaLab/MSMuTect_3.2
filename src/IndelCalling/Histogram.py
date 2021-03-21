@@ -2,6 +2,7 @@ from typing import Dict, List
 from collections import defaultdict
 from pysam import AlignedSegment
 
+from src.Entry.FormatUtil import format_list
 from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
 from src.IndelCalling.Locus import Locus
 
@@ -49,38 +50,16 @@ class Histogram:
             self.build_rounded()
         return self._rounded_repeats
 
-    def filter_by_support(self, support_threshold: int, rounded=False) -> defaultdict:
-        # returns default dictionary with all lengths with at least support_threshold reads supporting it
-        # rounded - return rounded dict()
-        if rounded:
-            original = self.rounded_repeat_lengths
-        else:
-            original = self.repeat_lengths
-        filtered = defaultdict(lambda: 0)
-        for length in original:
-            if support_threshold <= original[length]:
-                filtered[length] += original[length]
-        return filtered
-
-    def filter_by_repeats(self, repeat_minimum: int, repeat_maximum: int, rounded=False):
-        if rounded:
-            original = self.rounded_repeat_lengths
-        else:
-            original = self.repeat_lengths
-        filtered = defaultdict(lambda: 0)
-        for length in original:
-            if not (repeat_minimum <= length <= repeat_maximum):
-                filtered[length]+=original[length]
-        return filtered
+    @staticmethod
+    def header():
+        return "MOTIF_REPEATS_1\tMOTIF_REPEATS_2\tMOTIF_REPEATS_3\tMOTIF_REPEATS_4\tMOTIF_REPEATS_5\tMOTIF_REPEATS_6" \
+               "SUPPORTING_READS_2\tSUPPORTING_READS_2\tSUPPORTING_READS_3\tSUPPORTING_READS_4\tSUPPORTING_READS_5\tSUPPORTING_READS_6\t"
 
     def __str__(self):
-        ret = []
-        sorted_lengths = sorted(self.repeat_lengths.keys())
-        for length in sorted_lengths:
-            ret.append(f"{length}_{self.repeat_lengths[length]}, ")
-        if len(sorted_lengths) != 0:
-            ret[-1] = ret[-1][:-2]  # strip comma from last length
-        return "".join(ret)
+        sorted_repeats = sorted(self.repeat_lengths, key=self.repeat_lengths.get, reverse=True)
+        ordered_repeats =  [str(repeat) for repeat in sorted_repeats]
+        ordered_support = [str(self.repeat_lengths[repeat]) for repeat in sorted_repeats]
+        return format_list(ordered_repeats, 6) + "\t" + format_list(ordered_support, 6)
 
     def __eq__(self, other):
         for length in self.repeat_lengths:

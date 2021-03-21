@@ -3,12 +3,14 @@ from typing import List
 from collections import namedtuple
 from pysam import AlignmentFile
 
+import src.Entry.FormatUtil
 from src.IndelCalling.Locus import Locus
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Histogram import Histogram
 from src.IndelCalling.CallAlleles import calculate_alleles
 from src.IndelCalling.CallMutations import call_mutations, is_possible_mutation, call_verified_locus
 from src.IndelCalling.FisherTest import Fisher
+from src.IndelCalling.MutationCall import MutationCall
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.GenomicUtils.LocusFile import LociManager
 from . import BatchUtil
@@ -16,9 +18,9 @@ from . import BatchUtil
 PairResults = namedtuple("PairResults", ['normal_alleles', 'tumor_alleles', 'decision'])
 
 
-def format_full_mutations(normal_alleles: List[AlleleSet], tumor_alleles: List[AlleleSet], decisions: List[int]) -> List[List[str]]:
-    normal_alleles_output = BatchUtil.format_alleles(normal_alleles)
-    tumor_alleles_output = BatchUtil.format_alleles(tumor_alleles)
+def format_full_mutations(normal_alleles: List[AlleleSet], tumor_alleles: List[AlleleSet], decisions: List[MutationCall]) -> List[List[str]]:
+    normal_alleles_output = src.Entry.FormatUtil.format_alleles(normal_alleles)
+    tumor_alleles_output = src.Entry.FormatUtil.format_alleles(tumor_alleles)
     mut_output_lines = format_mutated(normal_alleles, tumor_alleles, decisions)
     return [normal_alleles_output, tumor_alleles_output, mut_output_lines]
 
@@ -29,10 +31,10 @@ def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
     noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
     results: List[List[str]] = BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table], loci_iterator,
                                   (batch_end - batch_start), cores, BatchUtil.extract_NX3_results)
-    allelic_header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tHISTOGRAM\tLOG_LIKELIHOOD\tALLELES\tMUTATION_CALL"
+    allelic_header = f"{Locus.header()}\t{Histogram.header()}\t{AlleleSet.header()}\tMUTATION_CALL"
     BatchUtil.write_results(output_prefix + ".normal.all", results[0], allelic_header)
     BatchUtil.write_results(output_prefix + ".tumor.all", results[1], allelic_header)
-    mutation_header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tDECISION\tNORMAL_HISTOGRAM\tTUMOR_HISTOGRAM\tNORMAL_LOG_LIKELIHOOD\tTUMOR_LOG_LIKELIHOOD\tNORMAL_ALLELES\tTUMOR_ALLELES"
+    mutation_header = f"{Locus.header()}\t{Histogram.header()}\t{AlleleSet.header()}\t{Histogram.header()}\t{AlleleSet.header()}\t{MutationCall.header()}"
     BatchUtil.write_results(output_prefix + ".full.mut", results[2], mutation_header)
 
 
@@ -66,7 +68,7 @@ def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int
     results: List[str] = BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table],
                                                      loci_iterator,
                                                      (batch_end - batch_start), cores)
-    mutation_header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tDECISION\tNORMAL_HISTOGRAM\tTUMOR_HISTOGRAM\tNORMAL_LOG_LIKELIHOOD\tTUMOR_LOG_LIKELIHOOD\tNORMAL_ALLELES\tTUMOR_ALLELES"
+    mutation_header = f"{Locus.header()}\t{Histogram.header()}\t{AlleleSet.header()}\t{Histogram.header()}\t{AlleleSet.header()}\t{MutationCall.header()}"
     BatchUtil.write_results(output_prefix + ".partial.mut", results, mutation_header)
 
 
@@ -84,7 +86,7 @@ def partial_mutations_pair(loci: List[Locus], normal: str, tumor: str, flanking:
     normal_alleles: List[AlleleSet] = get_allele_set(loci, normal, flanking, noise_table)
     fisher_calculator = Fisher()
     # for the sake of efficiency, normal_alleles, tumor_alleles, decisions
-    possibly_mutated: List[List[AlleleSet], List[AlleleSet], List[int]] = [[], [], []]
+    possibly_mutated: List[List[AlleleSet], List[AlleleSet], List[MutationCall]] = [[], [], []]
     tumor_reads_fetcher = ReadsFetcher(AlignmentFile(tumor), loci[0].chromosome)
     for current_normal_alleles in normal_alleles:
         if is_possible_mutation(current_normal_alleles):
@@ -95,17 +97,11 @@ def partial_mutations_pair(loci: List[Locus], normal: str, tumor: str, flanking:
     return format_mutated(possibly_mutated[0], possibly_mutated[1], possibly_mutated[2])
 
 
-def format_mutated(normal_alleles: List[AlleleSet], tumor_alleles: List[AlleleSet], decisions: List[int]):
-    mut_output_lines = [f"{normal_alleles[i].histogram.locus.chromosome}\t \
-                    {normal_alleles[i].histogram.locus.start}\t \
-                    {normal_alleles[i].histogram.locus.end}\t \
-                    {normal_alleles[i].histogram.locus.pattern}\t \
-                    {normal_alleles[i].histogram.locus.repeats}\t \
-                    {str(decisions[i])}\t \
-                    {str(normal_alleles[i].histogram)}\t \
+def format_mutated(normal_alleles: List[AlleleSet], tumor_alleles: List[AlleleSet], decisions: List[MutationCall]):
+    mut_output_lines = [f"{str(normal_alleles[i].histogram.locus)}\t \
                     {str(tumor_alleles[i].histogram)}\t \
-                    {str(normal_alleles[i].log_likelihood)}\t \
-                    {str(tumor_alleles[i].log_likelihood)}\t \
-                    {str(normal_alleles[i].get_str_alleles())}\t \
-                    {str(tumor_alleles[i].get_str_alleles())}" for i in range(len(normal_alleles))]
+                    {str(tumor_alleles[i])}\t \
+                    {str(normal_alleles[i].histogram)}\t \
+                    {str(normal_alleles[i])}\t \
+                    {str(decisions[i])}\t" for i in range(len(normal_alleles))]
     return mut_output_lines

@@ -10,3 +10,7 @@ class Locus:
 
     def __str__(self):
         return f"{self.chromosome}\t{self.start}\t{self.end}\t{self.pattern}\t{self.repeats}"
+
+    @staticmethod
+    def header():
+        return "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS"

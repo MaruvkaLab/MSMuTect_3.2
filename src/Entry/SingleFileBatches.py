@@ -2,6 +2,7 @@ import numpy as np
 from typing import List
 from pysam import AlignmentFile
 
+import src.Entry.FormatUtil
 from src.GenomicUtils.LocusFile import LociManager
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.IndelCalling.Histogram import Histogram
@@ -33,7 +34,7 @@ def partial_single_allelic(loci: List[Locus], BAM: str, flanking: int, noise_tab
         current_histogram.add_reads(reads)
         current_alleles = calculate_alleles(current_histogram, noise_table)
         allelic_results.append(current_alleles)
-    return BatchUtil.format_alleles(allelic_results)
+    return src.Entry.FormatUtil.format_alleles(allelic_results)
 
 
 def run_single_histogram(BAM: str, loci_file: str, batch_start: int,
