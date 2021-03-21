@@ -103,5 +103,5 @@ def format_mutated(normal_alleles: List[AlleleSet], tumor_alleles: List[AlleleSe
                     {str(tumor_alleles[i])}\t \
                     {str(normal_alleles[i].histogram)}\t \
                     {str(normal_alleles[i])}\t \
-                    {str(decisions[i])}\t" for i in range(len(normal_alleles))]
+                    {str(decisions[i])}" for i in range(len(normal_alleles))]
     return mut_output_lines

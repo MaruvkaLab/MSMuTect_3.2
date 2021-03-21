@@ -17,7 +17,7 @@ class AlleleSet:
 
     @staticmethod
     def header():
-        return "LOG_LIKELIHOOD\tALLELE_1\tALLELES_2\tALLELES_3\tALLELES_4\tALLELES_5\tFRACTION_1\tFRACTION_2\tFRACTION_3\tFRACTION_4\tFRACTION_5\t"
+        return "LOG_LIKELIHOOD\tALLELE_1\tALLELES_2\tALLELES_3\tALLELES_4\tALLELES_5\tFRACTION_1\tFRACTION_2\tFRACTION_3\tFRACTION_4\tFRACTION_5"
 
     @staticmethod
     def format_array(array: np.array, num_components=5):
@@ -30,6 +30,8 @@ class AlleleSet:
         return "\t".join(components)
 
     def sorted_alleles(self) -> Tuple[np.array, np.array]:
+        if self.repeat_lengths.size == 0:  # alleles are empty
+            return np.array([]), np.array([])
         order = (-self.frequencies).argsort() # sorts in descending order
         return self.repeat_lengths[order], self.frequencies[order]
 

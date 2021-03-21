@@ -18,7 +18,7 @@ def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
     noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
     results = BatchUtil.run_batch(partial_single_allelic, [BAM, flanking, noise_table],
                                                            loci_iterator,  (batch_end - batch_start), cores)
-    header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tHISTOGRAM\tLOG_LIKELIHOOD\tALLELES"
+    header = f"{Locus.header()}\t{Histogram.header()}\t{AlleleSet.header()}"
     BatchUtil.write_results(output_prefix + ".all", results, header)
 
 
@@ -42,7 +42,7 @@ def run_single_histogram(BAM: str, loci_file: str, batch_start: int,
     loci_iterator = LociManager(loci_file, batch_start)
     results = BatchUtil.run_batch(partial_single_histogram, [BAM, flanking], loci_iterator,
                                   (batch_end - batch_start), cores)
-    header = "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS\tHISTOGRAM\tLog_Likelihood\tALLELES"
+    header = f"{Locus.header()}\t{Histogram.header()}"
     BatchUtil.write_results(output_prefix + ".hist", results, header)
 
 

@@ -13,4 +13,4 @@ class Locus:
 
     @staticmethod
     def header():
-        return "CHROMOSOME\tSTART\tEND\tPATTERN\tREPEATS"
+        return "CHROMOSOME\tSTART\tEND\tPATTERN\tREFERENCE_REPEATS"

@@ -16,12 +16,12 @@ def run_msmutect(args: argparse.Namespace):
     else:  # slight performance hit: ~ 1 sec / 2*10^6 loci
         batch_end = count_lines(args.loci_file)
     if args.single_file:
-        if args.histogram:
-            run_single_histogram(args.single_file, args.loci_file, args.batch_start - 1,
-                                 batch_end, args.cores, args.flanking, args.output_prefix)
-        else:
+        if args.allele or not args.histogram:
             run_single_allelic(args.single_file, args.loci_file, args.batch_start - 1,
                                batch_end, args.cores, args.flanking, args.output_prefix)
+        else:
+            run_single_histogram(args.single_file, args.loci_file, args.batch_start - 1,
+                                 batch_end, args.cores, args.flanking, args.output_prefix)
 
     else:
         if args.histogram and not args.mutation:
