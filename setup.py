@@ -2,11 +2,11 @@ import pathlib
 from setuptools import setup, find_packages
 
 setup(
-    name='src',
+    name='msmutect',
     version='0.5',
-    packages=find_packages(include=['src', 'src.*']),
+    packages=['src', 'src.Entry', 'src.GenomicUtils', 'src.IndelCalling'],
     entry_points={
-        'console_scripts': ['src=src.Entry.main:main'],
+        'console_scripts': ['msmutect=src.Entry.main:main'],
     },
     url='https://github.com/MaruvkaLab/MSMuTect_0.5',
     license='MIT',
