@@ -1,12 +1,34 @@
-from setuptools import setup
+import pathlib
+from setuptools import setup, find_packages
 
 setup(
-    name='MSMuTect_3.2',
-    version='3.2',
-    packages=['src', 'src.Entry', 'src.GenomicUtils', 'src.IndelCalling', 'tests', 'tests.test_utils'],
-    url='https://github.com/MaruvkaLab/MSMuTect_3.2',
+    name='src',
+    version='0.5',
+    packages=find_packages(include=['src', 'src.*']),
+    entry_points={
+        'console_scripts': ['src=src.Entry.main:main'],
+    },
+    url='https://github.com/MaruvkaLab/MSMuTect_0.5',
     license='MIT',
-    author='Avraham Kahan, Yossi Maruvka, Gaia Frant',
-    author_email='avrahamkahan123@gmail.com',
-    description='Tool to examine indels in tumors to determine microsatellite stability'
+    author='Avraham Kahan, Yossi Maruvka, and the Maruvka Lab at Technion',
+    author_email='yosi.maruvka@bfe.technion.ac.il',
+    description='Tool to determine microsatellite in/stability in Tumors from DNA sequencing',
+    long_description=f"{pathlib.Path(__file__).parent}/README.md",
+    long_description_content_type="text/markdown",
+    install_requires=['typing>=3.7.4.3',
+                        'numpy>=1.20.1',
+                        'pysam>=0.16.0.1',
+                        'scipy>=1.6.1',
+                        'setuptools>=54.1.1'
+                        ],
+
+    classifiers=[
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+    ],
 )

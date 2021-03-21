@@ -43,6 +43,12 @@ def run_msmutect(args: argparse.Namespace):
                               args.cores, args.flanking, args.output_prefix)
 
 
+def main():
+    parser: argparse.ArgumentParser = create_parser()
+    arguments = parser.parse_args()
+    run_msmutect(arguments)
+
+
 if __name__ == "__main__":
     parser: argparse.ArgumentParser = create_parser()
     arguments = parser.parse_args()
