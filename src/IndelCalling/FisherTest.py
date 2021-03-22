@@ -25,5 +25,5 @@ class Fisher:
         for i in range(first_set.size):
             # casted to int, so if number is too large for numpy int 64 bits
             p_value *= self.choose(int(first_set[i] + second_set[i]), int(first_set[i]))
-        p_value /= self.choose(np.sum(first_set)+np.sum(second_set), np.sum(first_set))
+        p_value /= self.choose(int(np.sum(first_set)+np.sum(second_set)), int(np.sum(first_set)))
         return p_value
