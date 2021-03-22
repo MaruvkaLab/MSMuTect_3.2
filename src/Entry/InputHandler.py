@@ -1,4 +1,5 @@
-import argparse, sys, os
+import argparse, sys, os, pysam
+from typing import List
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -28,6 +29,29 @@ def exit_on(message: str, status: int = 1):
     sys.exit(status)
 
 
+def simple_index_check(bam: str):
+    if not os.path.exists(bam + ".bai"):  # index file
+        exit_on("Given BAM file/s are not sorted and/or indexed")
+
+
+def validate_indexing(bam_files: List[str]) -> None:
+    """ validates that given BAM files are indexed"""
+    prefixes = ['', 'chr', 'Chr']
+    for bam in bam_files:
+        simple_index_check(bam) # simply checks for .bai file
+        validated = False
+        current_handle = pysam.AlignmentFile(open(bam, 'rb'))
+        for prefix in prefixes:
+            try:
+                _ = current_handle.fetch(f"{prefix}{1}", start=10_000, multiple_iterators=True)
+                validated = True
+                break  # verified
+            except ValueError:  # different prefix, or not indexed
+                continue
+        if not validated:
+            exit_on("Given BAM file/s are not sorted and/or indexed, or contain an unsusual prefix (not 'chr', 'Chr', or nothing'")
+
+
 def validate_bams(arguments: argparse.Namespace):
     if (bool(arguments.tumor_file) or bool(arguments.normal_file)) == bool(arguments.single_file): #  XOR
         exit_on("Provide Single file, or both Normal and Tumor file")
@@ -39,6 +63,7 @@ def validate_bams(arguments: argparse.Namespace):
     else:
         if not os.path.exists(arguments.tumor_file) or not os.path.exists(arguments.normal_file):
             exit_on("Provided Normal or Tumor BAM path does not exist")
+    validate_indexing([bam_file for bam_file in [arguments.tumor_file, arguments.normal_file, arguments.single_file] if bool(bam_file)])
 
 
 def validate_output_files(arguments: argparse.Namespace):
