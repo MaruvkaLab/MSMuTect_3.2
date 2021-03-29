@@ -16,8 +16,8 @@ class AlleleSet:
         return self.histogram == other.histogram and self.log_likelihood == other.log_likelihood and bool((self.frequencies == other.frequencies).all())
 
     @staticmethod
-    def header():
-        return "LOG_LIKELIHOOD\tALLELE_1\tALLELES_2\tALLELES_3\tALLELES_4\tALLELES_5\tFRACTION_1\tFRACTION_2\tFRACTION_3\tFRACTION_4\tFRACTION_5"
+    def header(prefix=''):
+        return f"{prefix}LOG_LIKELIHOOD\t{prefix}ALLELE_1\t{prefix}ALLELES_2\t{prefix}ALLELES_3\t{prefix}ALLELES_4\t{prefix}FRACTION_1\t{prefix}FRACTION_2\t{prefix}FRACTION_3\t{prefix}FRACTION_4"
 
     @staticmethod
     def format_array(array: np.array, num_components=5):

@@ -72,19 +72,19 @@ def validate_output_files(arguments: argparse.Namespace):
         return
     elif arguments.single_file:
         if arguments.histogram and not arguments.allele:
-            if os.path.exists(arguments.output_prefix + ".hist.csv"):
+            if os.path.exists(arguments.output_prefix + ".hist.tsv"):
                 exit_on(overwrite_files_mssg)
         else:
-            if os.path.exists(arguments.output_prefix + ".all.csv"):
+            if os.path.exists(arguments.output_prefix + ".all.tsv"):
                 exit_on(overwrite_files_mssg)
     else:
-        if (arguments.histogram or arguments.allele) and arguments.mutation and os.path.exists(arguments.output_prefix + ".full.mut.csv"):
+        if (arguments.histogram or arguments.allele) and arguments.mutation and os.path.exists(arguments.output_prefix + ".full.mut.tsv"):
                     exit_on(overwrite_files_mssg)
-        elif arguments.mutation and os.path.exists(arguments.output_prefix + ".partial.mut.csv"):
+        elif arguments.mutation and os.path.exists(arguments.output_prefix + ".partial.mut.tsv"):
                 exit_on(overwrite_files_mssg)
-        elif arguments.allele and os.path.exists(arguments.output_prefix + ".all.csv"):
+        elif arguments.allele and os.path.exists(arguments.output_prefix + ".all.tsv"):
             exit_on(overwrite_files_mssg)
-        elif arguments.histogram and os.path.exists(arguments.output_prefix + ".hist.csv"):
+        elif arguments.histogram and os.path.exists(arguments.output_prefix + ".hist.tsv"):
             exit_on(overwrite_files_mssg)
 
 

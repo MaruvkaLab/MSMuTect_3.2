@@ -53,7 +53,7 @@ def extract_NX3_results(results) -> List[List[str]]:
 
 
 def write_results(output_prefix: str, results: List[str], header):
-    with open(f"{output_prefix}.csv", 'w+') as output_file:
+    with open(f"{output_prefix}.tsv", 'w+') as output_file:
         output_file.write(header)
         output_file.write("\n")
         output_file.write("\n".join(results))

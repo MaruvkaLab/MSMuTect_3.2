@@ -51,9 +51,9 @@ class Histogram:
         return self._rounded_repeats
 
     @staticmethod
-    def header():
-        return "MOTIF_REPEATS_1\tMOTIF_REPEATS_2\tMOTIF_REPEATS_3\tMOTIF_REPEATS_4\tMOTIF_REPEATS_5\tMOTIF_REPEATS_6\t" \
-               "SUPPORTING_READS_1\tSUPPORTING_READS_2\tSUPPORTING_READS_3\tSUPPORTING_READS_4\tSUPPORTING_READS_5\tSUPPORTING_READS_6"
+    def header(prefix=''):
+        return f"{prefix}MOTIF_REPEATS_1\t{prefix}MOTIF_REPEATS_2\t{prefix}MOTIF_REPEATS_3\t{prefix}MOTIF_REPEATS_4\t{prefix}MOTIF_REPEATS_5\t{prefix}MOTIF_REPEATS_6\t" \
+               f"{prefix}SUPPORTING_READS_1\t{prefix}SUPPORTING_READS_2\t{prefix}SUPPORTING_READS_3\t{prefix}SUPPORTING_READS_4\t{prefix}SUPPORTING_READS_5\t{prefix}SUPPORTING_READS_6"
 
     def __str__(self):
         sorted_repeats = sorted(self.repeat_lengths, key=self.repeat_lengths.get, reverse=True)

@@ -21,6 +21,6 @@ class LociManager:
             except StopIteration:  # iterator is exhausted
                 return loci
             loci.append(Locus(chromosome=locus[0], start=int(locus[3]), end=int(locus[4]), pattern=locus[12],
-                          repeats=float(locus[6])))
+                          repeats=float(locus[6]), sequence=locus[13]))
         return loci
 

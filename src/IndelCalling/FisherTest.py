@@ -1,3 +1,4 @@
+import math, sys
 from collections import defaultdict
 import numpy as np
 
@@ -11,6 +12,10 @@ class Fisher:
     def factorial(self, n: int) -> float:
         if self.already_computed[n] != -1:
             return self.already_computed[n]
+        elif n > sys.getrecursionlimit() - 1:  # to avoid recursion overload
+            ans = math.factorial(n)
+            self.already_computed[n] = ans
+            return ans
         else:
             answer = n * self.factorial(n-1)
             self.already_computed[n] = answer
