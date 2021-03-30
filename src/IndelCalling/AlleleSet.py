@@ -19,16 +19,6 @@ class AlleleSet:
     def header(prefix=''):
         return f"{prefix}LOG_LIKELIHOOD\t{prefix}ALLELE_1\t{prefix}ALLELES_2\t{prefix}ALLELES_3\t{prefix}ALLELES_4\t{prefix}FRACTION_1\t{prefix}FRACTION_2\t{prefix}FRACTION_3\t{prefix}FRACTION_4"
 
-    @staticmethod
-    def format_array(array: np.array, num_components=5):
-        components = [str(n) for n in array]
-        if len(components) < 5:
-            for i in range(num_components - len(components)):
-                components.append("NA")
-        else:
-            components = components[:5]
-        return "\t".join(components)
-
     def sorted_alleles(self) -> Tuple[np.array, np.array]:
         if self.repeat_lengths.size == 0:  # alleles are empty
             return np.array([]), np.array([])
@@ -39,4 +29,4 @@ class AlleleSet:
         sorted_alleles = self.sorted_alleles()
         alleles = sorted_alleles[0]
         freqs = sorted_alleles[1]
-        return str(self.log_likelihood) + "\t" + format_list(list(alleles), 5) + "\t" + format_list(list(freqs), 5)
+        return str(self.log_likelihood) + "\t" + format_list(list(alleles), 4) + "\t" + format_list(list(freqs), 4)

@@ -1,3 +1,4 @@
+
 from typing import List
 from pysam import AlignmentFile, AlignedSegment
 from pysam.libcalignmentfile import IteratorRowRegion
@@ -97,13 +98,3 @@ class ReadsFetcher:
             else:
                 cur_read = self.get_next_mapped_read()
         return self.remember_return(mapped_reads, cur_read)
-
-
-
-
-
-
-
-
-
-

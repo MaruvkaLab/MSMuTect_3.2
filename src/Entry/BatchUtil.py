@@ -64,6 +64,7 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
     """
     :param batch_function: function to run on given loci. First argument must be list of loci
     :param args: other args to feed function
+    :param extract_function: function to extract results from Pool
     :return: results from given function
     """
     results = []
