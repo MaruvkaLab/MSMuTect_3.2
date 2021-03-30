@@ -4,7 +4,7 @@ from typing import List
 
 def create_parser() -> argparse.ArgumentParser:
     # :return: creates parser with all command line arguments arguments
-    MSMuTect_intro = "MSMuTect\n Version 3.2\n Authors: Avraham Kahan, Yossi Maruvka and Gaia Frant"
+    MSMuTect_intro = "MSMuTect\n Version 3.2\n Authors: Yossi Maruka, Avraham Kahan, and the Maruvka Lab at Technion"
     parser = argparse.ArgumentParser(description=MSMuTect_intro)
     parser.add_argument("-T", "--tumor_file", help="Tumor BAM file")
     parser.add_argument("-N", "--normal_file", help="Non-tumor BAM file")
@@ -17,9 +17,8 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-H", "--histogram", help="Output a Histogram File", action='store_true')
     parser.add_argument("-A", "--allele", help="Output allele file", action='store_true')
     parser.add_argument("-m", "--mutation", help="Output mutation file", action='store_true')
-    parser.add_argument("-F", "--flanking", help="Length of flanking on both sides of an accepted read", default=10)
+    parser.add_argument("-F", "--flanking", help="Length of flanking on both sides of an accepted read", type=int, default=10)
     parser.add_argument("-f", "--force", help="overwrite pre-existing files", action='store_true')
-    parser.add_argument("-E", "--exclude", help="The probability that a read will be randomly excluded while processing loci", default=0)
     return parser
 
 
