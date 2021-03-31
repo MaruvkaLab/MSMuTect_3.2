@@ -14,23 +14,11 @@ def get_noise_table_path() -> str:
     return os.path.abspath(noise_table_path)
 
 
-def get_chunks(cores: int, batch_start: int, batch_end: int) -> List[Chunk]:
-    chunks = []
-    batch_size = (batch_end - batch_start) // cores
-    prev_end = batch_start - 1
-    for i in range(cores-1):
-        chunks.append(Chunk(start=prev_end + 1, end=prev_end + batch_size))
-        prev_end += batch_size
-    chunks.append(Chunk(start=prev_end + 1, end=batch_end))
-    return chunks
-
-
-def get_batch_sizes(total_batch_size: int, cores: int) -> List[int]:
-    batch_sizes = []
-    normal_batch = total_batch_size // cores
-    for i in range(cores - 1):
-        batch_sizes.append(normal_batch)
-    batch_sizes.append(total_batch_size - (len(batch_sizes) * normal_batch))
+def get_batch_sizes(total_batch_size: int, regular_size: int) -> List[int]:
+    batch_sizes = [regular_size for _ in range(total_batch_size // regular_size)]
+    remainder = total_batch_size % regular_size
+    if remainder != 0:
+        batch_sizes.append(remainder)
     return batch_sizes
 
 
@@ -68,14 +56,12 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
     :return: results from given function
     """
     results = []
-    per = 100_000
-    for i in range((total_batch_size//per)+1):
-        batch_sizes = get_batch_sizes(min(per, total_batch_size - i*per), cores)  # min is for last run through loop
-        with Pool(processes=cores) as threads:
-            for j in range(cores):
-                current_loci = loci_iterator.get_batch(batch_sizes[j])
-                results.append(threads.apply_async(batch_function,
-                                    args=([current_loci]+args)))
+    with Pool(processes=cores) as threads:
+        batch_sizes = get_batch_sizes(total_batch_size, 100_000)
+        for batch in batch_sizes:
+            current_loci = loci_iterator.get_batch(batch)
+            results.append(threads.apply_async(batch_function,
+                                               args=([current_loci] + args)))
             threads.close()
             threads.join()
     return extract_function(results)
