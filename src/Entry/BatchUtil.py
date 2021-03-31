@@ -62,8 +62,8 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
             current_loci = loci_iterator.get_batch(batch)
             results.append(threads.apply_async(batch_function,
                                                args=([current_loci] + args)))
-            threads.close()
-            threads.join()
+        threads.close()
+        threads.join()
     return extract_function(results)
 
 
