@@ -22,7 +22,12 @@ class Fisher:
             return answer
 
     def choose(self, n: int, k: int) -> float:
-        answer = self.factorial(n)/(self.factorial(k)*self.factorial(n-k))
+        try:
+            answer = self.factorial(n)/(self.factorial(k)*self.factorial(n-k))
+        except OverflowError:  # ints too big to be stored in float
+            numerator = self.factorial(n)
+            denominator = self.factorial(k)*self.factorial(n-k)
+            answer = numerator//denominator + (numerator % denominator)/denominator
         return answer
 
     def test(self, first_set: np.array, second_set: np.array):
