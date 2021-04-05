@@ -31,6 +31,13 @@ class TestHistogram(unittest.TestCase):
         fisher = Fisher()
         a = fisher.test(np.array([100, 35, 95]), np.array([4, 6, 50]))
 
+    def test_big_divide(self):
+        fisher = Fisher()
+        self.assertAlmostEqual(fisher.big_divide(200_000, 1_000), 200)
+        self.assertAlmostEqual(fisher.big_divide(1_000, 200_000), .005)
+        self.assertAlmostEqual(fisher.big_divide(2**3000, 2**3002), .25)
+
+
 
 if __name__ == '__main__':
     unittest.main()

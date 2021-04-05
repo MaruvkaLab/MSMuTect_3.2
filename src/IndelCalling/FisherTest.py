@@ -9,7 +9,7 @@ class Fisher:
         self.already_computed[0] = 1
         self.already_computed[1] = 1
 
-    def factorial(self, n: int) -> float:
+    def factorial(self, n: int) -> int:
         if self.already_computed[n] != -1:
             return self.already_computed[n]
         elif n > sys.getrecursionlimit() - 1:  # to avoid recursion overload
@@ -21,19 +21,31 @@ class Fisher:
             self.already_computed[n] = answer
             return answer
 
-    def choose(self, n: int, k: int) -> float:
-        try:
-            answer = self.factorial(n)/(self.factorial(k)*self.factorial(n-k))
-        except OverflowError:  # ints too big to be stored in float
-            numerator = self.factorial(n)
-            denominator = self.factorial(k)*self.factorial(n-k)
-            answer = numerator//denominator + (numerator % denominator)/denominator
-        return answer
+    def choose(self, n: int, k: int) -> int:
+        numerator = self.factorial(n)
+        denominator = self.factorial(k)*self.factorial(n-k)
+        return numerator // denominator
+
+    def get_mantissa(self, n: int, num_digits: int) -> int:
+        # get first prefix_length digits of n
+        return int(str(n)[:num_digits])
+
+    def big_divide(self, numerator: int, denominator: int) -> float:
+        # does division for massive numbers without causing overflow error
+        numerator_power = int(math.log10(numerator))
+        denominator_power = int(math.log10(denominator))
+        numerator_mantissa_power = min(numerator_power + 1, 10)
+        numerator_mantissa = self.get_mantissa(numerator, numerator_mantissa_power)
+        denominator_mantissa_power = min(denominator_power + 1, 10)
+        denominator_mantissa = self.get_mantissa(denominator, denominator_mantissa_power)
+        quotient_mantissa = numerator_mantissa / denominator_mantissa
+        quotient = quotient_mantissa * (10 ** ((numerator_power - numerator_mantissa_power) - (denominator_power - denominator_mantissa_power)))
+        return quotient
 
     def test(self, first_set: np.array, second_set: np.array):
         p_value = 1
         for i in range(first_set.size):
             # casted to int, so if number is too large for numpy int 64 bits
             p_value *= self.choose(int(first_set[i] + second_set[i]), int(first_set[i]))
-        p_value /= self.choose(int(np.sum(first_set)+np.sum(second_set)), int(np.sum(first_set)))
+        p_value = self.big_divide(p_value, self.choose(int(np.sum(first_set)+np.sum(second_set)), int(np.sum(first_set))))
         return p_value
