@@ -12,6 +12,10 @@ from src.IndelCalling.CallAlleles import calculate_alleles
 from . import BatchUtil
 
 
+def format_alleles(alleles: AlleleSet) -> str: # List[AlleleSet] not declared to avoid circular import
+    return f"{alleles.histogram.locus}\t{str(alleles.histogram)}\t{str(alleles)}"
+
+
 def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
                        batch_end: int, cores: int, flanking: int, output_prefix: str) -> None:
     loci_iterator = LociManager(loci_file, batch_start)
@@ -24,7 +28,7 @@ def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
 
 def partial_single_allelic(loci: List[Locus], BAM: str, flanking: int, noise_table) -> List[str]:
     BAM_handle = AlignmentFile(BAM, "rb")
-    allelic_results: List[AlleleSet] = []
+    allelic_results: List[str] = []
     if len(loci) == 0:
         return []
     reads_fetcher = ReadsFetcher(BAM_handle, loci[0].chromosome)
@@ -33,8 +37,8 @@ def partial_single_allelic(loci: List[Locus], BAM: str, flanking: int, noise_tab
         reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
         current_histogram.add_reads(reads)
         current_alleles = calculate_alleles(current_histogram, noise_table)
-        allelic_results.append(current_alleles)
-    return src.Entry.FormatUtil.format_alleles(allelic_results)
+        allelic_results.append(format_alleles(current_alleles))
+    return allelic_results
 
 
 def run_single_histogram(BAM: str, loci_file: str, batch_start: int,
@@ -46,9 +50,8 @@ def run_single_histogram(BAM: str, loci_file: str, batch_start: int,
     BatchUtil.write_results(output_prefix + ".hist", results, header)
 
 
-def format_histograms(histograms: List[Histogram]):
-    output_lines = [f"{str(histogram.locus)}\t{str(histogram)}" for histogram in histograms]
-    return output_lines
+def format_histogram(histogram: Histogram) -> str:
+    return f"{str(histogram.locus)}\t{str(histogram)}"
 
 
 def partial_single_histogram(loci: List[Locus], BAM: str, flanking: int) -> List[str]:
@@ -61,5 +64,5 @@ def partial_single_histogram(loci: List[Locus], BAM: str, flanking: int) -> List
         current_histogram = Histogram(locus)
         reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
         current_histogram.add_reads(reads)
-        histograms.append(current_histogram)
-    return format_histograms(histograms)
+        histograms.append(format_histogram(current_histogram))
+    return histograms

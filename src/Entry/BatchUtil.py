@@ -30,16 +30,6 @@ def extract_results(results) -> List[str]:
     return combined
 
 
-def extract_NX3_results(results) -> List[List[str]]:
-    combined: List[List[str]] = [[], [], []]
-    for result in results:
-        current_row = result.get()
-        combined[0]+=current_row[0]
-        combined[1]+=current_row[1]
-        combined[2]+=current_row[2]
-    return combined
-
-
 def write_results(output_prefix: str, results: List[str], header):
     with open(f"{output_prefix}.tsv", 'w+') as output_file:
         output_file.write(header)
@@ -49,18 +39,16 @@ def write_results(output_prefix: str, results: List[str], header):
 
 def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int) -> list:
     """
-    runs batch fuction without invoking pool to save perfomance (serialization, etc.)
+    runs batch fuction without invoking pool to save performance (serialization, etc.)
     """
     loci = loci_iterator.get_batch(total_batch_size)
     return batch_function(*([loci] + args)) # unwrap arguments in a list
 
 
-def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int,
-              extract_function=extract_results) -> list:
+def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int) -> list:
     """
     :param batch_function: function to run on given loci. First argument must be list of loci
     :param args: other args to feed function
-    :param extract_function: function to extract results from Pool
     :return: results from given function
     """
     results = []
@@ -74,7 +62,7 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
                                                args=([current_loci] + args)))
         threads.close()
         threads.join()
-    return extract_function(results)
+    return extract_results(results)
 
 
 
