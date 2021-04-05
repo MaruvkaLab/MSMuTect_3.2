@@ -47,6 +47,14 @@ def write_results(output_prefix: str, results: List[str], header):
         output_file.write("\n".join(results))
 
 
+def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int) -> list:
+    """
+    runs batch fuction without invoking pool to save perfomance (serialization, etc.)
+    """
+    loci = loci_iterator.get_batch(total_batch_size)
+    return batch_function(*([loci] + args)) # unwrap arguments in a list
+
+
 def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int,
               extract_function=extract_results) -> list:
     """
@@ -56,6 +64,8 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
     :return: results from given function
     """
     results = []
+    if cores == 1:
+        return run_single_threaded(batch_function, args, loci_iterator, total_batch_size)
     with Pool(processes=cores) as threads:
         batch_sizes = get_batch_sizes(total_batch_size, 100_000)
         for batch in batch_sizes:
