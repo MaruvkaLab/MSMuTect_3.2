@@ -6,11 +6,12 @@ from src.IndelCalling.Histogram import Histogram
 
 
 class AllelesMaximumLikelihood:
-    def __init__(self, histogram: Histogram, supported_lengths: np.array, noise_table: np.matrix, required_read_support: int = 6):
+    def __init__(self, histogram: Histogram, proper_lengths: np.array, supported_lengths: np.array, noise_table: np.matrix):
+        # supported lengths is a subset of proper lengths (supported must also have 6+ supporting reads)
         # gets  all lengths with at least 5 read support
         self.histogram = histogram
-        self.repeat_lengths = np.array(list(histogram.rounded_repeat_lengths.keys()))  # convert to arrays for performance reasons
-        self.num_reads = np.array(list(histogram.rounded_repeat_lengths.values()))
+        self.repeat_lengths = proper_lengths
+        self.num_reads = np.array([histogram.rounded_repeat_lengths[length] for length in self.repeat_lengths])
         self.supported_repeat_lengths = supported_lengths
         self.num_alleles = supported_lengths.size
         self.noise_table = noise_table
@@ -82,10 +83,10 @@ class AllelesMaximumLikelihood:
                          repeat_lengths = self.best_alleles, frequencies=self.best_frequencies)
 
 
-def find_alleles(histogram: Histogram, supported_repeat_lengths: np.array, noise_table) -> AlleleSet:
-    lesser_alleles_set = AllelesMaximumLikelihood(histogram, supported_repeat_lengths, noise_table).get_alleles()
+def find_alleles(histogram: Histogram, proper_lengths: np.array, supported_repeat_lengths: np.array, noise_table) -> AlleleSet:
+    lesser_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table).get_alleles()
     for i in range(2, 5):
-        greater_alleles_set = AllelesMaximumLikelihood(histogram, supported_repeat_lengths, noise_table).get_alleles()
+        greater_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table).get_alleles()
         likelihood_increase = 2 * (greater_alleles_set.log_likelihood - lesser_alleles_set.log_likelihood)
         if likelihood_increase > 0:
             p_value_i_alleles = stats.chi2.pdf(likelihood_increase, 2)
@@ -101,7 +102,7 @@ def find_alleles(histogram: Histogram, supported_repeat_lengths: np.array, noise
 
 
 def repeat_threshold(ms_length: int):
-    # number of repeats necessary for microsatellite of given length
+    # number of repeats necessary for microsatellite of given length to be considered
     if ms_length == 1:
         return 5
     elif ms_length == 2:
@@ -110,17 +111,19 @@ def repeat_threshold(ms_length: int):
         return 3
 
 
-def passes_filter(motif_length: int, repeat_size: float, supporting_reads: int, required_read_support: int):
-    return required_read_support <= supporting_reads and repeat_threshold(motif_length) < repeat_size < 40
+def passes_filter(motif_length: int, repeat_size: float):
+    return repeat_threshold(motif_length) < repeat_size < 40
 
 
 def calculate_alleles(histogram: Histogram, noise_table, required_read_support=6):
     # supported repeat = repeat length 6<=
-    supported_repeat_lengths = np.array([repeat_size for repeat_size in histogram.rounded_repeat_lengths if
-                                         passes_filter(len(histogram.locus.pattern), repeat_size, histogram.rounded_repeat_lengths[repeat_size], required_read_support)])
-    if supported_repeat_lengths.size == 0:
+    proper_motif_sizes = np.array([repeat_size for repeat_size in histogram.rounded_repeat_lengths if
+                                         passes_filter(len(histogram.locus.pattern), repeat_size)])
+    supported_proper_motifs = np.array([length for length in proper_motif_sizes
+                                        if histogram.rounded_repeat_lengths[length]>=required_read_support])
+    if supported_proper_motifs.size == 0:
         return AlleleSet(histogram, log_likelihood=-1, repeat_lengths=np.array([]), frequencies=np.array([-1]))
-    elif supported_repeat_lengths.size == 1:
-        return AlleleSet(histogram=histogram,  log_likelihood=0, repeat_lengths=np.array(list(supported_repeat_lengths)), frequencies=np.array([1]))
+    elif supported_proper_motifs.size == 1:
+        return AlleleSet(histogram=histogram,  log_likelihood=0, repeat_lengths=np.array(list(supported_proper_motifs)), frequencies=np.array([1]))
     else:
-        return find_alleles(histogram, supported_repeat_lengths, noise_table)
+        return find_alleles(histogram, proper_motif_sizes, supported_proper_motifs, noise_table)

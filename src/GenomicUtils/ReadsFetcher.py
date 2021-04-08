@@ -86,7 +86,7 @@ class ReadsFetcher:
 
     def get_reads(self, chromosome, start: int, end: int) -> List[AlignedSegment]:
         chromosome = self.strip_chromosome(chromosome)
-        if chromosome != self.chromosome or self.last_unmapped_read is None or abs(start - self.last_unmapped_read.reference_start) > 6000:
+        if chromosome != self.chromosome or self.last_unmapped_read is None or abs(start - self.last_unmapped_read.reference_start) > 7500:
             self.reset_iterator(chromosome, start)
         mapped_reads = self.backtrack_reads(start, end)
         cur_read = self.last_unmapped_read

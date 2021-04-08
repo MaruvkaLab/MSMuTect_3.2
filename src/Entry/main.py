@@ -4,8 +4,6 @@ from src.Entry.SingleFileBatches import run_single_allelic, run_single_histogram
 from src.Entry.PairFileBatches import run_full_pair, run_mutations_pair
 from src.Entry.InputHandler import create_parser, validate_input
 
-import cProfile
-
 
 def count_lines(file: str):
     return sum(1 for _ in open(file, 'rb'))
