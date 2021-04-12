@@ -38,6 +38,5 @@ class TestHistogram(unittest.TestCase):
         self.assertAlmostEqual(fisher.big_divide(2**3000, 2**3002), .25)
 
 
-
 if __name__ == '__main__':
     unittest.main()

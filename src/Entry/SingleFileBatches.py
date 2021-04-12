@@ -2,7 +2,6 @@ import numpy as np
 from typing import List
 from pysam import AlignmentFile
 
-import src.Entry.FormatUtil
 from src.GenomicUtils.LocusFile import LociManager
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.IndelCalling.Histogram import Histogram
