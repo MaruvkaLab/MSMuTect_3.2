@@ -1,4 +1,4 @@
-
+# cython: language_level=3
 
 class Locus:
     def __init__(self, chromosome: str,  start: int,  end: int,  pattern: str,  repeats: float, sequence: str):

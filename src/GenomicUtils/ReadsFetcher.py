@@ -1,4 +1,4 @@
-
+# cython: language_level=3
 from typing import List
 from pysam import AlignmentFile, AlignedSegment
 from pysam.libcalignmentfile import IteratorRowRegion

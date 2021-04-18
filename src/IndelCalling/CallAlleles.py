@@ -1,3 +1,4 @@
+# cython: language_level=3
 import scipy.stats as stats
 import numpy as np
 

@@ -1,3 +1,4 @@
+# cython: language_level=3
 import math, sys
 from collections import defaultdict
 import numpy as np
