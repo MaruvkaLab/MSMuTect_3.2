@@ -1,3 +1,4 @@
+#!/bin/bash
 mv src/IndelCalling/FisherTest.py src/IndelCalling/FisherTest.pyx
 mv src/IndelCalling/CallMutations.py src/IndelCalling/CallMutations.pyx
 mv src/IndelCalling/CallAlleles.py src/IndelCalling/CallAlleles.pyx
