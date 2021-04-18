@@ -1,5 +1,6 @@
 import pathlib
-from setuptools import setup, find_packages
+from setuptools import setup
+from Cython.Build import cythonize
 
 setup(
     name='msmutect',
@@ -31,4 +32,9 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
+ext_modules=cythonize(['src/IndelCalling/FisherTest.pyx', 'src/IndelCalling/CallMutations.pyx',
+                         'src/IndelCalling/CallAlleles.pyx', 'src/GenomicUtils/ReadsFetcher.pyx',
+                         'src/IndelCalling/Histog    ram.pyx', 'src/Entry/SingleFileBatches.pyx',
+                         'src/IndelCalling/Locus.pyx', 'src/IndelCalling/AlleleSet.pyx',
+                         'src/GenomicUtils/LocusFile.pyx', 'src/Entry/PairFileBatches.pyx'])
 )
