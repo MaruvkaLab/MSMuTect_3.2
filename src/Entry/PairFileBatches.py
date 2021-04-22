@@ -20,12 +20,7 @@ PairResults = namedtuple("PairResults", ['normal_alleles', 'tumor_alleles', 'dec
 
 
 def format_mutation_call(decision: MutationCall):
-    return f"{str(decision.normal_alleles.histogram.locus)}\t \
-                    {str(decision.tumor_alleles.histogram)}\t \
-                    {str(decision.tumor_alleles)}\t \
-                    {str(decision.normal_alleles.histogram)}\t \
-                    {str(decision.normal_alleles)}\t \
-                    {str(decision)}\t{str(decision.aic_values)}"
+    return f"{str(decision.normal_alleles.histogram.locus)}\t{str(decision.tumor_alleles.histogram)}\t{str(decision.tumor_alleles)}\t{str(decision.normal_alleles.histogram)}\t{str(decision.normal_alleles)}\t{str(decision)}\t{str(decision.aic_values)}"
 
 
 def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
@@ -34,7 +29,7 @@ def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
     noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
     results: List[str] = BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table], loci_iterator,
                                   (batch_end - batch_start), cores)
-    mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}{AICs.header()}"
+    mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}\t{AICs.header()}"
     BatchUtil.write_results(output_prefix + ".full.mut", results, mutation_header)
 
 

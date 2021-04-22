@@ -32,7 +32,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-ext_modules=cythonize(['src/IndelCalling/FisherTest.pyx', 'src/IndelCalling/CallMutations.pyx',
+    ext_modules=cythonize(['src/IndelCalling/FisherTest.pyx', 'src/IndelCalling/CallMutations.pyx',
                          'src/IndelCalling/CallAlleles.pyx', 'src/GenomicUtils/ReadsFetcher.pyx',
                          'src/IndelCalling/Histogram.pyx', 'src/Entry/SingleFileBatches.pyx',
                          'src/IndelCalling/Locus.pyx', 'src/IndelCalling/AlleleSet.pyx',
