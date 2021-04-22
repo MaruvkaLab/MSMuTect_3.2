@@ -14,19 +14,20 @@ from src.IndelCalling.MutationCall import MutationCall
 from src.IndelCalling.AICs import AICs
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.GenomicUtils.LocusFile import LociManager
+from src.GenomicUtils.NoiseTable import get_noise_table
 from . import BatchUtil
 
 PairResults = namedtuple("PairResults", ['normal_alleles', 'tumor_alleles', 'decision'])
 
 
 def format_mutation_call(decision: MutationCall):
-    return f"{str(decision.normal_alleles.histogram.locus)}\t{str(decision.tumor_alleles.histogram)}\t{str(decision.tumor_alleles)}\t{str(decision.normal_alleles.histogram)}\t{str(decision.normal_alleles)}\t{str(decision)}\t{str(decision.aic_values)}"
+    return f"{str(decision.normal_alleles.histogram.locus)}\t{str(decision.normal_alleles.histogram)}\t{str(decision.normal_alleles)}\t{str(decision.tumor_alleles.histogram)}\t{str(decision.tumor_alleles)}\t{str(decision)}\t{str(decision.aic_values)}"
 
 
 def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
                        batch_end: int, cores: int, flanking: int, output_prefix: str):
     loci_iterator = LociManager(loci_file, batch_start)
-    noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
+    noise_table = get_noise_table()
     results: List[str] = BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table], loci_iterator,
                                   (batch_end - batch_start), cores)
     mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}\t{AICs.header()}"
@@ -87,6 +88,3 @@ def partial_mutations_pair(loci: List[Locus], normal: str, tumor: str, flanking:
             tumor_alleles = get_alleles(locus, tumor_fetcher, flanking, noise_table)
             calls.append(format_mutation_call(call_mutations(normal_alleles, tumor_alleles, noise_table, fisher)))
     return calls
-
-
-

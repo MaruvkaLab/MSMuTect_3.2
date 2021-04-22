@@ -37,7 +37,7 @@ def check_normal_alleles(normal_alleles: AlleleSet, p_equal=0.3) -> int:
         return MutationCall.TOO_MANY_ALLELES
 
 
-def log_likelihood(histogram: Histogram, alleles: AlleleSet, noise_table) -> float:
+def log_likelihood(histogram: Histogram, alleles: AlleleSet, noise_table: np.array) -> float:
     L_k_log = 0
     rounded_histogram = histogram.rounded_repeat_lengths
     if alleles.repeat_lengths.size == 0:
@@ -61,7 +61,7 @@ def hist2vecs(histogram_a: Histogram, histogram_b: Histogram) -> ComparedSets:
     return ComparedSets(first_set=first_set, second_set=second_set)
 
 
-def calculate_AICs(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table, LOR_ratio = 8.0) -> AICs:
+def calculate_AICs(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, LOR_ratio = 8.0) -> AICs:
     num_normal_alleles = len(normal_alleles.repeat_lengths)
     num_tumor_alleles = len(tumor_alleles.repeat_lengths)
     L_Norm_Tum = log_likelihood(normal_alleles.histogram, tumor_alleles, noise_table)
@@ -84,7 +84,7 @@ def fisher_test(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, fisher_calc
     return one_sided_fisher
 
 
-def call_decision(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table, fisher_calculator,
+def call_decision(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, fisher_calculator,
                   LOR_ratio = 8.0, p_equal = 0.3, fisher_threshold = 0.031) -> MutationCall:
     normal_allele_call = check_normal_alleles(normal_alleles, p_equal)
     if normal_allele_call != MutationCall.MUTATION:
@@ -93,7 +93,7 @@ def call_decision(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_tab
         return call_verified_locus(normal_alleles, tumor_alleles, noise_table, fisher_calculator, fisher_threshold, LOR_ratio)
 
 
-def call_mutations(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table, fisher_calculator: Fisher) -> MutationCall:
+def call_mutations(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, fisher_calculator: Fisher) -> MutationCall:
     if np.array_equal(normal_alleles.repeat_lengths, tumor_alleles.repeat_lengths):
         return MutationCall(MutationCall.NOT_MUTATION, normal_alleles, tumor_alleles, AICs())
     else:
@@ -105,7 +105,7 @@ def is_possible_mutation(normal_alleles: AlleleSet, p_equal = 0.3) -> bool:
     return check_normal_alleles(normal_alleles, p_equal) == MutationCall.MUTATION
 
 
-def call_verified_locus(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table, fisher_calculator: Fisher,
+def call_verified_locus(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, fisher_calculator: Fisher,
                         fisher_threshold = 0.031, LOR_ratio = 8.0) -> MutationCall:
     # calls mutation for locus that has proper normal alleles and support
     aic_values = calculate_AICs(normal_alleles, tumor_alleles, noise_table)

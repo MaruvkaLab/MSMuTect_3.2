@@ -84,7 +84,7 @@ class AllelesMaximumLikelihood:
                          repeat_lengths = self.best_alleles, frequencies=self.best_frequencies)
 
 
-def find_alleles(histogram: Histogram, proper_lengths: np.array, supported_repeat_lengths: np.array, noise_table) -> AlleleSet:
+def find_alleles(histogram: Histogram, proper_lengths: np.array, supported_repeat_lengths: np.array, noise_table: np.array) -> AlleleSet:
     lesser_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table).get_alleles()
     for i in range(2, 5):
         greater_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table).get_alleles()
@@ -116,7 +116,7 @@ def passes_filter(motif_length: int, repeat_size: float):
     return repeat_threshold(motif_length) < repeat_size < 40
 
 
-def calculate_alleles(histogram: Histogram, noise_table, required_read_support=6):
+def calculate_alleles(histogram: Histogram, noise_table: np.array, required_read_support=6):
     # supported repeat = repeat length 6<=
     proper_motif_sizes = np.array([repeat_size for repeat_size in histogram.rounded_repeat_lengths if
                                          passes_filter(len(histogram.locus.pattern), repeat_size)])

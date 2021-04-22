@@ -1,10 +1,10 @@
 # cython: language_level=3
-import numpy as np
 from typing import List
 from pysam import AlignmentFile
 
 from src.GenomicUtils.LocusFile import LociManager
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
+from src.GenomicUtils.NoiseTable import get_noise_table
 from src.IndelCalling.Histogram import Histogram
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Locus import Locus
@@ -19,7 +19,7 @@ def format_alleles(alleles: AlleleSet) -> str: # List[AlleleSet] not declared to
 def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
                        batch_end: int, cores: int, flanking: int, output_prefix: str) -> None:
     loci_iterator = LociManager(loci_file, batch_start)
-    noise_table = np.loadtxt(BatchUtil.get_noise_table_path(), delimiter=',')  # noise table
+    noise_table = get_noise_table()
     results = BatchUtil.run_batch(partial_single_allelic, [BAM, flanking, noise_table],
                                                            loci_iterator,  (batch_end - batch_start), cores)
     header = f"{Locus.header()}\t{Histogram.header()}\t{AlleleSet.header()}"
