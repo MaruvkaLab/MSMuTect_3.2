@@ -2,16 +2,17 @@
 Indel, Allele and mutation caller, specifically designed to call MS-stable vs MS-unstable pairs in tumors.
 
 # Installation
-git clone https://github.com/MaruvkaLab/MSMuTect_0.5
-cd MSMuTect_0.5
-sh rename.sh
-python3 setup.py install
+git clone https://github.com/MaruvkaLab/MSMuTect_0.5  
+cd MSMuTect_0.5  
+sh rename.sh  
+python3 setup.py install  
 
 # Usage
-msmutect [flags]
-For the most typical usage of calling microsatellite instability for a pair of BAMs:
-msmutect -T [tumorbam.bam] -N [normalbam.bam] -l [loci_file.phobos] -O [output_prefix] -c [number of cores to use]. 
-For more advanced and other usages, see MANUAL.pdf for details
+Full Manual: https://docs.google.com/document/d/1glEt64Dj0W74n88XrI9GxlUYvrPJ6r7IK8Pbpi-1MWU/  
+msmutect [flags]  
+For the most typical usage of calling microsatellite instability for a pair of BAMs:  
+msmutect -T [tumorbam.bam] -N [normalbam.bam] -l [loci_file.phobos] -O [output_prefix] -c [number of cores to use].  
+For more advanced and other usages, see MANUAL.pdf for details  
 
 # Publication
 For orginal paper, see 
