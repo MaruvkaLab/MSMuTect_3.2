@@ -4,7 +4,7 @@ from typing import List
 
 def create_parser() -> argparse.ArgumentParser:
     # :return: creates parser with all command line arguments arguments
-    MSMuTect_intro = "MSMuTect\n Version 0.5\n Authors: Yossi Maruka, Avraham Kahan, and the Maruvka Lab at Technion"
+    MSMuTect_intro = "MSMuTect\n Version 0.5\n Authors: Yossi Maruvka, Avraham Kahan, and the Maruvka Lab at Technion"
     parser = argparse.ArgumentParser(description=MSMuTect_intro)
     parser.add_argument("-T", "--tumor_file", help="Tumor BAM file")
     parser.add_argument("-N", "--normal_file", help="Non-tumor BAM file")

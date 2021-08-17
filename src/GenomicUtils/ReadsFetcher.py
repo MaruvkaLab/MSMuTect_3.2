@@ -1,4 +1,5 @@
 # cython: language_level=3
+import sys
 from typing import List
 from pysam import AlignmentFile, AlignedSegment
 from pysam.libcalignmentfile import IteratorRowRegion
@@ -29,6 +30,8 @@ class ReadsFetcher:
                 return prefix
             except ValueError:  # different prefix
                 continue
+        print("UNKNOWN CHROMOSOME PREFIX FOUND: PLEASE REPORT THIS TO THE DEVELOPERS")
+        raise ValueError
 
     def reset_iterator(self, chromosome: str, start: int):
         # changes chromosome and gets new iterator using .bai index file
