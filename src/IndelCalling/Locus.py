@@ -2,7 +2,7 @@
 
 class Locus:
     def __init__(self, chromosome: str,  start: int,  end: int,  pattern: str,  repeats: float, sequence: str):
-        self.full_chromosome = self.parse_chromosome(chromosome)
+        self.chromosome = self.parse_chromosome(chromosome)
         self.start = start
         self.end = end
         self.pattern = pattern
