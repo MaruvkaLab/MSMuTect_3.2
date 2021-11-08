@@ -41,8 +41,12 @@ def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, 
     """
     runs batch fuction without invoking pool to save performance (serialization, etc.)
     """
-    loci = loci_iterator.get_batch(total_batch_size)
-    return batch_function(*([loci] + args)) # unwrap arguments in a list
+    results = []
+    batch_sizes = get_batch_sizes(total_batch_size, 100_000)
+    for batch in batch_sizes:
+        current_loci = loci_iterator.get_batch(batch)
+        results.append(batch_function(*([current_loci] + args)))
+    return extract_results(results)
 
 
 def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int) -> list:
@@ -63,6 +67,3 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
         threads.close()
         threads.join()
     return extract_results(results)
-
-
-

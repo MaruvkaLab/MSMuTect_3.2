@@ -94,7 +94,7 @@ def call_decision(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_tab
 
 
 def call_mutations(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, fisher_calculator: Fisher) -> MutationCall:
-    if np.array_equal(normal_alleles.repeat_lengths, tumor_alleles.repeat_lengths):
+    if np.array_equal(normal_alleles.repeat_lengths, tumor_alleles.repeat_lengths) or len(normal_alleles) == 0 or len(tumor_alleles) == 0:
         return MutationCall(MutationCall.NOT_MUTATION, normal_alleles, tumor_alleles, AICs())
     else:
         return call_decision(normal_alleles, tumor_alleles, noise_table, fisher_calculator)

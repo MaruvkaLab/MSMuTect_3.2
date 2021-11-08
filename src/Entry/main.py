@@ -18,7 +18,7 @@ def run_msmutect(args: argparse.Namespace):
     if args.single_file:
         if args.allele or not args.histogram:
             run_single_allelic(args.single_file, args.loci_file, args.batch_start - 1,
-                               batch_end, args.cores, args.flanking, args.output_prefix)
+                               batch_end, args.cores, args.flanking, args.read_level, args.output_prefix)
         else:
             run_single_histogram(args.single_file, args.loci_file, args.batch_start - 1,
                                  batch_end, args.cores, args.flanking, args.output_prefix)
@@ -31,26 +31,19 @@ def run_msmutect(args: argparse.Namespace):
                                  batch_end, args.cores, args.flanking, args.output_prefix + ".tumor")
         elif args.allele and not args.mutation:
             run_single_allelic(args.normal_file, args.loci_file, args.batch_start - 1,
-                               batch_end, args.cores, args.flanking, args.output_prefix + ".normal")
+                               batch_end, args.cores, args.flanking, args.read_level, args.output_prefix + ".normal")
             run_single_allelic(args.tumor_file, args.loci_file, args.batch_start - 1,
-                               batch_end, args.cores, args.flanking, args.output_prefix + ".tumor")
+                               batch_end, args.cores, args.flanking, args.read_level, args.output_prefix + ".tumor")
         else:
-            if args.histogram or args.allele:
+            if args.histogram or args.allele:  # args.mutation=True
                 run_full_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start, batch_end,
-                              args.cores, args.flanking, args.output_prefix)
-            else:
+                              args.cores, args.flanking, args.read_level, args.output_prefix)
+            else:  # args.mutation=True, just mutations
                 run_mutations_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start, batch_end,
-                              args.cores, args.flanking, args.output_prefix)
-
-
-def main():
-    parser: argparse.ArgumentParser = create_parser()
-    arguments = parser.parse_args()
-    run_msmutect(arguments)
+                                args.cores, args.flanking, args.read_level, args.output_prefix)
 
 
 if __name__ == "__main__":
     parser: argparse.ArgumentParser = create_parser()
     arguments = parser.parse_args()
     run_msmutect(arguments)
-
