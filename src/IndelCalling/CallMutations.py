@@ -95,6 +95,8 @@ def call_decision(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_tab
 
 def equivalent_arrays(a: np.array, b: np.array) -> bool:
     # returns whether arrays hold the same values in any value, is intended for integer arrays
+    if len(a)!=len(b):
+        return False
     a_sorted = np.sort(a.astype(np.uint8))
     b_sorted = np.sort(b.astype(np.uint8))
     return (a_sorted == b_sorted).all()
