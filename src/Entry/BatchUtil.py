@@ -45,8 +45,8 @@ def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, 
     batch_sizes = get_batch_sizes(total_batch_size, 100_000)
     for batch in batch_sizes:
         current_loci = loci_iterator.get_batch(batch)
-        results.append(batch_function(*([current_loci] + args)))
-    return extract_results(results)
+        results += batch_function(*([current_loci] + args))
+    return results
 
 
 def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int) -> list:
