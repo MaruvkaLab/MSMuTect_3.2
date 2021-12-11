@@ -8,11 +8,10 @@ sh rename.sh
 pip3 install . 
 
 # Usage
-Full Manual: https://docs.google.com/document/d/1glEt64Dj0W74n88XrI9GxlUYvrPJ6r7IK8Pbpi-1MWU/  
+Full Manual: https://github.com/MaruvkaLab/MSMuTect_0.5/wiki/Manual
 msmutect [flags]  
 For the most typical usage of calling microsatellite instability for a pair of BAMs:  
-msmutect -T [tumorbam.bam] -N [normalbam.bam] -l [loci_file.phobos] -O [output_prefix] -c [number of cores to use].  
-For more advanced and other usages, see MANUAL.pdf for details  
+msmutect -T [tumorbam.bam] -N [normalbam.bam] -l [loci_file.phobos] -O [output_prefix] -c [number of cores to use] -m.  
 
 # Publication
 For orginal paper, see 
