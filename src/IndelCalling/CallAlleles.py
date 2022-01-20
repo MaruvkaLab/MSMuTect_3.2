@@ -12,7 +12,7 @@ class AllelesMaximumLikelihood:
         # gets  all lengths with at least 5 read support
         self.histogram = histogram
         self.repeat_lengths = proper_lengths
-        self.num_reads = np.array([histogram.rounded_repeat_lengths[length] for length in self.repeat_lengths])
+        self.num_reads = np.array([histogram.rounded_repeat_lengths[length] for length in self.repeat_lengths], dtype=np.int)
         self.supported_repeat_lengths = supported_lengths
         self.num_alleles = supported_lengths.size
         self.noise_table = noise_table
@@ -113,7 +113,7 @@ def repeat_threshold(ms_length: int):
 
 
 def passes_filter(motif_length: int, repeat_size: float):
-    return repeat_threshold(motif_length) < repeat_size < 40
+    return repeat_threshold(motif_length) <= repeat_size <= 40
 
 
 def calculate_alleles(histogram: Histogram, noise_table: np.array, required_read_support=6):

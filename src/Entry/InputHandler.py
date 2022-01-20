@@ -18,6 +18,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-A", "--allele", help="Output allele file", action='store_true')
     parser.add_argument("-m", "--mutation", help="Output mutation file", action='store_true')
     parser.add_argument("-F", "--flanking", help="Length of flanking on both sides of an accepted read", type=int, default=10)
+    parser.add_argument("-r", "--read_level", help="Minimum number of reads to call allele", type=int, default=6)
     parser.add_argument("-f", "--force", help="overwrite pre-existing files", action='store_true')
     return parser
 
@@ -102,5 +103,8 @@ def validate_input(arguments: argparse.Namespace):
         exit_on("Cores must be equal to or greater than 1")
     elif arguments.flanking < 0:
         exit_on("Flanking must be equal to or greater than 0")
+    elif arguments.read_level < 1:
+        exit_on("Minimum Read Level for calling alleles must be equal to or greater than 1")
     elif not os.path.exists(arguments.loci_file):
         exit_on("Loci file path does not exist")
+

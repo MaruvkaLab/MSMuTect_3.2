@@ -93,8 +93,19 @@ def call_decision(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_tab
         return call_verified_locus(normal_alleles, tumor_alleles, noise_table, fisher_calculator, fisher_threshold, LOR_ratio)
 
 
+def equivalent_arrays(a: np.array, b: np.array) -> bool:
+    # returns whether arrays hold the same values in any value, is intended for integer arrays
+    if len(a)!=len(b):
+        return False
+    a_sorted = np.sort(a.astype(np.uint8))
+    b_sorted = np.sort(b.astype(np.uint8))
+    return (a_sorted == b_sorted).all()
+
+
 def call_mutations(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, fisher_calculator: Fisher) -> MutationCall:
-    if np.array_equal(normal_alleles.repeat_lengths, tumor_alleles.repeat_lengths):
+    if len(normal_alleles) == 0 or len(tumor_alleles) == 0:
+        return MutationCall(MutationCall.NO_NORMAL_ALLELES, normal_alleles, tumor_alleles, AICs())
+    elif equivalent_arrays(normal_alleles.repeat_lengths, tumor_alleles.repeat_lengths):
         return MutationCall(MutationCall.NOT_MUTATION, normal_alleles, tumor_alleles, AICs())
     else:
         return call_decision(normal_alleles, tumor_alleles, noise_table, fisher_calculator)

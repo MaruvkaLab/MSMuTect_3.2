@@ -17,16 +17,16 @@ def format_alleles(alleles: AlleleSet) -> str: # List[AlleleSet] not declared to
 
 
 def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
-                       batch_end: int, cores: int, flanking: int, output_prefix: str) -> None:
+                       batch_end: int, cores: int, flanking: int, required_reads: int, output_prefix: str) -> None:
     loci_iterator = LociManager(loci_file, batch_start)
     noise_table = get_noise_table()
-    results = BatchUtil.run_batch(partial_single_allelic, [BAM, flanking, noise_table],
+    results = BatchUtil.run_batch(partial_single_allelic, [BAM, flanking, noise_table, required_reads],
                                                            loci_iterator,  (batch_end - batch_start), cores)
     header = f"{Locus.header()}\t{Histogram.header()}\t{AlleleSet.header()}"
     BatchUtil.write_results(output_prefix + ".all", results, header)
 
 
-def partial_single_allelic(loci: List[Locus], BAM: str, flanking: int, noise_table) -> List[str]:
+def partial_single_allelic(loci: List[Locus], BAM: str, flanking: int, noise_table, required_reads=6) -> List[str]:
     BAM_handle = AlignmentFile(BAM, "rb")
     allelic_results: List[str] = []
     if len(loci) == 0:
@@ -36,7 +36,7 @@ def partial_single_allelic(loci: List[Locus], BAM: str, flanking: int, noise_tab
         current_histogram = Histogram(locus)
         reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
         current_histogram.add_reads(reads)
-        current_alleles = calculate_alleles(current_histogram, noise_table)
+        current_alleles = calculate_alleles(current_histogram, noise_table, required_read_support=required_reads)
         allelic_results.append(format_alleles(current_alleles))
     return allelic_results
 

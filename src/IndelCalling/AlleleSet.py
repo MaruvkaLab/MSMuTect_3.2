@@ -20,6 +20,9 @@ class AlleleSet:
     def header(prefix=''):
         return f"{prefix}LOG_LIKELIHOOD\t{prefix}ALLELE_1\t{prefix}ALLELES_2\t{prefix}ALLELES_3\t{prefix}ALLELES_4\t{prefix}FRACTION_1\t{prefix}FRACTION_2\t{prefix}FRACTION_3\t{prefix}FRACTION_4"
 
+    def __len__(self):
+        return len(self.repeat_lengths)
+
     def sorted_alleles(self) -> Tuple[np.array, np.array]:
         if self.repeat_lengths.size == 0:  # alleles are empty
             return np.array([]), np.array([])
