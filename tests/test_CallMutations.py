@@ -13,6 +13,5 @@ class TestCalcAlleles(unittest.TestCase):
         self.assertTrue(0 in vecs.first_set and 0 in vecs.second_set)
 
 
-
 if __name__ == '__main__':
     unittest.main()

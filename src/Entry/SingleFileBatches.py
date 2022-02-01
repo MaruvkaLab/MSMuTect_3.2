@@ -10,10 +10,7 @@ from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Locus import Locus
 from src.IndelCalling.CallAlleles import calculate_alleles
 from . import BatchUtil
-
-
-def format_alleles(alleles: AlleleSet) -> str: # List[AlleleSet] not declared to avoid circular import
-    return f"{alleles.histogram.locus}\t{str(alleles.histogram)}\t{str(alleles)}"
+from .formatting import format_alleles, format_histogram
 
 
 def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
@@ -48,10 +45,6 @@ def run_single_histogram(BAM: str, loci_file: str, batch_start: int,
                                   (batch_end - batch_start), cores)
     header = f"{Locus.header()}\t{Histogram.header()}"
     BatchUtil.write_results(output_prefix + ".hist", results, header)
-
-
-def format_histogram(histogram: Histogram) -> str:
-    return f"{str(histogram.locus)}\t{str(histogram)}"
 
 
 def partial_single_histogram(loci: List[Locus], BAM: str, flanking: int) -> List[str]:

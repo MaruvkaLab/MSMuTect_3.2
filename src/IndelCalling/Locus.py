@@ -11,6 +11,7 @@ class Locus:
 
     @staticmethod
     def parse_chromosome(chromosome: str) -> str:
+        # returns numerical version of chromosome: ie. chr17 -> 17
         if len(chromosome) < 3:
             return chromosome
         else:
@@ -21,10 +22,3 @@ class Locus:
             else:
                 if chromosome[-1].upper() == 'X' or chromosome[-1].upper() == 'Y':
                     return chromosome[-1].upper()
-
-    def __str__(self):
-        return f"{self.chromosome}\t{self.start}\t{self.end}\t{self.pattern}\t{self.sequence}\t{self.repeats}"
-
-    @staticmethod
-    def header():
-        return "CHROMOSOME\tSTART\tEND\tPATTERN\tREFERENCE_SEQUENCE\tREFERENCE_REPEATS"

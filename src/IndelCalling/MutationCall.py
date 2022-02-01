@@ -18,15 +18,3 @@ class MutationCall:
         self.aic_values = aic_values
         self.p_value = p_value
 
-    def format_pval(self):
-        if self.p_value == -1:
-            return 'NA'
-        else:
-            return str(self.p_value)
-
-    @staticmethod
-    def header():
-        return "CALL\tP_VALUE"
-
-    def __str__(self):
-        return f"{self.call}\t{self.format_pval()}"

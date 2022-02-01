@@ -1,5 +1,4 @@
 # cython: language_level=3
-import numpy as np
 from typing import List
 from collections import namedtuple
 from pysam import AlignmentFile
@@ -8,7 +7,7 @@ from src.IndelCalling.Locus import Locus
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Histogram import Histogram
 from src.IndelCalling.CallAlleles import calculate_alleles
-from src.IndelCalling.CallMutations import call_mutations, is_possible_mutation, call_verified_locus
+from src.IndelCalling.CallMutations import call_mutations, is_possible_mutation
 from src.IndelCalling.FisherTest import Fisher
 from src.IndelCalling.MutationCall import MutationCall
 from src.IndelCalling.AICs import AICs
@@ -16,12 +15,9 @@ from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.GenomicUtils.LocusFile import LociManager
 from src.GenomicUtils.NoiseTable import get_noise_table
 from . import BatchUtil
+from .formatting import format_mutation_call
 
 PairResults = namedtuple("PairResults", ['normal_alleles', 'tumor_alleles', 'decision'])
-
-
-def format_mutation_call(decision: MutationCall):
-    return f"{str(decision.normal_alleles.histogram.locus)}\t{str(decision.normal_alleles.histogram)}\t{str(decision.normal_alleles)}\t{str(decision.tumor_alleles.histogram)}\t{str(decision.tumor_alleles)}\t{str(decision)}\t{str(decision.aic_values)}"
 
 
 def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,

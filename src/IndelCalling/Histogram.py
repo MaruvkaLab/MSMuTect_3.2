@@ -3,7 +3,7 @@ from typing import Dict, List
 from collections import defaultdict
 from pysam import AlignedSegment
 
-from src.Entry.FormatUtil import format_list
+from src.Entry.formatting import format_list
 from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
 from src.IndelCalling.Locus import Locus
 
@@ -51,21 +51,10 @@ class Histogram:
             self.build_rounded()
         return self._rounded_repeats
 
-    @staticmethod
-    def header(prefix=''):
-        return f"{prefix}MOTIF_REPEATS_1\t{prefix}MOTIF_REPEATS_2\t{prefix}MOTIF_REPEATS_3\t{prefix}MOTIF_REPEATS_4\t{prefix}MOTIF_REPEATS_5\t{prefix}MOTIF_REPEATS_6\t{prefix}SUPPORTING_READS_1\t{prefix}SUPPORTING_READS_2\t{prefix}SUPPORTING_READS_3\t{prefix}SUPPORTING_READS_4\t{prefix}SUPPORTING_READS_5\t{prefix}SUPPORTING_READS_6"
-
     def prune_keys(self):
         for k in list(self.repeat_lengths.keys()): # list so dictionary size of keys don't change during pruning
             if self.repeat_lengths[k] == 0:
                 del self.repeat_lengths[k]
-
-    def __str__(self):
-        self.prune_keys()
-        sorted_repeats = sorted(self.repeat_lengths, key=self.repeat_lengths.get, reverse=True)
-        ordered_repeats = [str(repeat) for repeat in sorted_repeats]
-        ordered_support = [str(self.repeat_lengths[repeat]) for repeat in sorted_repeats]
-        return format_list(ordered_repeats, 6) + "\t" + format_list(ordered_support, 6)
 
     def __eq__(self, other):
         for length in self.repeat_lengths:
