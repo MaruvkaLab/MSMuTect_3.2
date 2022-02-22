@@ -3,6 +3,7 @@ from typing import List
 from collections import namedtuple
 from multiprocessing import Pool
 
+from src.GenomicUtils.DetectLocusSolver import NoiseLocusParser
 from src.GenomicUtils.LocusParser import LociManager
 
 Chunk = namedtuple("Chunk", ["start", "end"])
@@ -37,6 +38,11 @@ def write_results(output_prefix: str, results: List[str], header):
         output_file.write("\n".join(results))
 
 
+def write_msidetect_results(results: str, output_prefix: str):
+    with open(f"{output_prefix}.res", 'w+') as msi_detect_results:
+        msi_detect_results.write(results)
+
+
 def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int) -> list:
     """
     runs batch fuction without invoking pool to save performance (serialization, etc.)
@@ -50,14 +56,33 @@ def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, 
 
 
 def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int) -> list:
-    """
-    :param batch_function: function to run on given loci. First argument must be list of loci
-    :param args: other args to feed function
-    :return: results from given function
-    """
     results = []
     if cores == 1:
         return run_single_threaded(batch_function, args, loci_iterator, total_batch_size)
+    with Pool(processes=cores) as threads:
+        batch_sizes = get_batch_sizes(total_batch_size, 100_000)
+        for batch in batch_sizes:
+            current_loci = loci_iterator.get_batch(batch)
+            results.append(threads.apply_async(batch_function,
+                                               args=([current_loci] + args)))
+        threads.close()
+        threads.join()
+    return extract_results(results)
+
+
+def run_msidetect_single_threaded(batch_function, args: list, loci_iterator: NoiseLocusParser, total_batch_size: int) -> str:
+    results = []
+    batch_sizes = get_batch_sizes(total_batch_size, 100_000)
+    for batch in batch_sizes:
+        current_loci = loci_iterator.get_batch(batch)
+        results += batch_function(*([current_loci] + args))
+    return results
+
+
+def run_msidetect_batch(batch_function, args: list, loci_iterator: NoiseLocusParser, total_batch_size: int, cores: int) -> str:
+    results = []
+    if cores == 1:
+        return run_msidetect_single_threaded(batch_function, args, loci_iterator, total_batch_size)
     with Pool(processes=cores) as threads:
         batch_sizes = get_batch_sizes(total_batch_size, 100_000)
         for batch in batch_sizes:

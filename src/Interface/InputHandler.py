@@ -10,7 +10,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-N", "--normal_file", help="Non-tumor BAM file")
     parser.add_argument("-S", "--single_file", help="Analyze a single file for histogram and/or alleles")
     parser.add_argument("-D", "--msi_detect", help="Run MSI Detect instead", action='store_true')
-    parser.add_argument("-n", "--noise_directory", help="Directory containing the noise files for MSIDetect", type=str)
+    parser.add_argument("-n", "--noise_file", help="The noise file for MSIDetect", type=str)
     parser.add_argument("-l", "--loci_file", help="File of loci to be processed and included in the output", required=True)
     parser.add_argument("-O", "--output_prefix", help="prefix for all output files", required=True)
     parser.add_argument("-c", "--cores", help="Number of cores to run MSMuTect on", type=int, default=1)
@@ -76,8 +76,11 @@ def validate_output_files(arguments: argparse.Namespace):
         if arguments.histogram and not arguments.allele:
             if os.path.exists(arguments.output_prefix + ".hist.tsv"):
                 exit_on(overwrite_files_mssg)
-        else:
+        elif arguments.histogram:
             if os.path.exists(arguments.output_prefix + ".all.tsv"):
+                exit_on(overwrite_files_mssg)
+        elif arguments.msi_detect:
+            if os.path.exists(arguments.output_prefix + ".res"):
                 exit_on(overwrite_files_mssg)
     else:
         if (arguments.histogram or arguments.allele) and arguments.mutation and os.path.exists(arguments.output_prefix + ".full.mut.tsv"):
@@ -101,8 +104,10 @@ def validate_input(arguments: argparse.Namespace):
         exit_on("Pair of files must be provided to call mutations")
     elif arguments.msi_detect and (arguments.tumor_file or arguments.normal_file):
         exit_on("MSI Detect only works on single files. See -S flag")
-    elif arguments.msi_detect and not arguments.noise_directory:
-        exit_on("MSI Detect requires noise directory. See -n flag")
+    elif arguments.msi_detect and not arguments.noise_file:
+        exit_on("MSI Detect requires noise file. See -n flag")
+    elif arguments.msi_detect and not os.path.exists(arguments.noise_file):
+        exit_on("Given noise file does not exist")
     elif arguments.batch_start <= 0:
         exit_on("Batch Start must be equal to or greater than 1")
     elif arguments.cores <= 0:

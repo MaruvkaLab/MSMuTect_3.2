@@ -2,10 +2,11 @@
 from typing import List
 from pysam import AlignmentFile
 
-from src.GenomicUtils.LociMap import LociMap
+from src.GenomicUtils.DetectLocusSolver import NoiseLocusParser
 from src.GenomicUtils.LocusParser import LociManager
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.GenomicUtils.NoiseTable import get_noise_table
+from src.IndelCalling.NoiseLocus import NoiseLocus
 from src.IndelCalling.Histogram import Histogram
 from src.IndelCalling.Locus import Locus
 from src.IndelCalling.CallAlleles import calculate_alleles
@@ -16,14 +17,25 @@ from .formatting import format_alleles, format_histogram, locus_header, histogra
 # that strings are the most compact representation possible, and memory availability is important
 
 
-def run_msi_detect(noise_directory: str, single_file: str, loci_file: str, batch_start: int, batch_end: int, cores: int,
+def run_msi_detect(noise_file: str, single_file: str, loci_file: str, batch_start: int, batch_end: int, cores: int,
                    flanking: int, output_prefix: str) -> None:
-    loci_map = LociMap(loci_file, batch_start, batch_end)
-    results = BatchUtil.run_batch(partial_msi_detect, [BAM, flanking, noise_table, required_reads],
-                                                           loci_iterator,  (batch_end - batch_start), cores)
+    loci_iterator = NoiseLocusParser(loci_file, noise_file, batch_start)
+    results = BatchUtil.run_msidetect_batch(partial_msi_detect, [single_file, flanking], loci_iterator,  (batch_end - batch_start), cores)
+    BatchUtil.write_msidetect_results(output_prefix, results)
 
-def partial_msi_detect() -> List[str]:
-    pass
+
+def partial_msi_detect(loci: List[NoiseLocus], BAM: str, flanking: int) -> List[str]:
+    BAM_handle = AlignmentFile(BAM, "rb")
+    allelic_results: List[str] = []
+    if len(loci) == 0:
+        return []
+    reads_fetcher = ReadsFetcher(BAM_handle, loci[0].chromosome)
+    for locus in loci:
+        current_histogram = Histogram(locus)
+        reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
+        current_histogram.add_reads(reads)
+
+    return allelic_results
 
 
 def run_single_allelic(BAM: str, loci_file: str, batch_start: int,

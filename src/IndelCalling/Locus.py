@@ -22,3 +22,6 @@ class Locus:
             else:
                 if chromosome[-1].upper() == 'X' or chromosome[-1].upper() == 'Y':
                     return chromosome[-1].upper()
+
+    def __eq__(self, other):
+        return self.start == other.start and self.end == other.end and self.chromosome == other.chromsome
