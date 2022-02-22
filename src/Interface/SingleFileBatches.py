@@ -2,15 +2,28 @@
 from typing import List
 from pysam import AlignmentFile
 
-from src.GenomicUtils.LocusFile import LociManager
+from src.GenomicUtils.LociMap import LociMap
+from src.GenomicUtils.LocusParser import LociManager
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.GenomicUtils.NoiseTable import get_noise_table
 from src.IndelCalling.Histogram import Histogram
-from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Locus import Locus
 from src.IndelCalling.CallAlleles import calculate_alleles
 from . import BatchUtil
-from .formatting import format_alleles, format_histogram
+from .formatting import format_alleles, format_histogram, locus_header, histogram_header, allele_header
+
+# The reason functions are not composed of one another (for instance, having allele function call histogram generation is
+# that strings are the most compact representation possible, and memory availability is important
+
+
+def run_msi_detect(noise_directory: str, single_file: str, loci_file: str, batch_start: int, batch_end: int, cores: int,
+                   flanking: int, output_prefix: str) -> None:
+    loci_map = LociMap(loci_file, batch_start, batch_end)
+    results = BatchUtil.run_batch(partial_msi_detect, [BAM, flanking, noise_table, required_reads],
+                                                           loci_iterator,  (batch_end - batch_start), cores)
+
+def partial_msi_detect() -> List[str]:
+    pass
 
 
 def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
@@ -19,7 +32,7 @@ def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
     noise_table = get_noise_table()
     results = BatchUtil.run_batch(partial_single_allelic, [BAM, flanking, noise_table, required_reads],
                                                            loci_iterator,  (batch_end - batch_start), cores)
-    header = f"{Locus.header()}\t{Histogram.header()}\t{AlleleSet.header()}"
+    header = f"{locus_header()}\t{histogram_header()}\t{allele_header()}"
     BatchUtil.write_results(output_prefix + ".all", results, header)
 
 
@@ -43,7 +56,7 @@ def run_single_histogram(BAM: str, loci_file: str, batch_start: int,
     loci_iterator = LociManager(loci_file, batch_start)
     results = BatchUtil.run_batch(partial_single_histogram, [BAM, flanking], loci_iterator,
                                   (batch_end - batch_start), cores)
-    header = f"{Locus.header()}\t{Histogram.header()}"
+    header = f"{locus_header()}\t{histogram_header()}"
     BatchUtil.write_results(output_prefix + ".hist", results, header)
 
 

@@ -3,7 +3,7 @@ from typing import List
 from collections import namedtuple
 from multiprocessing import Pool
 
-from src.GenomicUtils.LocusFile import LociManager
+from src.GenomicUtils.LocusParser import LociManager
 
 Chunk = namedtuple("Chunk", ["start", "end"])
 

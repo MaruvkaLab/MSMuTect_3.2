@@ -1,8 +1,8 @@
 import argparse
 
-from src.Entry.SingleFileBatches import run_single_allelic, run_single_histogram
-from src.Entry.PairFileBatches import run_full_pair, run_mutations_pair
-from src.Entry.InputHandler import create_parser, validate_input
+from src.Interface.SingleFileBatches import run_single_allelic, run_single_histogram
+from src.Interface.PairFileBatches import run_full_pair, run_mutations_pair
+from src.Interface.InputHandler import create_parser, validate_input
 
 
 def count_lines(file: str):
@@ -19,6 +19,8 @@ def run_msmutect(args: argparse.Namespace):
         if args.allele or not args.histogram:
             run_single_allelic(args.single_file, args.loci_file, args.batch_start - 1,
                                batch_end, args.cores, args.flanking, args.read_level, args.output_prefix)
+        elif args.msi_detect:
+            run_msi_detect(args.noise_directory, args.single_file, args.loci_file, args.batch_start - 1, batch_end, args.cores, args.flanking, args.output_prefix)
         else:
             run_single_histogram(args.single_file, args.loci_file, args.batch_start - 1,
                                  batch_end, args.cores, args.flanking, args.output_prefix)

@@ -3,7 +3,6 @@ from typing import Dict, List
 from collections import defaultdict
 from pysam import AlignedSegment
 
-from src.Entry.formatting import format_list
 from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
 from src.IndelCalling.Locus import Locus
 

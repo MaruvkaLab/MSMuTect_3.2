@@ -9,6 +9,8 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-T", "--tumor_file", help="Tumor BAM file")
     parser.add_argument("-N", "--normal_file", help="Non-tumor BAM file")
     parser.add_argument("-S", "--single_file", help="Analyze a single file for histogram and/or alleles")
+    parser.add_argument("-D", "--msi_detect", help="Run MSI Detect instead", action='store_true')
+    parser.add_argument("-n", "--noise_directory", help="Directory containing the noise files for MSIDetect", type=str)
     parser.add_argument("-l", "--loci_file", help="File of loci to be processed and included in the output", required=True)
     parser.add_argument("-O", "--output_prefix", help="prefix for all output files", required=True)
     parser.add_argument("-c", "--cores", help="Number of cores to run MSMuTect on", type=int, default=1)
@@ -95,8 +97,12 @@ def validate_input(arguments: argparse.Namespace):
     validate_output_files(arguments)
     if not os.path.exists(arguments.loci_file):
         exit_on("Provided loci file does not exist")
-    if arguments.mutation and arguments.single_file:
+    elif arguments.mutation and arguments.single_file:
         exit_on("Pair of files must be provided to call mutations")
+    elif arguments.msi_detect and (arguments.tumor_file or arguments.normal_file):
+        exit_on("MSI Detect only works on single files. See -S flag")
+    elif arguments.msi_detect and not arguments.noise_directory:
+        exit_on("MSI Detect requires noise directory. See -n flag")
     elif arguments.batch_start <= 0:
         exit_on("Batch Start must be equal to or greater than 1")
     elif arguments.cores <= 0:

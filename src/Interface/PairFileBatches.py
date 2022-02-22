@@ -12,7 +12,7 @@ from src.IndelCalling.FisherTest import Fisher
 from src.IndelCalling.MutationCall import MutationCall
 from src.IndelCalling.AICs import AICs
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
-from src.GenomicUtils.LocusFile import LociManager
+from src.GenomicUtils.LocusParser import LociManager
 from src.GenomicUtils.NoiseTable import get_noise_table
 from . import BatchUtil
 from .formatting import format_mutation_call

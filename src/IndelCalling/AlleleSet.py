@@ -2,7 +2,6 @@
 from typing import Tuple
 import numpy as np
 
-from src.Entry.formatting import format_list
 from src.IndelCalling.Histogram import Histogram
 
 

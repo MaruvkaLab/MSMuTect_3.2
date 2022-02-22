@@ -1,6 +1,6 @@
 import unittest
 
-from src.Entry.BatchUtil import *
+from src.Interface.BatchUtil import *
 
 
 class TestBatchUtil(unittest.TestCase):

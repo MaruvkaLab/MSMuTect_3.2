@@ -5,9 +5,9 @@ from Cython.Build import cythonize
 setup(
     name='msmutect',
     version='0.5',
-    packages=['src', 'src.Entry', 'src.GenomicUtils', 'src.IndelCalling'],
+    packages=['src', 'src.Interface', 'src.GenomicUtils', 'src.IndelCalling'],
     entry_points={
-        'console_scripts': ['msmutect=src.Entry.main:main'],
+        'console_scripts': ['msmutect=src.Interface.main:main'],
     },
     url='https://github.com/MaruvkaLab/MSMuTect_0.5',
     license='MIT',
@@ -34,7 +34,7 @@ setup(
     ],
     ext_modules=cythonize(['src/IndelCalling/FisherTest.pyx', 'src/IndelCalling/CallMutations.pyx',
                          'src/IndelCalling/CallAlleles.pyx', 'src/GenomicUtils/ReadsFetcher.pyx',
-                         'src/IndelCalling/Histogram.pyx', 'src/Entry/SingleFileBatches.pyx',
+                         'src/IndelCalling/Histogram.pyx', 'src/Interface/SingleFileBatches.pyx',
                          'src/IndelCalling/Locus.pyx', 'src/IndelCalling/AlleleSet.pyx',
-                         'src/GenomicUtils/LocusFile.pyx', 'src/Entry/PairFileBatches.pyx'])
+                         'src/GenomicUtils/LocusFile.pyx', 'src/Interface/PairFileBatches.pyx'])
 )
