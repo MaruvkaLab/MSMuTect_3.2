@@ -6,7 +6,9 @@ from src.Interface.InputHandler import create_parser, validate_input
 
 
 def count_lines(file: str):
-    return sum(1 for _ in open(file, 'rb'))
+    with open(file, 'rb') as opened_file:
+        count=sum(1 for _ in opened_file)
+    return count
 
 
 def run_msmutect(args: argparse.Namespace):
@@ -16,7 +18,7 @@ def run_msmutect(args: argparse.Namespace):
     else:  # slight performance hit: ~ 1 sec / 2*10^6 loci
         batch_end = count_lines(args.loci_file)
     if args.single_file:
-        if args.allele or not args.histogram:
+        if args.allele or not args.histogram:  # default for single file is alleles, unless -histogram is specified
             run_single_allelic(args.single_file, args.loci_file, args.batch_start - 1,
                                batch_end, args.cores, args.flanking, args.read_level, args.output_prefix)
         elif args.msi_detect:

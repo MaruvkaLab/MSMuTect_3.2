@@ -2,7 +2,6 @@
 from typing import List
 from pysam import AlignmentFile
 
-from src.GenomicUtils.DetectLocusSolver import NoiseLocusParser
 from src.GenomicUtils.LocusParser import LociManager
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.GenomicUtils.NoiseTable import get_noise_table
@@ -15,11 +14,12 @@ from .formatting import format_alleles, format_histogram, locus_header, histogra
 
 # The reason functions are not composed of one another (for instance, having allele function call histogram generation is
 # that strings are the most compact representation possible, and memory availability is important
+from ..GenomicUtils.NoiseParser import NoiseLociParser
 
 
-def run_msi_detect(noise_file: str, single_file: str, loci_file: str, batch_start: int, batch_end: int, cores: int,
+def run_msi_detect(single_file: str, noise_file: str, batch_start: int, batch_end: int, cores: int,
                    flanking: int, output_prefix: str) -> None:
-    loci_iterator = NoiseLocusParser(loci_file, noise_file, batch_start)
+    loci_iterator = NoiseLociParser(noise_file, batch_start)
     results = BatchUtil.run_msidetect_batch(partial_msi_detect, [single_file, flanking], loci_iterator,  (batch_end - batch_start), cores)
     BatchUtil.write_msidetect_results(output_prefix, results)
 

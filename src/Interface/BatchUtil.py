@@ -3,8 +3,8 @@ from typing import List
 from collections import namedtuple
 from multiprocessing import Pool
 
-from src.GenomicUtils.DetectLocusSolver import NoiseLocusParser
 from src.GenomicUtils.LocusParser import LociManager
+from src.GenomicUtils.NoiseParser import NoiseLociParser
 
 Chunk = namedtuple("Chunk", ["start", "end"])
 
@@ -70,7 +70,7 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
     return extract_results(results)
 
 
-def run_msidetect_single_threaded(batch_function, args: list, loci_iterator: NoiseLocusParser, total_batch_size: int) -> str:
+def run_msidetect_single_threaded(batch_function, args: list, loci_iterator: NoiseLociParser, total_batch_size: int) -> str:
     results = []
     batch_sizes = get_batch_sizes(total_batch_size, 100_000)
     for batch in batch_sizes:
@@ -79,7 +79,7 @@ def run_msidetect_single_threaded(batch_function, args: list, loci_iterator: Noi
     return results
 
 
-def run_msidetect_batch(batch_function, args: list, loci_iterator: NoiseLocusParser, total_batch_size: int, cores: int) -> str:
+def run_msidetect_batch(batch_function, args: list, loci_iterator: NoiseLociParser, total_batch_size: int, cores: int) -> str:
     results = []
     if cores == 1:
         return run_msidetect_single_threaded(batch_function, args, loci_iterator, total_batch_size)

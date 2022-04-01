@@ -6,7 +6,7 @@ from src.IndelCalling.Locus import Locus
 
 class NoiseLocus(Locus):
     def __init__(self, chromosome: str,  start: int,  end: int,  pattern: str,  repeats: float, sequence: str,
-                 noise_array: np.array, is_msi: bool):
+                 mss_noise_array: np.array, msi_noise_array: np.array):
         super().__init__(chromosome, start, end, pattern, repeats, sequence)
-        self.noise_array = noise_array
-        self.is_msi = is_msi
+        self.mss_noise_array: np.array = mss_noise_array
+        self.msi_noise_array: np.array = msi_noise_array
