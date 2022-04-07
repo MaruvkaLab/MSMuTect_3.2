@@ -91,4 +91,4 @@ def run_msidetect_batch(batch_function, args: list, loci_iterator: NoiseLociPars
                                                args=([current_loci] + args)))
         threads.close()
         threads.join()
-    return extract_results(results)
+    return "\n".join(extract_results(results))

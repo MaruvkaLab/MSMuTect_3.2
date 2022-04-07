@@ -23,5 +23,9 @@ class Locus:
                 if chromosome[-1].upper() == 'X' or chromosome[-1].upper() == 'Y':
                     return chromosome[-1].upper()
 
+    @property
+    def motif_length(self):
+        return len(self.pattern)
+
     def __eq__(self, other):
         return self.start == other.start and self.end == other.end and self.chromosome == other.chromsome

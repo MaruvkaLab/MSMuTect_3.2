@@ -15,6 +15,7 @@ from .formatting import format_alleles, format_histogram, locus_header, histogra
 # The reason functions are not composed of one another (for instance, having allele function call histogram generation is
 # that strings are the most compact representation possible, and memory availability is important
 from ..GenomicUtils.NoiseParser import NoiseLociParser
+from ..IndelCalling.DetectLocusScores import DetectLocusScores
 
 
 def run_msi_detect(single_file: str, noise_file: str, batch_start: int, batch_end: int, cores: int,
@@ -34,7 +35,7 @@ def partial_msi_detect(loci: List[NoiseLocus], BAM: str, flanking: int) -> List[
         current_histogram = Histogram(locus)
         reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
         current_histogram.add_reads(reads)
-
+        locus_scores = DetectLocusScores(current_histogram)
     return allelic_results
 
 
