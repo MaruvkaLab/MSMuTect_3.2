@@ -2,11 +2,11 @@
 
 class DetectRepeat:
     # container class
-    def __init__(self, supporting_reads: int, num_repeats: int, num_bases: int, reference_read_dist: int, msi_locus_score: float, msi_shared_noise: float, mss_locus_score: float,
-                 mss_shared_noise: float):
+    def __init__(self, supporting_reads: int, num_repeats: int, num_bases: int, reference_read_dist: int, msi_locus_score: float,
+                 msi_shared_noise: float, mss_locus_score: float, mss_shared_noise: float):
+        self.supporting_reads = supporting_reads
         self.num_repeats = num_repeats
         self.num_bases = num_bases
-        self.supporting_reads = supporting_reads
         self.reference_read_dist = reference_read_dist ##WI
         self.msi_locus_score = msi_locus_score
         self.msi_shared_noise = msi_shared_noise

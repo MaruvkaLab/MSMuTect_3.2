@@ -1,5 +1,7 @@
 from typing import List
 
+from src.IndelCalling.DetectAggregator import DetectAggregator
+from src.IndelCalling.DetectRepeat import DetectRepeat
 from src.IndelCalling.Locus import Locus
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Histogram import Histogram
@@ -73,3 +75,19 @@ def mutation_call_string(mut_call: MutationCall):
 
 def format_mutation_call(decision: MutationCall):
     return f"{format_alleles(decision.normal_alleles)}\t{format_alleles(decision.tumor_alleles)}\t{mutation_call_string(decision)}"
+
+
+def detect_repeat_header() -> str:
+    return "SUPPORTING_READS\tNUM_REPEATS\tNUM_BASES\tDIFFERENCE_FROM_REF\tMSI_LOCUS_SCORE\tMSS_LOCUS_SCORE\tMSI_SHARED_NOISE\tMSS_SHARED_NOISE\tMSI_COMBINED_SCORE\tMSS_COMBINED_SCORE"
+
+
+def format_detect_repeat(repeat: DetectRepeat) -> str:
+    return f"{repeat.supporting_reads}\t{repeat.num_repeats}\t{repeat.num_bases}\t{repeat.reference_read_dist}\t{repeat.msi_locus_score}\t{repeat.mss_locus_score}\t{repeat.msi_shared_noise}\t{repeat.mss_shared_noise}\t{repeat.combined_msi_score}\t{repeat.combined_mss_score}"
+
+
+def aggregator_header() -> str:
+    return "ALL_COUNTED_READS\tREADS_SEEN\tREADS_CLEARING_THRESH\tRELATIVE_LOCI_SCORE\tRELATIVE_LOG_LOCI_SCORE\tRELATIVE_LOG_SHARED_NOISE\tRELATIVE_LOG_COMBINED_SCORE\tCALLED_RELATIVE_LOCI_SCORESt\tSCORE_NORMALIZED_BY_EVENT_SIZE\t"
+
+
+def format_aggregator(aggregator: DetectAggregator) -> str:
+    return f"{aggregator.all_counted_reads}\t{aggregator.candidate_counted_reads}\t{aggregator.reads_supporting_msi}\t{aggregator.relative_loci_score}\t{aggregator.relative_log_loci_score}\t{aggregator.relative_log_shared_noise}\t{aggregator.relative_log_combined_score}\t{aggregator.called_relative_loci_scores}\t{aggregator.score_normalized_by_event_size}"

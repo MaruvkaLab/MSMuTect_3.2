@@ -58,6 +58,9 @@ class Histogram:
     def read_support(self):
         return sum([self.repeat_lengths.values()])
 
+    def __getitem__(self, item):
+        return self.rounded_repeat_lengths[item]
+
     def __eq__(self, other):
         for length in self.repeat_lengths:
             if not self.repeat_lengths[length] == other.repeat_lengths[length]:

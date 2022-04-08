@@ -10,12 +10,16 @@ from src.IndelCalling.Histogram import Histogram
 from src.IndelCalling.Locus import Locus
 from src.IndelCalling.CallAlleles import calculate_alleles
 from . import BatchUtil
-from .formatting import format_alleles, format_histogram, locus_header, histogram_header, allele_header
+from .formatting import format_alleles, format_histogram, locus_header, histogram_header, allele_header, \
+    format_detect_repeat
 
 # The reason functions are not composed of one another (for instance, having allele function call histogram generation is
 # that strings are the most compact representation possible, and memory availability is important
 from ..GenomicUtils.NoiseParser import NoiseLociParser
-from ..IndelCalling.DetectLocusScores import DetectLocusScores
+from ..IndelCalling.DetectAggregator import DetectAggregator
+from ..IndelCalling.DetectLocusScores import score_repeats
+from ..IndelCalling.DetectParams import DetectParams
+from ..IndelCalling.DetectRepeat import DetectRepeat
 
 
 def run_msi_detect(single_file: str, noise_file: str, batch_start: int, batch_end: int, cores: int,
@@ -25,18 +29,22 @@ def run_msi_detect(single_file: str, noise_file: str, batch_start: int, batch_en
     BatchUtil.write_msidetect_results(output_prefix, results)
 
 
-def partial_msi_detect(loci: List[NoiseLocus], BAM: str, flanking: int) -> List[str]:
+def partial_msi_detect(loci: List[NoiseLocus], BAM: str, flanking: int) -> tuple[DetectAggregator, list[str]]:
     BAM_handle = AlignmentFile(BAM, "rb")
-    allelic_results: List[str] = []
+    compacted_scores = []
+    detect_params = DetectParams(-20, 0, 15.0, 0.00001, 5, 100) # Q
+    aggregator = DetectAggregator(detect_params)
     if len(loci) == 0:
-        return []
+        return aggregator, []
     reads_fetcher = ReadsFetcher(BAM_handle, loci[0].chromosome)
     for locus in loci:
         current_histogram = Histogram(locus)
         reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
         current_histogram.add_reads(reads)
-        locus_scores = DetectLocusScores(current_histogram)
-    return allelic_results
+        locus_scores: list[DetectRepeat] = score_repeats(current_histogram)
+        aggregator.add_loci_scores(locus_scores, current_histogram)
+        compacted_scores+=[format_detect_repeat(repeat) for repeat in locus_scores]
+    return aggregator, compacted_scores
 
 
 def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
