@@ -7,20 +7,21 @@ setup(
     version='0.5',
     packages=['src', 'src.Interface', 'src.GenomicUtils', 'src.IndelCalling'],
     entry_points={
-        'console_scripts': ['msmutect=src.Interface.main:main'],
+        'console_scripts': ['msmutect=src.Interface.msmutect:main', 'msidetect=src.Interface.msidetect:main'],
     },
     url='https://github.com/MaruvkaLab/MSMuTect_0.5',
     license='MIT',
     author='Avraham Kahan, Yossi Maruvka, and the Maruvka Lab at Technion',
     author_email='yosi.maruvka@bfe.technion.ac.il',
-    description='Tool to determine microsatellite in/stability in Tumors from DNA sequencing',
+    description='Tools to determine microsatellite in/stability in Tumors from DNA sequencing',
     long_description=f"{pathlib.Path(__file__).parent}/README.md",
     long_description_content_type="text/markdown",
     install_requires=['typing>=3.7.4.3',
-                        'numpy>=1.20.1',
+                        'numpy>=1.19.5',
                         'pysam>=0.16.0.1',
                         'scipy>=1.6.1',
-                        'setuptools>=54.1.1'
+                        'setuptools>=54.1.1',
+                        'Cython>=0.29.23'
                         ],
 
     classifiers=[
