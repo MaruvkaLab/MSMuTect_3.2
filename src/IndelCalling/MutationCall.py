@@ -4,6 +4,7 @@ from src.IndelCalling.AICs import AICs
 
 class MutationCall:
     # pseudo enum
+    REVERTED_TO_NORMAL = -5
     NO_NORMAL_ALLELES = -4
     BORDERLINE_NONMUTATION = -3
     TOO_MANY_ALLELES = -2
@@ -24,9 +25,21 @@ class MutationCall:
         else:
             return str(self.p_value)
 
+    def call_abbreviation(self, call: int) -> str:
+        abbreviations = {
+                         MutationCall.REVERTED_TO_NORMAL: "RN",
+                         MutationCall.NO_NORMAL_ALLELES: "NNA",
+                         MutationCall.BORDERLINE_NONMUTATION: "FFT", # failed fisher test
+                         MutationCall.TOO_MANY_ALLELES : "TMA",
+                         MutationCall.INSUFFICIENT: "INS",
+                         MutationCall.NOT_MUTATION: "NM",
+                         MutationCall.MUTATION: "M"}
+        return abbreviations[call]
+
+
     @staticmethod
     def header():
         return "CALL\tP_VALUE"
 
     def __str__(self):
-        return f"{self.call}\t{self.format_pval()}"
+        return f"{self.call_abbreviation(self.call)}\t{self.format_pval()}"

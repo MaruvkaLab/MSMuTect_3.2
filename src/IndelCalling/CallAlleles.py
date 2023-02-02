@@ -84,10 +84,12 @@ class AllelesMaximumLikelihood:
                          repeat_lengths = self.best_alleles, frequencies=self.best_frequencies)
 
 
-def find_alleles(histogram: Histogram, proper_lengths: np.array, supported_repeat_lengths: np.array, noise_table: np.array) -> AlleleSet:
+def find_alleles(histogram: Histogram, proper_lengths: np.array, supported_repeat_lengths: np.array, noise_table: np.array, min_read_support: int = -1) -> AlleleSet:
     lesser_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table).get_alleles()
+    lesser_alleles_set.min_read_support = min_read_support
     for i in range(2, 5):
         greater_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table).get_alleles()
+        greater_alleles_set.min_read_support = min_read_support
         likelihood_increase = 2 * (greater_alleles_set.log_likelihood - lesser_alleles_set.log_likelihood)
         if likelihood_increase > 0:
             p_value_i_alleles = stats.chi2.pdf(likelihood_increase, 2)
@@ -123,8 +125,8 @@ def calculate_alleles(histogram: Histogram, noise_table: np.array, required_read
     supported_proper_motifs = np.array([length for length in proper_motif_sizes
                                         if histogram.rounded_repeat_lengths[length]>=required_read_support])
     if supported_proper_motifs.size == 0:
-        return AlleleSet(histogram, log_likelihood=-1, repeat_lengths=np.array([]), frequencies=np.array([-1]))
+        return AlleleSet(histogram, log_likelihood=-1, repeat_lengths=np.array([]), frequencies=np.array([-1]), min_read_support=required_read_support)
     elif supported_proper_motifs.size == 1:
-        return AlleleSet(histogram=histogram,  log_likelihood=0, repeat_lengths=np.array(list(supported_proper_motifs)), frequencies=np.array([1]))
+        return AlleleSet(histogram=histogram,  log_likelihood=0, repeat_lengths=np.array(list(supported_proper_motifs)), frequencies=np.array([1]), min_read_support=required_read_support)
     else:
-        return find_alleles(histogram, proper_motif_sizes, supported_proper_motifs, noise_table)
+        return find_alleles(histogram, proper_motif_sizes, supported_proper_motifs, noise_table, required_read_support)
