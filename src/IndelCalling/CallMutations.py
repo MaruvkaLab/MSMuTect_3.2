@@ -26,7 +26,7 @@ def cdf_test(first_allele_reads: int, second_allele_reads: int, p_equal: float =
 
 def check_normal_alleles(normal_alleles: AlleleSet, p_equal=0.3) -> int:
     if len(normal_alleles.repeat_lengths) == 0:
-        return MutationCall.NO_NORMAL_ALLELES
+        return MutationCall.NO_ALLELES
     elif len(normal_alleles.repeat_lengths) == 1:
         return MutationCall.MUTATION  # not that it is necessarily a mutation yet; however it may be
     elif len(normal_alleles.repeat_lengths) == 2:
@@ -106,7 +106,7 @@ def equivalent_arrays(a: np.array, b: np.array) -> bool:
 
 def call_mutations(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, fisher_calculator: Fisher) -> MutationCall:
     if len(normal_alleles) == 0 or len(tumor_alleles) == 0:
-        return MutationCall(MutationCall.NO_NORMAL_ALLELES, normal_alleles, tumor_alleles, AICs())
+        return MutationCall(MutationCall.NO_ALLELES, normal_alleles, tumor_alleles, AICs())
     elif equivalent_arrays(normal_alleles.repeat_lengths, tumor_alleles.repeat_lengths):
         return MutationCall(MutationCall.NOT_MUTATION, normal_alleles, tumor_alleles, AICs())
     else:

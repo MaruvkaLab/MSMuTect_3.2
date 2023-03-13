@@ -4,8 +4,8 @@ from src.IndelCalling.AICs import AICs
 
 class MutationCall:
     # pseudo enum
-    REVERTED_TO_NORMAL = -5
-    NO_NORMAL_ALLELES = -4
+    REVERTED_TO_REFERENCE = -5
+    NO_ALLELES = -4
     BORDERLINE_NONMUTATION = -3
     TOO_MANY_ALLELES = -2
     INSUFFICIENT = -1
@@ -27,9 +27,9 @@ class MutationCall:
 
     def call_abbreviation(self, call: int) -> str:
         abbreviations = {
-                         MutationCall.REVERTED_TO_NORMAL: "RN",
-                         MutationCall.NO_NORMAL_ALLELES: "NNA",
-                         MutationCall.BORDERLINE_NONMUTATION: "FFT", # failed fisher test
+                         MutationCall.REVERTED_TO_REFERENCE: "RR",
+                         MutationCall.NO_ALLELES: "AN", # either tumor or normal lacks alleles
+                         MutationCall.BORDERLINE_NONMUTATION: "FFT",  # failed fisher test
                          MutationCall.TOO_MANY_ALLELES : "TMA",
                          MutationCall.INSUFFICIENT: "INS",
                          MutationCall.NOT_MUTATION: "NM",
