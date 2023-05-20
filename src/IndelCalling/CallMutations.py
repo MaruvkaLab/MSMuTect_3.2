@@ -132,8 +132,13 @@ def reconstruct_tumor_alleles_without_reference_length(tumor_alleles: AlleleSet,
         return new_tumor_alleles
 
 
+def reversion_to_reference_simple(tumor_alleles: AlleleSet) -> bool:
+    reference_length = int(tumor_alleles.histogram.locus.repeats)
+    return len(tumor_alleles.repeat_lengths)==1 and reference_length in tumor_alleles.repeat_lengths.astype(np.int32)
+
+
 def reversion_to_reference(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, fisher_calculator: Fisher,
-                        fisher_threshold = 0.031, LOR_ratio = 8.0) -> bool:
+                           fisher_threshold = 0.031, LOR_ratio = 8.0) -> bool:
     reference_length = normal_alleles.histogram.locus.repeats
     if reference_length not in tumor_alleles.repeat_lengths:
         return False
@@ -159,7 +164,7 @@ def call_verified_locus(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noi
         p_value = fisher_test(normal_alleles, tumor_alleles, fisher_calculator)
         if p_value < fisher_threshold:
             if reversion_to_reference(normal_alleles, tumor_alleles, noise_table, fisher_calculator, fisher_threshold, LOR_ratio):
-                return MutationCall(MutationCall.MUTATION, normal_alleles, tumor_alleles, aic_values, p_value)
+                return MutationCall(MutationCall.REVERTED_TO_REFERENCE, normal_alleles, tumor_alleles, aic_values, p_value)
             else:
                 return MutationCall(MutationCall.MUTATION, normal_alleles, tumor_alleles, aic_values, p_value)
         else:

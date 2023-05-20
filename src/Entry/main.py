@@ -36,10 +36,10 @@ def run_msmutect(args: argparse.Namespace):
                                batch_end, args.cores, args.flanking, args.read_level, args.output_prefix + ".tumor")
         else:
             if args.histogram or args.allele:  # args.mutation=True
-                run_full_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start, batch_end,
+                run_full_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start-1, batch_end,
                               args.cores, args.flanking, args.read_level, args.output_prefix)
             else:  # args.mutation=True, just mutations
-                run_mutations_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start, batch_end,
+                run_mutations_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start-1, batch_end,
                                 args.cores, args.flanking, args.read_level, args.output_prefix)
 
 
