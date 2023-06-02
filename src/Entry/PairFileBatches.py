@@ -8,10 +8,10 @@ from src.IndelCalling.Locus import Locus
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Histogram import Histogram
 from src.IndelCalling.CallAlleles import calculate_alleles
-from src.IndelCalling.CallMutations import call_mutations, is_possible_mutation, call_verified_locus
+from src.IndelCalling.CallMutations import call_mutations, is_possible_mutation
 from src.IndelCalling.FisherTest import Fisher
 from src.IndelCalling.MutationCall import MutationCall
-from src.IndelCalling.AICs import AICs
+
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.GenomicUtils.LocusFile import LociManager
 from src.GenomicUtils.NoiseTable import get_noise_table
@@ -21,7 +21,7 @@ PairResults = namedtuple("PairResults", ['normal_alleles', 'tumor_alleles', 'dec
 
 
 def format_mutation_call(decision: MutationCall):
-    return f"{str(decision.normal_alleles.histogram.locus)}\t{str(decision.normal_alleles.histogram)}\t{str(decision.normal_alleles)}\t{str(decision.tumor_alleles.histogram)}\t{str(decision.tumor_alleles)}\t{str(decision)}\t{str(decision.aic_values)}"
+    return f"{str(decision.normal_alleles.histogram.locus)}\t{str(decision.normal_alleles.histogram)}\t{str(decision.normal_alleles)}\t{str(decision.tumor_alleles.histogram)}\t{str(decision.tumor_alleles)}\t{str(decision)}"
 
 
 def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
@@ -30,7 +30,7 @@ def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
     noise_table = get_noise_table()
     results: List[str] = BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table, required_reads], loci_iterator,
                                   (batch_end - batch_start), cores)
-    mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}\t{AICs.header()}"
+    mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}"
     BatchUtil.write_results(output_prefix + ".full.mut", results, mutation_header)
 
 
@@ -63,7 +63,7 @@ def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int
     results: List[str] = BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table, required_reads],
                                                      loci_iterator,
                                                      (batch_end - batch_start), cores)
-    mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}\t{AICs.header()}"
+    mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}"
     BatchUtil.write_results(output_prefix + ".partial.mut", results, mutation_header)
 
 

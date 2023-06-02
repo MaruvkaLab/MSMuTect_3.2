@@ -1,6 +1,5 @@
 # cython: language_level=3
 import numpy as np
-from collections import namedtuple
 from scipy.stats import binom
 
 from src.IndelCalling.CallAlleles import calculate_alleles
@@ -10,10 +9,9 @@ from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Histogram import Histogram
 from src.IndelCalling.AICs import AICs
 
-
 # used for generating sets for fisher test.
 # ex. (5.0_4, 6.0_5) and (3.0_2, 5.0_1) -> first_set = [0, 4, 5], second_set = [2, 0, 1]
-ComparedSets = namedtuple("ComparedSets", ['first_set', 'second_set'])
+from src.IndelCalling.hist2vecs import hist2vecs
 
 
 def cdf_test(first_allele_reads: int, second_allele_reads: int, p_equal: float = 0.3):
@@ -48,19 +46,6 @@ def log_likelihood(histogram: Histogram, alleles: AlleleSet, noise_table: np.arr
         if length < 40:
             L_k_log+=rounded_histogram[length]*np.log(sum(alleles.frequencies*noise_table[alleles.repeat_lengths, length]) + 1e-6)
     return L_k_log
-
-
-def hist2vecs(histogram_a: Histogram, histogram_b: Histogram) -> ComparedSets:
-    # ex. (5.0_4, 6.0_5) and (3.0_2, 5.0_1) -> first_set = [0, 4, 5], second_set = [2, 0, 1]
-    combined_lengths = set(list(histogram_a.rounded_repeat_lengths.keys()) + list(histogram_b.rounded_repeat_lengths.keys())) # WI: make sure this change is correct
-    first_set = np.zeros(len(combined_lengths))
-    second_set = np.zeros(len(combined_lengths))
-    i = 0
-    for length in combined_lengths:
-        first_set[i] = histogram_a.rounded_repeat_lengths[length]
-        second_set[i] = histogram_b.rounded_repeat_lengths[length]
-        i+=1
-    return ComparedSets(first_set=first_set, second_set=second_set)
 
 
 def calculate_AICs(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array) -> AICs:

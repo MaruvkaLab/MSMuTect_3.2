@@ -1,5 +1,7 @@
+from scipy.stats import ks_2samp
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.AICs import AICs
+from src.IndelCalling.hist2vecs import hist2vecs
 
 
 class MutationCall:
@@ -36,10 +38,16 @@ class MutationCall:
                          MutationCall.MUTATION: "M"}
         return abbreviations[call]
 
+    def ks_test_value(self):
+        reads_sets = hist2vecs(self.tumor_alleles.histogram, self.normal_alleles.histogram)  # order is important for Fisher test
+        ks_test_result = ks_2samp(reads_sets.first_set, reads_sets.second_set)
+        return ks_test_result
+
 
     @staticmethod
     def header():
-        return "CALL\tP_VALUE"
+        return f"CALL\tFISHER_TEST_P_VALUE\t{AICs.header()}\tKS_TEST_PVALUE\tKS_TEST_STATISTIC"
 
     def __str__(self):
-        return f"{self.call_abbreviation(self.call)}\t{self.format_pval()}"
+        ks_val = self.ks_test_value()
+        return f"{self.call_abbreviation(self.call)}\t{self.format_pval()}\t{str(self.aic_values)}\t{ks_val.pvalue}\t{ks_val.statistic}"
