@@ -43,7 +43,6 @@ class MutationCall:
     def ks_test_value(self) -> Tuple[float, float]:
         reads_sets = hist2vecs(self.tumor_alleles.histogram, self.normal_alleles.histogram)  # order is important for Fisher test
         if reads_sets.first_set.nbytes == 0 or reads_sets.second_set.nbytes == 0:
-            pass
             return -1, -1
         else:
             ks_test_result = ks_2samp(reads_sets.first_set, reads_sets.second_set)
