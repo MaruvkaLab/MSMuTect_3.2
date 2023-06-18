@@ -3,7 +3,7 @@ from typing import Tuple
 from scipy.stats import ks_2samp
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.AICs import AICs
-from src.IndelCalling.hist2vecs import hist2vecs
+from src.IndelCalling.hist2vecs import hist2vecs, hist2samps
 
 
 class MutationCall:
@@ -41,11 +41,11 @@ class MutationCall:
         return abbreviations[call]
 
     def ks_test_value(self) -> Tuple[float, float]:
-        reads_sets = hist2vecs(self.tumor_alleles.histogram, self.normal_alleles.histogram)  # order is important for Fisher test
-        if reads_sets.first_set.nbytes == 0 or reads_sets.second_set.nbytes == 0:
+        reads_samps = hist2samps(self.tumor_alleles.histogram, self.normal_alleles.histogram)  # order is important for Fisher test
+        if len(reads_samps[0]) == 0 or len(reads_samps[1])== 0:
             return -1, -1
         else:
-            ks_test_result = ks_2samp(reads_sets.first_set, reads_sets.second_set)
+            ks_test_result = ks_2samp(reads_samps[0], reads_samps[1])
             return ks_test_result.pvalue, ks_test_result.statistic
 
 

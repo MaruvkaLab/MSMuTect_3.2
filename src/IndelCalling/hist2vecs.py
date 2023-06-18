@@ -1,5 +1,5 @@
 import numpy as np
-
+from typing import Tuple, List
 from src.IndelCalling.ComparedSets import ComparedSets
 from src.IndelCalling.Histogram import Histogram
 
@@ -15,3 +15,18 @@ def hist2vecs(histogram_a: Histogram, histogram_b: Histogram) -> ComparedSets:
         second_set[i] = histogram_b.rounded_repeat_lengths[length]
         i+=1
     return ComparedSets(first_set=first_set, second_set=second_set)
+
+
+def sample_from_hist(hist: Histogram) -> List[int]:
+    ret = []
+    for length in hist.rounded_repeat_lengths:
+        for _ in range(hist.rounded_repeat_lengths[length]):
+            ret.append(length)
+    return ret
+
+
+def hist2samps(histogram_a: Histogram, histogram_b: Histogram) -> Tuple[List[int], List[int]]:
+    sample_a = sample_from_hist(histogram_a)
+    sample_b = sample_from_hist(histogram_b)
+    return sample_a, sample_b
+
