@@ -12,7 +12,7 @@ class AllelesMaximumLikelihood:
         # gets  all lengths with at least 5 read support
         self.histogram = histogram
         self.repeat_lengths = proper_lengths
-        self.num_reads = np.array([histogram.rounded_repeat_lengths[length] for length in self.repeat_lengths], dtype=np.int)
+        self.num_reads = np.array([histogram.rounded_repeat_lengths[length] for length in self.repeat_lengths], dtype=np.int32)
         self.supported_repeat_lengths = supported_lengths
         self.num_alleles = supported_lengths.size
         self.noise_table = noise_table

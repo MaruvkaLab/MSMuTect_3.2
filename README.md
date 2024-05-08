@@ -4,7 +4,6 @@ Indel, Allele and mutation caller, specifically designed to call MS-stable vs MS
 # Installation
 git clone https://github.com/MaruvkaLab/MSMuTect_0.5  
 cd MSMuTect_0.5  
-sh rename.sh  
 pip3 install -r requirements.txt
 
 # Usage
