@@ -1,8 +1,11 @@
+import multiprocessing.pool
 import os
+import shutil
 from typing import List
 from collections import namedtuple
 from multiprocessing import Pool
 
+from src.Entry.FileBackedQueue import FileBackedQueue
 from src.GenomicUtils.LocusFile import LociManager
 
 Chunk = namedtuple("Chunk", ["start", "end"])
@@ -22,11 +25,9 @@ def get_batch_sizes(total_batch_size: int, regular_size: int) -> List[int]:
     return batch_sizes
 
 
-def extract_results(results) -> List[str]:
+def extract_results(results: List[multiprocessing.pool.ApplyResult]) -> List[FileBackedQueue]:
     # extracts results from multiproccessing
-    combined = []
-    for result in results:
-        combined += result.get()
+    combined = [result.get() for result in results]
     return combined
 
 
@@ -37,6 +38,15 @@ def write_results(output_prefix: str, results: List[str], header):
         output_file.write("\n".join(results))
 
 
+def write_queues_results(output_prefix: str, results: List[FileBackedQueue], header: str):
+    with open(f"{output_prefix}.tsv", 'w+') as output_file:
+        output_file.write(header)
+        output_file.write("\n")
+        for r in results:
+            shutil.copyfileobj(open(r.out_file_path, 'r'), output_file)
+            r.delete_backing_file()
+
+
 def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int) -> list:
     """
     runs batch fuction without invoking pool to save performance (serialization, etc.)
@@ -45,11 +55,11 @@ def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, 
     batch_sizes = get_batch_sizes(total_batch_size, 100_000)
     for batch in batch_sizes:
         current_loci = loci_iterator.get_batch(batch)
-        results += batch_function(*([current_loci] + args))
+        results += batch_function(*([current_loci] + args)) # 0 is process number
     return results
 
 
-def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int) -> list:
+def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int) -> List[FileBackedQueue]:
     """
     :param batch_function: function to run on given loci. First argument must be list of loci
     :param args: other args to feed function
@@ -60,7 +70,7 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
         return run_single_threaded(batch_function, args, loci_iterator, total_batch_size)
     with Pool(processes=cores) as threads:
         batch_sizes = get_batch_sizes(total_batch_size, 100_000)
-        for batch in batch_sizes:
+        for i, batch in enumerate(batch_sizes):
             current_loci = loci_iterator.get_batch(batch)
             results.append(threads.apply_async(batch_function,
                                                args=([current_loci] + args)))

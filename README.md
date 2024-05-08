@@ -5,11 +5,10 @@ Indel, Allele and mutation caller, specifically designed to call MS-stable vs MS
 git clone https://github.com/MaruvkaLab/MSMuTect_0.5  
 cd MSMuTect_0.5  
 sh rename.sh  
-pip3 install . 
+pip3 install -r requirements.txt
 
 # Usage
-Full Manual: https://github.com/MaruvkaLab/MSMuTect_0.5/wiki/Manual  
-msmutect [flags]  
+msmutect.sh [flags]  
 For the most typical usage of calling microsatellite instability for a pair of BAMs:  
 msmutect -T [tumorbam.bam] -N [normalbam.bam] -l [loci_file.phobos] -O [output_prefix] -c [number of cores to use] -m.  
 
