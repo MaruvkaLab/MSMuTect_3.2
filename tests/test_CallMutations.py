@@ -1,5 +1,4 @@
-import unittest, numpy as np
-from typing import List
+import unittest
 
 from tests.test_utils.generate_histograms import get_histograms
 from src.IndelCalling.CallMutations import *

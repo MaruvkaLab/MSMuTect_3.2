@@ -30,7 +30,7 @@ def exit_on(message: str, status: int = 1):
 
 
 def simple_index_check(bam: str):
-    if not os.path.exists(bam + ".bai"):  # index file
+    if not os.path.exists(bam + ".bai")  and not os.path.exists(os.path.exists(bam[:-4] + ".bai") ):  # index file
         exit_on("Given BAM file/s are not sorted and/or indexed")
 
 
@@ -68,6 +68,8 @@ def validate_bams(arguments: argparse.Namespace):
 
 def validate_output_files(arguments: argparse.Namespace):
     overwrite_files_mssg = "Files would be overwritten by this run. To force overwrite, use -f flag"
+    if not os.path.exists(os.path.dirname(arguments.output_prefix)):
+        exit_on("Output directory does not exist")
     if arguments.force:
         return
     elif arguments.single_file:

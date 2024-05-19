@@ -23,5 +23,12 @@ class LociManager:
                 return loci
             loci.append(Locus(chromosome=locus[0], start=int(locus[3]), end=int(locus[4]), pattern=locus[12],
                           repeats=float(locus[6]), sequence=locus[13]))
+
+
         return loci
 
+
+if __name__ == '__main__':
+    # test all loci
+    tst = LociManager("/home/avraham/MaruvkaLab/full_ex/probs/tmp.phobos", 0)
+    tst.get_batch(10**10) # will get everything

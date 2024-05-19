@@ -1,11 +1,15 @@
+from typing import Tuple
+
+from scipy.stats import ks_2samp
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.AICs import AICs
+from src.IndelCalling.hist2vecs import hist2vecs, hist2samps
 
 
 class MutationCall:
     # pseudo enum
-    REVERTED_TO_NORMAL = -5
-    NO_NORMAL_ALLELES = -4
+    REVERTED_TO_REFERENCE = -5
+    NO_ALLELES = -4
     BORDERLINE_NONMUTATION = -3
     TOO_MANY_ALLELES = -2
     INSUFFICIENT = -1
@@ -27,19 +31,28 @@ class MutationCall:
 
     def call_abbreviation(self, call: int) -> str:
         abbreviations = {
-                         MutationCall.REVERTED_TO_NORMAL: "RN",
-                         MutationCall.NO_NORMAL_ALLELES: "NNA",
-                         MutationCall.BORDERLINE_NONMUTATION: "FFT", # failed fisher test
+                         MutationCall.REVERTED_TO_REFERENCE: "RR",
+                         MutationCall.NO_ALLELES: "AN", # either tumor or normal lacks alleles
+                         MutationCall.BORDERLINE_NONMUTATION: "FFT",  # failed fisher test
                          MutationCall.TOO_MANY_ALLELES : "TMA",
                          MutationCall.INSUFFICIENT: "INS",
                          MutationCall.NOT_MUTATION: "NM",
                          MutationCall.MUTATION: "M"}
         return abbreviations[call]
 
+    def ks_test_value(self) -> Tuple[float, float]:
+        reads_samps = hist2samps(self.tumor_alleles.histogram, self.normal_alleles.histogram)  # order is important for Fisher test
+        if len(reads_samps[0]) == 0 or len(reads_samps[1])== 0:
+            return -1, -1
+        else:
+            ks_test_result = ks_2samp(reads_samps[0], reads_samps[1])
+            return ks_test_result.pvalue, ks_test_result.statistic
+
 
     @staticmethod
     def header():
-        return "CALL\tP_VALUE"
+        return f"CALL\tFISHER_TEST_P_VALUE\t{AICs.header()}\tKS_TEST_PVALUE\tKS_TEST_STATISTIC"
 
     def __str__(self):
-        return f"{self.call_abbreviation(self.call)}\t{self.format_pval()}"
+        p_val, statistic = self.ks_test_value()
+        return f"{self.call_abbreviation(self.call)}\t{self.format_pval()}\t{str(self.aic_values)}\t{p_val}\t{statistic}"
