@@ -9,7 +9,7 @@ pip3 install -r requirements.txt
 # Usage
 First, the loci file must be sorted properly:
 This should work on all unix systems:   
-sort -t $'\t' -k1,1 -k5n,5 -k4n,4 -V [original loci file] > [new loci file]
+sort -t $'\t' -k1,1 -k5n,5 -k4n,4 -V [original loci file] > [new loci file]    
 Then: 
 msmutect.sh [flags]  
 For the most typical usage of calling microsatellite instability for a pair of BAMs:  
