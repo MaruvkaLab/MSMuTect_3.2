@@ -68,6 +68,8 @@ def validate_bams(arguments: argparse.Namespace):
 
 def validate_output_files(arguments: argparse.Namespace):
     overwrite_files_mssg = "Files would be overwritten by this run. To force overwrite, use -f flag"
+    if not os.path.exists(os.path.dirname(arguments.output_prefix)):
+        exit_on("Output directory does not exist")
     if arguments.force:
         return
     elif arguments.single_file:

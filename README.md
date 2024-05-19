@@ -11,6 +11,7 @@ msmutect.sh [flags]
 For the most typical usage of calling microsatellite instability for a pair of BAMs:  
 msmutect -T [tumorbam.bam] -N [normalbam.bam] -l [loci_file.phobos] -O [output_prefix] -c [number of cores to use] -m.  
 
+If a run gets interrupted files with names like tmp_25147_1716098274.1160007_92669 will be left in the output directory. They can be deleted with no issue
 # Publication
 For orginal paper, see 
 YE  Maruvka, Mouw K,  et al, Analysis of somatic microsatellite indels identifies driver events in human tumors

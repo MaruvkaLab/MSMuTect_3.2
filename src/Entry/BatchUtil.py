@@ -47,7 +47,7 @@ def write_queues_results(output_prefix: str, results: List[FileBackedQueue], hea
             r.delete_backing_file()
 
 
-def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int) -> list:
+def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, result_dir: str) -> list:
     """
     runs batch fuction without invoking pool to save performance (serialization, etc.)
     """
@@ -55,11 +55,11 @@ def run_single_threaded(batch_function, args: list, loci_iterator: LociManager, 
     batch_sizes = get_batch_sizes(total_batch_size, 100_000)
     for batch in batch_sizes:
         current_loci = loci_iterator.get_batch(batch)
-        results += batch_function(*([current_loci] + args)) # 0 is process number
+        results.append(batch_function(*([current_loci] + args + [result_dir])))
     return results
 
 
-def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int) -> List[FileBackedQueue]:
+def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batch_size: int, cores: int, result_dir: str) -> List[FileBackedQueue]:
     """
     :param batch_function: function to run on given loci. First argument must be list of loci
     :param args: other args to feed function
@@ -67,13 +67,13 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
     """
     results = []
     if cores == 1:
-        return run_single_threaded(batch_function, args, loci_iterator, total_batch_size)
+        return run_single_threaded(batch_function, args, loci_iterator, total_batch_size, result_dir)
     with Pool(processes=cores) as threads:
         batch_sizes = get_batch_sizes(total_batch_size, 100_000)
         for i, batch in enumerate(batch_sizes):
             current_loci = loci_iterator.get_batch(batch)
             results.append(threads.apply_async(batch_function,
-                                               args=([current_loci] + args)))
+                                               args=([current_loci] + args + [result_dir])))
         threads.close()
         threads.join()
     return extract_results(results)

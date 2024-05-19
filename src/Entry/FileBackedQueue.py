@@ -9,11 +9,10 @@ class FileBackedQueue:
     """
     Will write items in itself to a file when it passes a certain size
     """
-    def __init__(self, out_file: str = None, max_memory: int = 10**7):
-        if out_file is None:
-            out_file = get_unique_filename()
-        self.out_file_path = out_file
-        self.out_file = open(f"{out_file}", 'w+')
+    def __init__(self, out_file_dir: str = "", max_memory: int = 10**7):
+        out_file = get_unique_filename()
+        self.out_file_path = os.path.join(out_file_dir, out_file)
+        self.out_file = open(f"{self.out_file_path}", 'w+')
         self.max_memory = max_memory
         self.queue = []
         self.queue_size = 0

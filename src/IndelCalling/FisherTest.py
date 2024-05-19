@@ -33,15 +33,17 @@ class Fisher:
 
     def big_divide(self, numerator: int, denominator: int) -> float:
         # does division for massive numbers without causing overflow error
-        numerator_power = int(math.log10(numerator))
-        denominator_power = int(math.log10(denominator))
-        numerator_mantissa_power = min(numerator_power + 1, 10)
-        numerator_mantissa = self.get_mantissa(numerator, numerator_mantissa_power)
-        denominator_mantissa_power = min(denominator_power + 1, 10)
-        denominator_mantissa = self.get_mantissa(denominator, denominator_mantissa_power)
-        quotient_mantissa = numerator_mantissa / denominator_mantissa
-        quotient = quotient_mantissa * (10 ** ((numerator_power - numerator_mantissa_power) - (denominator_power - denominator_mantissa_power)))
-        return quotient
+        numerator_log = math.log(numerator)
+        denominator_log = math.log(denominator)
+        return math.exp(numerator_log-denominator_log)
+        # numerator_power = int(math.log10(numerator))
+        # denominator_power = int(math.log10(denominator))
+        # numerator_mantissa_power = min(numerator_power + 1, 10)
+        # numerator_mantissa = self.get_mantissa(numerator, numerator_mantissa_power)
+        # denominator_mantissa_power = min(denominator_power + 1, 10)
+        # denominator_mantissa = self.get_mantissa(denominator, denominator_mantissa_power)
+        # quotient_mantissa = numerator_mantissa / denominator_mantissa
+        # quotient = quotient_mantissa * (10 ** ((numerator_power - numerator_mantissa_power) - (denominator_power - denominator_mantissa_power)))
 
     def test(self, first_set: np.array, second_set: np.array):
         p_value = 1
@@ -50,3 +52,9 @@ class Fisher:
             p_value *= self.choose(int(first_set[i] + second_set[i]), int(first_set[i]))
         p_value = self.big_divide(p_value, self.choose(int(np.sum(first_set)+np.sum(second_set)), int(np.sum(first_set))))
         return p_value
+
+
+if __name__ == '__main__':
+    f=Fisher()
+    a=f.big_divide(10, 3)
+    print(a)
