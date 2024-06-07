@@ -28,7 +28,7 @@ def run_single_allelic(BAM: str, loci_file: str, batch_start: int,
     BatchUtil.write_queues_results(output_prefix + ".all", results, header)
 
 
-def partial_single_allelic(loci: List[Locus], BAM: str, flanking: int, noise_table, results_dir: str, required_reads=6) -> FileBackedQueue:
+def partial_single_allelic(loci: List[Locus], BAM: str, flanking: int, noise_table, required_reads: int, results_dir: str) -> FileBackedQueue:
     allelic_results = FileBackedQueue(out_file_dir=results_dir, max_memory=10**7) # 10MB
     BAM_handle = AlignmentFile(BAM, "rb")
     if len(loci) != 0:
