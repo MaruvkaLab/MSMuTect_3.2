@@ -1,4 +1,6 @@
+# cython: profile=True
 # cython: language_level=3
+
 import os
 from typing import List
 from pysam import AlignmentFile

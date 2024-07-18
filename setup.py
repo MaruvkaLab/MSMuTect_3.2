@@ -32,9 +32,18 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    ext_modules=cythonize(['src/IndelCalling/FisherTest.pyx', 'src/IndelCalling/CallMutations.pyx',
-                         'src/IndelCalling/CallAlleles.pyx', 'src/GenomicUtils/ReadsFetcher.pyx',
-                         'src/IndelCalling/Histogram.pyx', 'src/Entry/SingleFileBatches.pyx',
-                         'src/IndelCalling/Locus.pyx', 'src/IndelCalling/AlleleSet.pyx',
-                         'src/GenomicUtils/LocusFile.pyx', 'src/Entry/PairFileBatches.pyx'])
+    ext_modules=cythonize([
+                        'src/IndelCalling/FisherTest.pyx',
+                        'src/IndelCalling/CallMutations.pyx',
+                         'src/IndelCalling/CallAlleles.pyx',
+                         'src/IndelCalling/Histogram.pyx',
+                        'src/IndelCalling/AlleleSet.pyx',
+                         'src/IndelCalling/Locus.pyx',
+
+                        'src/GenomicUtils/ReadsFetcher.pyx',
+                         'src/GenomicUtils/LocusFile.pyx',
+
+                           'src/Entry/PairFileBatches.pyx',
+                           'src/Entry/SingleFileBatches.pyx'],
+                          compiler_directives={'language_level' : "3", "profile": True})
 )

@@ -55,7 +55,7 @@ class ReadsFetcher:
     def get_next_mapped_read(self) -> AlignedSegment:
         cur_read = next(self.reads_iterator, None)
         while cur_read is not None:
-            if cur_read.cigartuples is None or cur_read.reference_end is None or cur_read.reference_start is None:  #  unaligned
+            if cur_read.reference_end is None:  #  unaligned
                 cur_read = next(self.reads_iterator, None)
             else:
                 return cur_read

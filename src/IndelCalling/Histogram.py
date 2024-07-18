@@ -19,6 +19,17 @@ class Histogram:
         read_position = read.reference_start+1
         indel_bases = 0 # number of added/deleted bases in MS locus
         for cigar_op in read.cigartuples:
+            # current_cig_op = cigar_op[0]
+            # num_bases = cigar_op[1]
+            # read_position+=(int(current_cig_op==CIGAR_OPTIONS.ALG_MATCH or current_cig_op==CIGAR_OPTIONS.SEQ_MATCH or
+            #                     current_cig_op==CIGAR_OPTIONS.SEQ_MISMATCH or current_cig_op==CIGAR_OPTIONS.DELETION) * num_bases)
+            #
+            # is_deletion =
+            # pre_read_deletion = max(num_bases + read_position - self.locus.start, 0)*(int(read_position < self.locus.start))*int(current_cig_op==CIGAR_OPTIONS.DELETION)
+            # inread_deletion = num_bases
+            #
+            # indel_bases+= int(cigar_op[0] == CIGAR_OPTIONS.INSERTION)+(-1*int(cigar_op[0] == CIGAR_OPTIONS.DELETION))
+
             if cigar_op[0] in [CIGAR_OPTIONS.ALG_MATCH, CIGAR_OPTIONS.SEQ_MATCH, CIGAR_OPTIONS.SEQ_MISMATCH]:
                 read_position += cigar_op[1]
             elif cigar_op[0] == CIGAR_OPTIONS.INSERTION:
