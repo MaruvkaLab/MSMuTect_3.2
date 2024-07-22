@@ -12,6 +12,7 @@ mv src/GenomicUtils/LocusFile.pyx src/GenomicUtils/LocusFile.py
 mv src/Entry/PairFileBatches.pyx src/Entry/PairFileBatches.py
 
 
-does this actually work?
-samtools view -f 0x2  /home/avraham/MaruvkaLab/msmutect_runs/data/TCGA-A6-2680-10A-01D-2188-10_wgs_Illumina.bam
-samtools view -F 0x2  /home/avraham/MaruvkaLab/msmutect_runs/data/TCGA-A6-2680-10A-01D-2188-10_wgs_Illumina.bam
+#does this actually work?
+#samtools view -f 0x2  /home/avraham/MaruvkaLab/msmutect_runs/data/TCGA-A6-2680-10A-01D-2188-10_wgs_Illumina.bam
+#samtools view -F 0x2  /home/avraham/MaruvkaLab/msmutect_runs/data/TCGA-A6-2680-10A-01D-2188-10_wgs_Illumina.bam
+#find . -iname '*.so' -type f -delete

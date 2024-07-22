@@ -43,7 +43,7 @@ def validate_indexing(bam_files: List[str]) -> None:
         current_handle = pysam.AlignmentFile(open(bam, 'rb'))
         for prefix in prefixes:
             try:
-                _ = current_handle.fetch(f"{prefix}{1}", start=10_000, multiple_iterators=True)
+                _ = current_handle.fetch(f"{prefix}{1}", start=10_000, multiple_iterators=False)
                 validated = True
                 break  # verified
             except ValueError:  # different prefix, or not indexed

@@ -25,6 +25,7 @@ class FileBackedQueue:
 
     def flush(self):
         self.out_file.write("\n".join(self.queue))
+        self.out_file.write("\n")
         self.queue = []
         self.queue_size = 0
 

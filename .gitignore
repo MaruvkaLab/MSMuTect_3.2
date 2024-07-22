@@ -7,4 +7,6 @@
 *.iml
 *.xml
 *.pyc
+*.pyx
 profiling_util.py
+build/
