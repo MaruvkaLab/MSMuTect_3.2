@@ -30,7 +30,18 @@ def exit_on(message: str, status: int = 1):
 
 
 def simple_index_check(bam: str):
-    if not os.path.exists(bam + ".bai")  and not os.path.exists(os.path.exists(bam[:-4] + ".bai") ):  # index file
+    bam_bai_path = bam + ".bai"
+    bai_path = bam[:-4] + ".bai"
+    bam_bai_file_exists = os.path.exists(bam_bai_path)
+    bai_file_exists = os.path.exists(bai_path)
+    index_file_older_than_bam_message = "Index file older than BAM file. Index file must be younger than BAM file. If you are sure the index file is correct, run 'touch [index_file]'"
+    if bam_bai_file_exists:
+        if os.path.getmtime(bam_bai_path) < os.path.getmtime(bam):
+            exit_on(index_file_older_than_bam_message)
+    elif bai_file_exists:
+        if os.path.getmtime(bai_path) < os.path.getmtime(bam):
+            exit_on(index_file_older_than_bam_message)
+    else:
         exit_on("Given BAM file/s are not sorted and/or indexed")
 
 
@@ -49,13 +60,13 @@ def validate_indexing(bam_files: List[str]) -> None:
             except ValueError:  # different prefix, or not indexed
                 continue
         if not validated:
-            exit_on("Given BAM file/s are not sorted and/or indexed, or contain an unsusual prefix (not 'chr', 'Chr', or nothing'")
+            exit_on("Given BAM file/s are not sorted and/or indexed, or contain an unsusual prefix (not 'chr', 'Chr', or nothing")
 
 
 def validate_bams(arguments: argparse.Namespace):
     if (bool(arguments.tumor_file) or bool(arguments.normal_file)) == bool(arguments.single_file): #  XOR
         exit_on("Provide Single file, or both Normal and Tumor file")
-    elif bool(arguments.tumor_file) != bool(arguments.normal_file):
+    elif bool(arguments.tumor_file) != bool(arguments.normal_file): #  XOR
         exit_on("Provide Single file, or both Normal and Tumor file")
     elif arguments.single_file:
         if not os.path.exists(arguments.single_file):
@@ -68,6 +79,8 @@ def validate_bams(arguments: argparse.Namespace):
 
 def validate_output_files(arguments: argparse.Namespace):
     overwrite_files_mssg = "Files would be overwritten by this run. To force overwrite, use -f flag"
+    if os.path.sep not in arguments.output_prefix:
+        arguments.output_prefix = os.path.join(os.getcwd(), arguments.output_prefix)
     if not os.path.exists(os.path.dirname(arguments.output_prefix)):
         exit_on("Output directory does not exist")
     if arguments.force:
