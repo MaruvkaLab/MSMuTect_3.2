@@ -2,6 +2,6 @@
 
 MSMUTECT_PATH=$(readlink -f "$0")
 MSMUTECT_DIR=$(dirname $MSMUTECT_PATH)
-cd $MSMUTECT_DIR
+#cd $MSMUTECT_DIR
 export PYTHONPATH=$MSMUTECT_DIR
-python3 src/Entry/main.py "$@"
+python3 $MSMUTECT_DIR/src/Entry/main.py "$@"

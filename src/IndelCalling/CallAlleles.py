@@ -7,23 +7,23 @@ from src.IndelCalling.Histogram import Histogram
 
 
 class AllelesMaximumLikelihood:
-    def __init__(self, histogram: Histogram, proper_lengths: np.array, supported_lengths: np.array, noise_table: np.matrix):
+    def __init__(self, histogram: Histogram, proper_lengths: np.array, supported_lengths: np.array, noise_table: np.matrix, num_alleles: int):
         # supported lengths is a subset of proper lengths (supported must also have 6+ supporting reads)
         # gets  all lengths with at least 5 read support
         self.histogram = histogram
         self.repeat_lengths = proper_lengths
         self.num_reads = np.array([histogram.rounded_repeat_lengths[length] for length in self.repeat_lengths], dtype=np.int32)
         self.supported_repeat_lengths = supported_lengths
-        self.num_alleles = supported_lengths.size
+        self.num_alleles = num_alleles #: NEW
+        # self.num_alleles = supported_lengths.size
         self.noise_table = noise_table
         self.max_log_likelihood = -1e9
         self.best_alleles = np.array([])
         self.best_frequencies = np.array([])
 
     def reset_intermediates(self):
-        self.random_repeat_lengths = self.supported_repeat_lengths[
-            np.random.permutation(self.supported_repeat_lengths.size)[0:self.num_alleles]]
-
+        randomized_order = np.random.permutation(self.supported_repeat_lengths.size)[0:self.num_alleles]
+        self.random_repeat_lengths = self.supported_repeat_lengths[randomized_order]
         self.new_frequencies = np.zeros(self.num_alleles)
         self.frequencies = np.ones(self.num_alleles) / self.num_alleles
         self.Z_i_j = np.zeros([44, self.num_alleles])
@@ -73,7 +73,7 @@ class AllelesMaximumLikelihood:
     def get_alleles(self):
         for _ in range(10):
             self.reset_intermediates()
-            while self.change > 1e-5:
+            while self.change > 1e-5: # if we have already converged, return
                 self.update_ZIJ()
                 self.estimate_new_frequencies()
                 self.maximize_new_thetas()
@@ -85,10 +85,10 @@ class AllelesMaximumLikelihood:
 
 
 def find_alleles(histogram: Histogram, proper_lengths: np.array, supported_repeat_lengths: np.array, noise_table: np.array, min_read_support: int = -1) -> AlleleSet:
-    lesser_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table).get_alleles()
+    lesser_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table, num_alleles=1).get_alleles()
     lesser_alleles_set.min_read_support = min_read_support
     for i in range(2, 5):
-        greater_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table).get_alleles()
+        greater_alleles_set = AllelesMaximumLikelihood(histogram, proper_lengths, supported_repeat_lengths, noise_table, num_alleles=i).get_alleles()
         greater_alleles_set.min_read_support = min_read_support
         likelihood_increase = 2 * (greater_alleles_set.log_likelihood - lesser_alleles_set.log_likelihood)
         if likelihood_increase > 0:

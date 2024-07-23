@@ -12,8 +12,8 @@ from src.IndelCalling.Histogram import Histogram
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.Locus import Locus
 from src.IndelCalling.CallAlleles import calculate_alleles
-from . import BatchUtil
-from .FileBackedQueue import FileBackedQueue
+from src.Entry import BatchUtil
+from src.Entry.FileBackedQueue import FileBackedQueue
 
 
 def format_alleles(alleles: AlleleSet) -> str: # List[AlleleSet] not declared to avoid circular import
@@ -70,3 +70,16 @@ def partial_single_histogram(loci: List[Locus], BAM: str, flanking: int, results
             histograms.append(format_histogram(current_histogram))
     histograms.close()
     return histograms
+
+
+if __name__ == '__main__':
+    # run_single_histogram(BAM: str, loci_file: str, batch_start: int,
+    #                          batch_end: int, cores: int, flanking: int, output_prefix: str) -> None:
+    # run_single_histogram("/home/avraham/MaruvkaLab/msmutect_runs/problems/multiple_times_loci/only_interesting_reads.bam",
+    #                      "/home/avraham/MaruvkaLab/msmutect_runs/problems/multiple_times_loci/interesting_locus",
+    #                      0, 1, 1, 10, "croc_tmp")
+
+    run_single_allelic(
+        "/home/avraham/MaruvkaLab/msmutect_runs/problems/multiple_times_loci/only_interesting_reads.bam",
+        "/home/avraham/MaruvkaLab/msmutect_runs/problems/multiple_times_loci/interesting_locus",
+        0, 1, 1, 10, 6, "croc_tmp")
