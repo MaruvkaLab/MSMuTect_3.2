@@ -36,8 +36,8 @@ def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
     BatchUtil.write_queues_results(output_prefix + ".full.mut", results, mutation_header)
 
 
-def get_alleles(locus: Locus, reads_fetcher: ReadsFetcher, flanking: int, noise_table, required_reads=6) -> AlleleSet:
-    histogram = Histogram(locus)
+def get_alleles(locus: Locus, reads_fetcher: ReadsFetcher, flanking: int, noise_table, required_reads=6, integer_indels_only=False) -> AlleleSet:
+    histogram = Histogram(locus, integer_indels_only)
     reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
     histogram.add_reads(reads)
     alleles = calculate_alleles(histogram, noise_table, required_read_support=required_reads)
@@ -69,8 +69,8 @@ def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int
     BatchUtil.write_queues_results(output_prefix + ".partial.mut", results, mutation_header)
 
 
-def get_tumor_alleles(reads_fetcher: ReadsFetcher, locus: Locus, flanking: int, noise_table, required_reads=6) -> AlleleSet:
-    histogram = Histogram(locus)
+def get_tumor_alleles(reads_fetcher: ReadsFetcher, locus: Locus, flanking: int, noise_table, required_reads=6, integer_indels_only=False) -> AlleleSet:
+    histogram = Histogram(locus, integer_indels_only=integer_indels_only)
     reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
     histogram.add_reads(reads)
     current_alleles = calculate_alleles(histogram, noise_table, required_read_support=required_reads)

@@ -18,22 +18,22 @@ def run_msmutect(args: argparse.Namespace):
     if args.single_file:
         if args.allele or not args.histogram:
             run_single_allelic(args.single_file, args.loci_file, args.batch_start - 1,
-                               batch_end, args.cores, args.flanking, args.read_level, args.output_prefix)
+                               batch_end, args.cores, args.flanking, args.read_level, args.integer, args.output_prefix)
         else:
             run_single_histogram(args.single_file, args.loci_file, args.batch_start - 1,
-                                 batch_end, args.cores, args.flanking, args.output_prefix)
+                                 batch_end, args.cores, args.flanking, args.integer, args.output_prefix)
 
     else:
         if args.histogram and not args.mutation:
             run_single_histogram(args.normal_file, args.loci_file, args.batch_start - 1,
-                                 batch_end, args.cores, args.flanking, args.output_prefix + ".normal")
+                                 batch_end, args.cores, args.flanking, args.integer, args.output_prefix + ".normal")
             run_single_histogram(args.tumor_file, args.loci_file, args.batch_start - 1,
-                                 batch_end, args.cores, args.flanking, args.output_prefix + ".tumor")
+                                 batch_end, args.cores, args.flanking, args.integer, args.output_prefix + ".tumor")
         elif args.allele and not args.mutation:
             run_single_allelic(args.normal_file, args.loci_file, args.batch_start - 1,
-                               batch_end, args.cores, args.flanking, args.read_level, args.output_prefix + ".normal")
+                               batch_end, args.cores, args.flanking, args.read_level, args.integer, args.output_prefix + ".normal")
             run_single_allelic(args.tumor_file, args.loci_file, args.batch_start - 1,
-                               batch_end, args.cores, args.flanking, args.read_level, args.output_prefix + ".tumor")
+                               batch_end, args.cores, args.flanking, args.read_level, args.integer, args.output_prefix + ".tumor")
         else:
             if args.histogram or args.allele:  # args.mutation=True
                 run_full_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start-1, batch_end,

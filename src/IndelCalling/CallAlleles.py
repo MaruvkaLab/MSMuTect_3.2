@@ -95,7 +95,7 @@ def find_alleles(histogram: Histogram, proper_lengths: np.array, supported_repea
             p_value_i_alleles = stats.chi2.pdf(likelihood_increase, 2)
             if p_value_i_alleles > 0.05:
                 return lesser_alleles_set
-            elif supported_repeat_lengths == i:
+            elif len(supported_repeat_lengths) == i:
                 return greater_alleles_set
             else:
                 lesser_alleles_set = greater_alleles_set

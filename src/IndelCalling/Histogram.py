@@ -9,11 +9,12 @@ from src.IndelCalling.Locus import Locus
 
 
 class Histogram:
-    def __init__(self, locus: Locus):
+    def __init__(self, locus: Locus, integer_indels_only: bool):
         self.locus = locus
         self.repeat_lengths: Dict[float, int] = defaultdict(int)  # key = repeat length; value = supporting reads
         self._rounded_repeats = defaultdict(int)  # using int is same as lambda: 0, but lambda: 0 has pickling issues with multiprocessing
         self.built_rounded = False  # whether rounded repeat lengths has been built yet
+        self.integer_indels_only = integer_indels_only
 
     def calculate_repeat_length(self, read: AlignedSegment) -> float:
         read_position = read.reference_start+1
@@ -62,7 +63,11 @@ class Histogram:
 
     def build_rounded(self):
         for length in self.repeat_lengths.keys():
-            self._rounded_repeats[round(length)] += self.repeat_lengths[length]
+            if self.integer_indels_only:
+                integer_indel_only_length = self.locus.repeats + int(length-self.locus.repeats)
+                self._rounded_repeats[integer_indel_only_length] += self.repeat_lengths[length]
+            else:
+                self._rounded_repeats[round(length)] += self.repeat_lengths[length]
         self.built_rounded = True
 
     @property
