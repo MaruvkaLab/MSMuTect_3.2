@@ -1,0 +1,101 @@
+@HD	VN:1.0	GO:none	SO:coordinate
+@SQ	SN:1	LN:249250621	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:2	LN:243199373	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:3	LN:198022430	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:4	LN:191154276	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:5	LN:180915260	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:6	LN:171115067	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:7	LN:159138663	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:8	LN:146364022	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:9	LN:141213431	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:10	LN:135534747	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:11	LN:135006516	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:12	LN:133851895	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:13	LN:115169878	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:14	LN:107349540	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:15	LN:102531392	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:16	LN:90354753	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:17	LN:81195210	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:18	LN:78077248	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:19	LN:59128983	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:20	LN:63025520	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:21	LN:48129895	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:22	LN:51304566	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:X	LN:155270560	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:Y	LN:59373566	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:MT	LN:16569	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000207.1	LN:4262	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000226.1	LN:15008	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000229.1	LN:19913	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000231.1	LN:27386	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000210.1	LN:27682	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000239.1	LN:33824	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000235.1	LN:34474	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000201.1	LN:36148	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000247.1	LN:36422	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000245.1	LN:36651	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000197.1	LN:37175	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000203.1	LN:37498	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000246.1	LN:38154	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000249.1	LN:38502	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000196.1	LN:38914	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000248.1	LN:39786	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000244.1	LN:39929	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000238.1	LN:39939	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000202.1	LN:40103	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000234.1	LN:40531	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000232.1	LN:40652	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000206.1	LN:41001	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000240.1	LN:41933	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000236.1	LN:41934	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000241.1	LN:42152	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000243.1	LN:43341	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000242.1	LN:43523	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000230.1	LN:43691	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000237.1	LN:45867	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000233.1	LN:45941	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000204.1	LN:81310	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000198.1	LN:90085	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000208.1	LN:92689	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000191.1	LN:106433	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000227.1	LN:128374	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000228.1	LN:129120	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000214.1	LN:137718	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000221.1	LN:155397	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000209.1	LN:159169	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000218.1	LN:161147	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000220.1	LN:161802	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000213.1	LN:164239	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000211.1	LN:166566	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000199.1	LN:169874	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000217.1	LN:172149	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000216.1	LN:172294	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000215.1	LN:172545	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000205.1	LN:174588	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000219.1	LN:179198	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000224.1	LN:179693	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000223.1	LN:180455	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000195.1	LN:182896	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000212.1	LN:186858	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000222.1	LN:186861	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000200.1	LN:187035	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000193.1	LN:189789	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000194.1	LN:191469	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000225.1	LN:211173	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@SQ	SN:GL000192.1	LN:547496	UR:ftp://ftp.ncbi.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz	AS:GRCh37-lite	SP:Homo sapiens
+@RG	ID:0	PL:Illumina	PU:121116_SN580_0275_AD1DVJACXX_4	LB:IWG_TCOL.A6-2680-01A-T_3pA	DS:TCGA Colon	DT:2012-12-04T10:00:00-0600	SM:TCGA-A6-2680-01A-01D-1554-10	CN:BCM
+@RG	ID:0.1	PL:Illumina	PU:121116_SN1133_0223_BC1940ACXX_1	LB:IWG_TCOL.A6-2680-01A-T_3pA	DS:TCGA Colon	DT:2012-12-08T15:00:00-0600	SM:TCGA-A6-2680-01A-01D-1554-10	CN:BCM
+@RG	ID:0.2	PL:Illumina	PU:121128_SN7001353_0116_BD1DFCACXX_1	LB:IWG_TCOL.A6-2680-01A-T_3pA	DS:TCGA Colon	DT:2012-12-17T13:00:00-0600	SM:TCGA-A6-2680-01A-01D-1554-10	CN:BCM
+@RG	ID:0.3	PL:Illumina	PU:121104_SN738_0312_AD1D4DACXX_3	LB:IWG_TCOL.A6-2680-01A-T_3pA	DS:TCGA Colon	DT:2012-11-21T12:00:00-0600	SM:TCGA-A6-2680-01A-01D-1554-10	CN:BCM
+@PG	ID:GATK TableRecalibration	VN:1.6-2-gc2b74ec	CL:default_platform=illumina force_platform=null window_size_nqs=5 solid_recal_mode=SET_Q_ZERO solid_nocall_strategy=THROW_EXCEPTION context_size=8 homopolymer_nback=7 recal_file=D1DVJACXX-4.csv preserve_qscores_less_than=5 smoothing=1 max_quality_score=50 doNotWriteOriginalQuals=false no_pg_tag=false fail_with_no_eof_marker=false skipUQUpdate=false Covariates=[ReadGroupCovariate, QualityScoreCovariate, CycleCovariate, DinucCovariate] 
+@PG	ID:GATK TableRecalibration.1	VN:1.6-2-gc2b74ec	CL:default_platform=illumina force_platform=null window_size_nqs=5 solid_recal_mode=SET_Q_ZERO solid_nocall_strategy=THROW_EXCEPTION context_size=8 homopolymer_nback=7 recal_file=C1940ACXX-1.csv preserve_qscores_less_than=5 smoothing=1 max_quality_score=50 doNotWriteOriginalQuals=false no_pg_tag=false fail_with_no_eof_marker=false skipUQUpdate=false Covariates=[ReadGroupCovariate, QualityScoreCovariate, CycleCovariate, DinucCovariate] 
+@PG	ID:GATK TableRecalibration.2	VN:1.6-2-gc2b74ec	CL:default_platform=illumina force_platform=null window_size_nqs=5 solid_recal_mode=SET_Q_ZERO solid_nocall_strategy=THROW_EXCEPTION context_size=8 homopolymer_nback=7 recal_file=D1DFCACXX-1.csv preserve_qscores_less_than=5 smoothing=1 max_quality_score=50 doNotWriteOriginalQuals=false no_pg_tag=false fail_with_no_eof_marker=false skipUQUpdate=false Covariates=[ReadGroupCovariate, QualityScoreCovariate, CycleCovariate, DinucCovariate] 
+@PG	ID:GATK TableRecalibration.3	VN:1.6-2-gc2b74ec	CL:default_platform=illumina force_platform=null window_size_nqs=5 solid_recal_mode=SET_Q_ZERO solid_nocall_strategy=THROW_EXCEPTION context_size=8 homopolymer_nback=7 recal_file=D1D4DACXX-3.csv preserve_qscores_less_than=5 smoothing=1 max_quality_score=50 doNotWriteOriginalQuals=false no_pg_tag=false fail_with_no_eof_marker=false skipUQUpdate=false Covariates=[ReadGroupCovariate, QualityScoreCovariate, CycleCovariate, DinucCovariate] 
+@PG	ID:bwa	PN:bwa	VN:0.5.9-r16
+@PG	ID:GATK IndelRealigner	VN:1.3-8-gb0e6afe	CL:knownAlleles=[] LODThresholdForCleaning=5.0 consensusDeterminationModel=USE_READS entropyThreshold=0.15 maxReadsInMemory=150000 maxIsizeForMovement=3000 maxPositionalMoveAllowed=200 maxConsensuses=30 maxReadsForConsensuses=120 maxReadsForRealignment=20000 noOriginalAlignmentTags=false nWayOut=null generate_nWayOut_md5s=false check_early=false noPGTag=false keepPGTags=false indelsFileForDebugging=null statisticsFileForDebugging=null SNPsFileForDebugging=null
+@PG	ID:samtools	PN:samtools	PP:GATK TableRecalibration	VN:1.10	CL:samtools view -h TCGA-A6-2680-01A-01D-1554-10_wgs_Illumina.bam 1:10000-10005
+@PG	ID:samtools.1	PN:samtools	PP:GATK TableRecalibration.1	VN:1.10	CL:samtools view -h TCGA-A6-2680-01A-01D-1554-10_wgs_Illumina.bam 1:10000-10005
+@PG	ID:samtools.2	PN:samtools	PP:GATK TableRecalibration.2	VN:1.10	CL:samtools view -h TCGA-A6-2680-01A-01D-1554-10_wgs_Illumina.bam 1:10000-10005
+@PG	ID:samtools.3	PN:samtools	PP:GATK TableRecalibration.3	VN:1.10	CL:samtools view -h TCGA-A6-2680-01A-01D-1554-10_wgs_Illumina.bam 1:10000-10005
+@PG	ID:samtools.4	PN:samtools	PP:bwa	VN:1.10	CL:samtools view -h TCGA-A6-2680-01A-01D-1554-10_wgs_Illumina.bam 1:10000-10005
+@PG	ID:samtools.5	PN:samtools	PP:GATK IndelRealigner	VN:1.10	CL:samtools view -h FAKE_wgs_Illumina.bam 1:10000-10005

@@ -118,8 +118,7 @@ def passes_filter(motif_length: int, repeat_size: float):
     return repeat_threshold(motif_length) <= repeat_size <= 40
 
 
-def calculate_alleles(histogram: Histogram, noise_table: np.array, required_read_support=6):
-    # supported repeat = repeat length 6<=
+def calculate_alleles(histogram: Histogram, noise_table: np.array, required_read_support):
     proper_motif_sizes = np.array([repeat_size for repeat_size in histogram.rounded_repeat_lengths if
                                          passes_filter(len(histogram.locus.pattern), repeat_size)])
     supported_proper_motifs = np.array([length for length in proper_motif_sizes

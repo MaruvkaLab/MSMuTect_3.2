@@ -18,7 +18,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-A", "--allele", help="Output allele file", action='store_true')
     parser.add_argument("-m", "--mutation", help="Output mutation file", action='store_true')
     parser.add_argument("-F", "--flanking", help="Length of flanking on both sides of an accepted read", type=int, default=10)
-    parser.add_argument("-r", "--read_level", help="Minimum number of reads to call allele", type=int, default=6)
+    parser.add_argument("-r", "--read_level", help="Minimum number of reads to call allele", type=int, default=5)
     parser.add_argument("-f", "--force", help="overwrite pre-existing files", action='store_true')
     parser.add_argument("--integer", help="only use indels of integer deletions/insertions of the repeat unit when calling alleles", action='store_true')
     return parser

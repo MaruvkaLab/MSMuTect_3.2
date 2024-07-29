@@ -10,3 +10,6 @@
 *.pyx
 profiling_util.py
 build/
+.idea/
+*.sam
+!tests/sample_bams/header_only.sam

@@ -13,7 +13,9 @@ sort -t $'\t' -k1,1 -k5n,5 -k4n,4 -V [original loci file] > [new loci file]
 Then: 
 msmutect.sh [flags]  
 For the most typical usage of calling microsatellite instability for a pair of BAMs:  
-msmutect -T [tumorbam.bam] -N [normalbam.bam] -l [loci_file.phobos] -O [output_prefix] -c [number of cores to use] -m.  
+msmutect.sh -T [tumorbam.bam] -N [normalbam.bam] -l [loci_file.phobos] -O [output_prefix] -c [number of cores to use] -m.  
+msmutect will create temporary files when running with names like tmp_10242_1721809243.1243694_25529. It deletes them at the end. If, for some reason, msmutect is interrupted,  
+they will persist. They can be safely removed
 
 If a run gets interrupted files with names like tmp_25147_1716098274.1160007_92669 will be left in the output directory. They can be deleted with no issue
 # Publication

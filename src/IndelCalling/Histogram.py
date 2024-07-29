@@ -62,11 +62,16 @@ class Histogram:
             self.repeat_lengths[repeat_length]+=1
 
     def build_rounded(self):
-        for length in self.repeat_lengths.keys():
-            if self.integer_indels_only:
+
+        if self.integer_indels_only:
+            first_pass_dict = defaultdict(int)
+            for length in self.repeat_lengths.keys():
                 integer_indel_only_length = self.locus.repeats + int(length-self.locus.repeats)
-                self._rounded_repeats[integer_indel_only_length] += self.repeat_lengths[length]
-            else:
+                first_pass_dict[integer_indel_only_length] += self.repeat_lengths[length]
+            for length in first_pass_dict:
+                self._rounded_repeats[round(length)] = first_pass_dict[length]
+        else:
+            for length in self.repeat_lengths.keys():
                 self._rounded_repeats[round(length)] += self.repeat_lengths[length]
         self.built_rounded = True
 
