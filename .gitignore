@@ -13,3 +13,4 @@ build/
 .idea/
 *.sam
 !tests/sample_bams/header_only.sam
+!tests/sample_bams/fake_sample_locus_sorted.tsv

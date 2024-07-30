@@ -44,8 +44,15 @@ class ReadsFetcher:
 
     def backtrack_reads(self, start: int, end: int) -> List[AlignedSegment]:
         # get reads that map from the last query
-        return [read for read in self.last_extracted_reads
-                if read.reference_start + 1 <= start and end <= read.reference_end + 1]
+        new_last_extracted_reads = []
+        ret = []
+        for read in self.last_extracted_reads:
+            if read.reference_start + 1 <= start and end <= read.reference_end + 1:
+                ret.append(read)
+            elif end <= read.reference_end + 1: # could theoretically map to the next locus if it's start and end are later
+                new_last_extracted_reads.append(read)
+        self.last_extracted_reads = new_last_extracted_reads
+        return ret
 
     @staticmethod
     def simple_filter(read: AlignedSegment) -> bool:
@@ -85,7 +92,7 @@ class ReadsFetcher:
     def remember_return(self, mapped_reads: List[AlignedSegment], last_read: AlignedSegment) -> List[AlignedSegment]:
         #  logs reads for use in for next reads fetch and returns them
         self.last_unmapped_read = last_read
-        self.last_extracted_reads = mapped_reads
+        self.last_extracted_reads+=mapped_reads
         return mapped_reads
 
     def get_reads(self, chromosome, start: int, end: int) -> List[AlignedSegment]:

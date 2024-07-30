@@ -17,6 +17,46 @@ def old():
     add_to_end_of_file("/home/avraham/MaruvkaLab/msmutect_runs/data/fake/map.sam", rl)
 
 
+def create_readline_custom_length(fake_reads: List[FakeRead], custom_length: int):
+    if len(fake_reads) == 0:
+        return
+
+    seq = 'A' * custom_length
+    # based on real TCGA case, but fields obscured and changed
+    fields = ["FAKE",  # name
+              '2', # bitwise flags. 2 indicates aligned properly
+              '1', # chromosome
+              '10051',  # start
+              '4',  # mapping quality
+              '101M',  # cigar
+              '=', # reference name of next read
+              '44444', # position of next read
+              '108', # template length
+              seq,
+              seq,
+              'X0:i:100',
+              'MD:Z:79A22',
+              'RG:Z:0.3',
+              'XG:i:0',
+              'AM:i:0',
+              'NM:i:1',
+              'SM:i:0',
+              'XM:i:1',
+              'XO:i:0',
+              'MQ:i:0',
+              'OQ:Z:C@SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS?A=A;ABB((,:9<??BBB@D9<A?B99AB',
+              "XT:A:R"]
+
+
+    all_new_reads = []
+    for fr in fake_reads:
+        new_read = fields.copy()
+        new_read[3] = str(fr.read_start)
+        new_read[5] = fr.cigar_str
+        all_new_reads.append(new_read)
+    return "\n".join(["\t".join(a) for a in all_new_reads])
+
+
 def create_readline(fake_reads: List[FakeRead]):
     if len(fake_reads) == 0:
         return
@@ -61,6 +101,17 @@ def add_to_end_of_file(fp: str, lines: str):
         sam.write(lines)
 
 
+def create_new_bam_custom_length(new_name: str, fake_reads: List[FakeRead], custom_length: int):
+    header_only_file = header_only_sam()
+    new_filename = os.path.join(sample_bams_path(), new_name + ".sam")
+    shutil.copyfile(header_only_file, new_filename)
+    readlines = create_readline_custom_length(fake_reads, custom_length)
+    add_to_end_of_file(new_filename, readlines)
+    bam_filename = new_filename[:-4]+".bam"
+    os.system(f"samtools view -b -h {new_filename} > {bam_filename}")
+    os.system(f"samtools index {bam_filename}")
+
+
 def create_new_bam(new_name: str, fake_reads: List[FakeRead]):
     header_only_file = header_only_sam()
     new_filename = os.path.join(sample_bams_path(), new_name + ".sam")
@@ -80,13 +131,21 @@ def create_new_bam(new_name: str, fake_reads: List[FakeRead]):
 # ])
 
 
-create_new_bam("indels", [
-        FakeRead(10_000, "35M30D66M"),  # knock out entire smallest locus. repeat_length=0
-        FakeRead(10_035, "18M2D83M"),  # knock out end of smallest locus, repeat_length=8
-        FakeRead(10_035, "10M2D91M"),  # knock out start of smallest locus, repeat_length=8
+# create_new_bam("indels", [
+#         FakeRead(10_000, "35M30D66M"),  # knock out entire smallest locus. repeat_length=0
+#         FakeRead(10_035, "18M2D83M"),  # knock out end of smallest locus, repeat_length=8
+#         FakeRead(10_035, "10M2D91M"),  # knock out start of smallest locus, repeat_length=8
+#
+#         FakeRead(10_035, "10M1I90M"),  # insertion at start of smallest locus, repeat_length=11
+#         FakeRead(10_035, "20M1I80M"),  # insertion at end of smallest locus, repeat_length=11
+#         FakeRead(10_035, "15M1I85M"),  # insertion of middle of smallest locus, repeat_length=11
+# ])
 
-        FakeRead(10_035, "10M1I90M"),  # insertion at start of smallest locus, repeat_length=11
-        FakeRead(10_035, "20M1I80M"),  # insertion at end of smallest locus, repeat_length=11
-        FakeRead(10_035, "15M1I85M"),  # insertion of middle of smallest locus, repeat_length=11
 
-])
+create_new_bam_custom_length("multimapping_loci", [
+        FakeRead(9990, "150M"),  # should align to all
+        FakeRead(9991, "150M"), # should align to all except biggest
+        FakeRead(10_001, "150M"), # should align to all except biggest
+        FakeRead(10_026, "150M"), # should align to first and third
+        FakeRead(10_040, "150M") # should not align to any
+], 150)

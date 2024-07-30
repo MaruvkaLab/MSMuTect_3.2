@@ -63,6 +63,18 @@ class TestHistogram(unittest.TestCase):
         self.assertEqual(third_line.motif_repeats[0], 0)
         self.assertEqual(third_line.motif_repeat_support[0], 1)
 
+    def test_multimapping_loci(self):
+        j = os.path.join
+        multimapping_results = os.path.join(test_results_path(), 'multimapping')
+        run_msmutect_from_cmd(f"-l {locus_file_path()} -H -S {j(sample_bams_path(), 'multimapping_loci.bam')}"
+                              f" -O {multimapping_results} -f")
+        results_reader = ResultsReader(multimapping_results + ".hist.tsv")
+
+        mapping_reads = [4, 3, 4, 1]
+        for i in range(4):
+            current_line = next(results_reader)
+            self.assertEqual(mapping_reads[i], current_line.motif_repeat_support[0], f"Failed on {i}")
+
 
 if __name__ == '__main__':
     unittest.main()
