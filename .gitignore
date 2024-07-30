@@ -1,5 +1,7 @@
 *.bam
 *.bai
+*.c
+*.so
 *.tsv
 *.csv
 *.MutOnly
@@ -20,3 +22,4 @@ pyinstaller_build/
 !pyinstaller_build/build.sh
 nuitka_build_tst/
 pyinstaller_venv/
+small_venv/
