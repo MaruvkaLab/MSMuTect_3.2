@@ -14,3 +14,9 @@ build/
 *.sam
 !tests/sample_bams/header_only.sam
 !tests/sample_bams/fake_sample_locus_sorted.tsv
+compilation_env/
+nuitka_build/
+pyinstaller_build/
+!pyinstaller_build/build.sh
+nuitka_build_tst/
+pyinstaller_venv/
