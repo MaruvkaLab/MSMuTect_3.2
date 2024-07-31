@@ -3,7 +3,7 @@ from typing import Tuple
 from scipy.stats import ks_2samp
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.AICs import AICs
-from src.IndelCalling.hist2vecs import hist2vecs, hist2samps
+from src.IndelCalling.hist2vecs import hist2samps
 
 
 class MutationCall:

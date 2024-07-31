@@ -37,6 +37,9 @@ class TestHistogram(unittest.TestCase):
         self.assertEqual(rounded_histogram_1.rounded_repeat_lengths[11], 9)
         self.assertEqual(rounded_histogram_1.rounded_repeat_lengths[12], 7)
 
+        rounded_histogram_2 = histogram_histograms()[2]
+        self.assertEqual(rounded_histogram_2.rounded_repeat_lengths[6], 7)
+
     def test_indels(self):
         j = os.path.join
         indel_results = os.path.join(test_results_path(), 'indels')

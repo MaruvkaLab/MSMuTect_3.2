@@ -89,6 +89,11 @@ def histogram_histograms() -> List[Histogram]:
     histogram_1.repeat_lengths = convert_dict_default({11.0: 5, 11.666: 4, 12.0: 3, 12.666: 4})
     ret.append(histogram_1)
 
+    locus_2 = Locus("1", 232435, 232445, "A", 5.5, "AAAAAAAAAAA")
+    histogram_2 = Histogram(locus_2, True)
+    histogram_2.repeat_lengths = convert_dict_default({4.999: 3, 6.0: 4})
+    ret.append(histogram_2)
+
     return ret
 
 
