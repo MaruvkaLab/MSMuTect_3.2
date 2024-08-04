@@ -64,12 +64,15 @@ class Histogram:
     def build_rounded(self):
 
         if self.integer_indels_only:
-            first_pass_dict = defaultdict(int)
+            # first_pass_dict = defaultdict(int)
             for length in self.repeat_lengths.keys():
-                integer_indel_only_length = self.locus.repeats + int(length-self.locus.repeats)
-                first_pass_dict[integer_indel_only_length] += self.repeat_lengths[length]
-            for length in first_pass_dict:
-                self._rounded_repeats[round(length)] = first_pass_dict[length]
+                if abs(length - self.locus.repeats)%1 < 0.001: # rounding error precision. Assume locus file has at least 3 digits of mantissa
+                    self._rounded_repeats[round(length)]+=self.repeat_lengths[length]
+
+            #     integer_indel_only_length = self.locus.repeats + int(length-self.locus.repeats)
+            #     first_pass_dict[integer_indel_only_length] += self.repeat_lengths[length]
+            # for length in first_pass_dict:
+            #     self._rounded_repeats[round(length)] = first_pass_dict[length]
         else:
             for length in self.repeat_lengths.keys():
                 self._rounded_repeats[round(length)] += self.repeat_lengths[length]

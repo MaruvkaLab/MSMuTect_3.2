@@ -30,15 +30,15 @@ class TestHistogram(unittest.TestCase):
 
     def test_rounding_winteger_only_flag(self):
         rounded_histogram = histogram_histograms()[0]
-        self.assertEqual(rounded_histogram.rounded_repeat_lengths[11], 12)
-        self.assertEqual(rounded_histogram.rounded_repeat_lengths[12], 2)
+        self.assertEqual(0, rounded_histogram.rounded_repeat_lengths[11])
+        self.assertEqual(0, rounded_histogram.rounded_repeat_lengths[12])
 
         rounded_histogram_1 = histogram_histograms()[1]
-        self.assertEqual(rounded_histogram_1.rounded_repeat_lengths[11], 9)
-        self.assertEqual(rounded_histogram_1.rounded_repeat_lengths[12], 7)
+        self.assertEqual(5, rounded_histogram_1.rounded_repeat_lengths[11])
+        self.assertEqual(3, rounded_histogram_1.rounded_repeat_lengths[12])
 
         rounded_histogram_2 = histogram_histograms()[2]
-        self.assertEqual(rounded_histogram_2.rounded_repeat_lengths[6], 7)
+        self.assertEqual(3, rounded_histogram_2.rounded_repeat_lengths[5])
 
     def test_indels(self):
         j = os.path.join
