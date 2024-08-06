@@ -1,6 +1,4 @@
-import multiprocessing.pool
-import os
-import shutil
+import multiprocessing.pool, time, os, shutil
 from typing import List
 from collections import namedtuple
 from multiprocessing import Pool
@@ -71,10 +69,21 @@ def run_batch(batch_function, args: list, loci_iterator: LociManager, total_batc
         return run_single_threaded(batch_function, args, loci_iterator, total_batch_size, result_dir)
     with Pool(processes=cores) as threads:
         batch_sizes = get_batch_sizes(total_batch_size, 100_000)
-        for i, batch in enumerate(batch_sizes):
+
+        for batch in batch_sizes:
+            num_active_processes = sum([1 for p in results if not p.ready()]) # how many processes are actually running
+            while num_active_processes == cores:
+                time.sleep(1)  # long wait time to avoid wasting processing power
+                num_active_processes = sum([1 for p in results if not p.ready()])
             current_loci = loci_iterator.get_batch(batch)
             results.append(threads.apply_async(batch_function,
-                                               args=([current_loci] + args + [result_dir])))
+                                           args=([current_loci] + args + [result_dir])))
+
+
+        # for i, batch in enumerate(batch_sizes):
+        #     current_loci = loci_iterator.get_batch(batch)
+        #     results.append(threads.apply_async(batch_function,
+        #                                        args=([current_loci] + args + [result_dir])))
         threads.close()
         threads.join()
     return extract_results(results)
