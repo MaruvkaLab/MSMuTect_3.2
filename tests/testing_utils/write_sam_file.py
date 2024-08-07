@@ -123,23 +123,40 @@ def create_new_bam(new_name: str, fake_reads: List[FakeRead]):
     os.system(f"samtools index {bam_filename}")
 
 
-# create_new_bam("mapping_small_locus", [
-#         FakeRead(9_963, "101M"),  # shouldn't map (misses on flanking)
-#         FakeRead(9_964, "101M"),  # should map
-#         FakeRead(10_035, "101M"),  # should map
-#         FakeRead(10_036, "101M"),  # shouldn't map
-# ])
+create_new_bam("mapping_small_locus", [
+        FakeRead(9_964, "101M"),  # shouldn't map (misses on flanking)
+        FakeRead(9_965, "101M"),  # should map
+        FakeRead(10_035, "101M"),  # should map
+        FakeRead(10_036, "101M"),  # shouldn't map
+])
 
 
-# create_new_bam("indels", [
-#         FakeRead(10_000, "35M30D66M"),  # knock out entire smallest locus. repeat_length=0
-#         FakeRead(10_035, "18M2D83M"),  # knock out end of smallest locus, repeat_length=8
-#         FakeRead(10_035, "10M2D91M"),  # knock out start of smallest locus, repeat_length=8
-#
-#         FakeRead(10_035, "10M1I90M"),  # insertion at start of smallest locus, repeat_length=11
-#         FakeRead(10_035, "20M1I80M"),  # insertion at end of smallest locus, repeat_length=11
-#         FakeRead(10_035, "15M1I85M"),  # insertion of middle of smallest locus, repeat_length=11
-# ])
+create_new_bam("indels", [
+        FakeRead(10_000, "35M30D66M"),  # knock out entire smallest locus. repeat_length=0
+
+        FakeRead(10_035, "18M2D83M"),  # knock out end of smallest locus, repeat_length=9
+        FakeRead(10_035, "19M10D82M"),  # knock out end and then some of smallest locus, repeat_length=9
+        FakeRead(10_035, "19M3D82M"),  # knock out end and then some of smallest locus, repeat_length=9
+        FakeRead(10_035, "9M3D92M"),  # knock out start of smallest locus, repeat_length=9
+
+        FakeRead(10_035, "10M1D91M"),  # knock out start of smallest locus, repeat_length=10
+        FakeRead(10_035, "10M1D91M"),  # knock out start of smallest locus, repeat_length=10
+
+
+        FakeRead(10_035, "10M1I90M"),  # insertion at start of smallest locus, repeat_length=12
+        FakeRead(10_035, "20M1I80M"),  # insertion at end of smallest locus, repeat_length=12
+        FakeRead(10_035, "15M1I85M"),  # insertion of middle of smallest locus, repeat_length=12
+
+
+        FakeRead(10_035, "5M1I95M"),  # insertion before start of smallest locus, repeat_length=11
+        FakeRead(10_035, "40M2D61M"),  # deletion after end of smallest locus, repeat_length=11
+        FakeRead(10_035, "101M"),   # standard: rl=11
+        FakeRead(10_035, "101M"),  # standard: rl=11
+        FakeRead(10_035, "101M"),   # standard: rl=11
+        FakeRead(10_035, "101M"),   # standard: rl=11
+
+    # 11_6, 9_4, 12_3, 10_2, 0_1
+])
 
 
 create_new_bam_custom_length("multimapping_loci", [

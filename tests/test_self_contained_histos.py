@@ -47,16 +47,21 @@ class TestHistogram(unittest.TestCase):
                               f" -O {indel_results} -f")
         results_reader = ResultsReader(indel_results + ".hist.tsv")
         first_line = next(results_reader)
-        self.assertEqual(len(first_line.motif_repeat_support), 3)
+        self.assertEqual(len(first_line.motif_repeat_support), 5)
+
+        # 11_6, 9_4, 12_3, 10_2, 0_1
+
         self.assertEqual(first_line.motif_repeats[0], 11)
-        self.assertEqual(first_line.motif_repeats[1], 8)
-        self.assertEqual(first_line.motif_repeats[2], 0)
+        self.assertEqual(first_line.motif_repeats[1], 9)
+        self.assertEqual(first_line.motif_repeats[2], 12)
+        self.assertEqual(first_line.motif_repeats[3], 10)
+        self.assertEqual(first_line.motif_repeats[4], 0)
 
-        self.assertEqual(first_line.motif_repeat_support[0], 3)
-        self.assertEqual(first_line.motif_repeat_support[1], 2)
-        self.assertEqual(first_line.motif_repeat_support[2], 1)
-
-        self.assertEqual(first_line.motif_repeat_support[2], 1)
+        self.assertEqual(first_line.motif_repeat_support[0], 6)
+        self.assertEqual(first_line.motif_repeat_support[1], 4)
+        self.assertEqual(first_line.motif_repeat_support[2], 3)
+        self.assertEqual(first_line.motif_repeat_support[3], 2)
+        self.assertEqual(first_line.motif_repeat_support[4], 1)
 
         second_line = next(results_reader)
         self.assertEqual(second_line.motif_repeats[0], 0)

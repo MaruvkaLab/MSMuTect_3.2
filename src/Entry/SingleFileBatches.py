@@ -76,11 +76,11 @@ def partial_single_histogram(loci: List[Locus], BAM: str, flanking: int, integer
 if __name__ == '__main__':
     # run_single_histogram(BAM: str, loci_file: str, batch_start: int,
     #                          batch_end: int, cores: int, flanking: int, output_prefix: str) -> None:
-    # run_single_histogram("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/multimapping_loci.bam",
-    #                      "/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/fake_sample_locus_sorted.tsv",
-    #                      0, 10, 1, 10, False, "croc_tmp")
-
-    run_single_allelic(
-        "/home/avraham/MaruvkaLab/msmutect_runs/problems/integer_wierd_rounding/prob_locus.bam",
-        "/home/avraham/MaruvkaLab/msmutect_runs/problems/integer_wierd_rounding/prob_locus",
-        0, 1, 1, 10, 6, True, "croc_tmp")
+    run_single_histogram("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/multimapping_loci.bam",
+                         "/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/fake_sample_locus_sorted.tsv",
+                         0, 10, 1, 10, False, "croc_tmp")
+    #
+    # run_single_allelic(
+    #     "/home/avraham/MaruvkaLab/msmutect_runs/problems/integer_wierd_rounding/prob_locus.bam",
+    #     "/home/avraham/MaruvkaLab/msmutect_runs/problems/integer_wierd_rounding/prob_locus",
+    #     0, 1, 1, 10, 6, True, "croc_tmp")

@@ -45,9 +45,9 @@ class ReadsFetcher:
         new_last_extracted_reads = []
         ret = []
         for read in self.last_extracted_reads:
-            if read.reference_start + 1 <= start and end <= read.reference_end + 1:
+            if read.reference_start + 1 <= start and end <= read.reference_end:
                 ret.append(read)
-            elif end <= read.reference_end + 1: # could theoretically map to the next locus if it's start and end are later
+            elif end <= read.reference_end: # could theoretically map to the next locus if it's start and end are later
                 new_last_extracted_reads.append(read)
         self.last_extracted_reads = new_last_extracted_reads
         return ret
@@ -69,7 +69,7 @@ class ReadsFetcher:
     def add_all_mapped(self, mapped_reads: List[AlignedSegment], cur_read: AlignedSegment, start: int, end: int) -> List[AlignedSegment]:
         # this function is called once we have found the first mapped read and we now add all other mapped reads
         while cur_read.reference_start + 1 <= start:
-            if end <= cur_read.reference_end + 1 and self.simple_filter(cur_read):
+            if end <= cur_read.reference_end and self.simple_filter(cur_read):
                 mapped_reads.append(cur_read)
             cur_read = self.get_next_mapped_read()
             if cur_read is None:  # reads iterator is exhausted
@@ -102,7 +102,7 @@ class ReadsFetcher:
         while cur_read is not None:
             if start < cur_read.reference_start + 1:
                 return self.remember_return(mapped_reads, cur_read)
-            elif cur_read.reference_start + 1 <= start and end <= cur_read.reference_end + 1:
+            elif cur_read.reference_start + 1 <= start and end <= cur_read.reference_end: # from pysam documentation: 'reference_end points to one past the last aligned residue'. Hence, no plus 1 even tho its 0 indexed and phobos is 1 indexed
                 return self.add_all_mapped(mapped_reads, cur_read, start, end)
             else:
                 cur_read = self.get_next_mapped_read()

@@ -1,5 +1,5 @@
 import unittest, time
-
+from tests.testing_utils.self_contained_utils import locus_file_path
 from src.GenomicUtils.LocusFile import LociManager
 
 
@@ -12,6 +12,11 @@ class TestHistogram(unittest.TestCase):
         init_start = time.process_time()
         _ = manager.get_batch(1_000_000)
         self.assertLess(time.process_time()-init_start, 4)
+
+    def test_load_single(self):
+        manager = LociManager(locus_file_path(), 0)
+        l = manager.get_batch(1)[0]
+        self.assertTrue(True)
 
 
 if __name__ == '__main__':

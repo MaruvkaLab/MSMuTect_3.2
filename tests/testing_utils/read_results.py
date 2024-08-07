@@ -36,12 +36,12 @@ class ResultsReader:
             motif_repeats = []
             motif_repeat_support = []
             for i in range(6, 12):
-                if broken_line[i]=="NA":
+                if broken_line[i].strip()=="NA":
                     break
                 else:
                     motif_repeats.append(float(broken_line[i]))
             for i in range(12, 18):
-                if broken_line[i] == "NA":
+                if broken_line[i].strip() == "NA":
                     break
                 else:
                     motif_repeat_support.append(int(broken_line[i]))
