@@ -4,7 +4,7 @@ from typing import List
 
 def create_parser() -> argparse.ArgumentParser:
     # :return: creates parser with all command line arguments arguments
-    MSMuTect_intro = "MSMuTect\n Version 0.5\n Authors: Yossi Maruvka, Avraham Kahan, and the Maruvka Lab at Technion"
+    MSMuTect_intro = "MSMuTect\n Version 4.0\n Authors: Yossi Maruvka, Avraham Kahan, and the Maruvka Lab at Technion"
     parser = argparse.ArgumentParser(description=MSMuTect_intro)
     parser.add_argument("-T", "--tumor_file", help="Tumor BAM file")
     parser.add_argument("-N", "--normal_file", help="Non-tumor BAM file")
@@ -19,8 +19,9 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-m", "--mutation", help="Output mutation file", action='store_true')
     parser.add_argument("-F", "--flanking", help="Length of flanking on both sides of an accepted read", type=int, default=10)
     parser.add_argument("-r", "--read_level", help="Minimum number of reads to call allele", type=int, default=5)
-    parser.add_argument("-f", "--force", help="overwrite pre-existing files", action='store_true')
-    parser.add_argument("--integer", help="only use indels of integer deletions/insertions of the repeat unit when calling alleles", action='store_true')
+    parser.add_argument("-f", "--force", help="Overwrite pre-existing files", action='store_true')
+    parser.add_argument("--integer", help="Only use indels of integer deletions/insertions of the repeat unit when calling alleles", action='store_true')
+    parser.add_argument("--vcf", help="Output VCF file in addition to TSV file. IMPORTANT NOTE: the location of the indel may be anywhere in the locus, but the VCF will always have it at the beginning of the locus. In addition, all loci with non-reference alleles are listed but only mutations are listed as 'PASS'", action='store_true')
     return parser
 
 
@@ -93,7 +94,9 @@ def validate_output_files(arguments: argparse.Namespace):
         else:
             if os.path.exists(arguments.output_prefix + ".all.tsv"):
                 exit_on(overwrite_files_mssg)
-    else:
+    else:  # pair file
+        if arguments.mutation and arguments.vcf and os.path.exists(arguments.output_prefix+".vcf"):
+            exit_on(overwrite_files_mssg)
         if (arguments.histogram or arguments.allele) and arguments.mutation and os.path.exists(arguments.output_prefix + ".full.mut.tsv"):
                     exit_on(overwrite_files_mssg)
         elif not arguments.histogram and not arguments.allele and os.path.exists(arguments.output_prefix + ".partial.mut.tsv"):
@@ -123,4 +126,6 @@ def validate_input(arguments: argparse.Namespace):
         exit_on("Minimum Read Level for calling alleles must be equal to or greater than 1")
     elif not os.path.exists(arguments.loci_file):
         exit_on("Loci file path does not exist")
+    elif arguments.vcf and not arguments.mutation:
+        exit_on("VCF file can only be generated for mutation calls")
 

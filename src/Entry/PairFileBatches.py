@@ -26,13 +26,16 @@ def format_mutation_call(decision: MutationCall):
 
 
 def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
-                       batch_end: int, cores: int, flanking: int, required_reads: int, integer_indels_only, output_prefix: str):
+                       batch_end: int, cores: int, flanking: int, required_reads: int, integer_indels_only, output_prefix: str) -> str:
+    # returns path of output file
     loci_iterator = LociManager(loci_file, batch_start)
     noise_table = get_noise_table()
     results: List[FileBackedQueue] = BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table, required_reads, integer_indels_only], loci_iterator,
                                   (batch_end - batch_start), cores, os.path.dirname(output_prefix))
     mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}"
-    BatchUtil.write_queues_results(output_prefix + ".full.mut", results, mutation_header)
+    output_file = output_prefix + ".full.mut"
+    BatchUtil.write_queues_results(output_file, results, mutation_header)
+    return output_file+".tsv"
 
 
 def get_alleles(locus: Locus, reads_fetcher: ReadsFetcher, flanking: int, noise_table, required_reads: int, integer_indels_only: bool) -> AlleleSet:
@@ -60,6 +63,7 @@ def partial_full_pair(loci: List[Locus], normal: str, tumor: str, flanking: int,
 
 def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
                        batch_end: int, cores: int, flanking: int, required_reads: int, integer_indels_only: bool, output_prefix: str):
+    # returns output file
     loci_iterator = LociManager(loci_file, batch_start)
     noise_table = get_noise_table()
     results: List[FileBackedQueue] = BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table,
@@ -67,7 +71,9 @@ def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int
                                                      loci_iterator,
                                                      (batch_end - batch_start), cores, result_dir=os.path.dirname(output_prefix))
     mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}"
-    BatchUtil.write_queues_results(output_prefix + ".partial.mut", results, mutation_header)
+    output_file = output_prefix + ".partial.mut"
+    BatchUtil.write_queues_results(output_file, results, mutation_header)
+    return output_file+".tsv"
 
 
 def get_tumor_alleles(reads_fetcher: ReadsFetcher, locus: Locus, flanking: int, noise_table, required_reads=6, integer_indels_only=False) -> AlleleSet:

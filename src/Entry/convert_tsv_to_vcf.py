@@ -72,7 +72,7 @@ def create_vcf_lines(input_tsv_fp: str) -> str:
 
 def convert_tsv_to_vcf(input_tsv_fp: str, output_vcf_fp: str):
     vcf_lines = create_vcf_lines(input_tsv_fp)
-    header = """
+    header = """\
 ##fileformat=VCFv4.0
 ##<ID=ID,Number=,Type=,Description="NOTE: FOR ALL IMPURE LOCI, THE LOCATION OF THE MUTATION MAY BE INCORRECT BY UP TO THE LENGTH OF THE MICROSATELLITE LOCUS. THE EXACT REF AND ALT SEQUENCE MAY BE ERRANT AS WELL">
 ##fileformat=VCFv4.2
@@ -109,12 +109,11 @@ def convert_tsv_to_vcf(input_tsv_fp: str, output_vcf_fp: str):
 ##FILTER=<ID=FFT,Description="Failed Fisher Test">
 ##FILTER=<ID=TMA,Description="Too many alleles">
 ##FILTER=<ID=INS,Description="Insufficient support">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-            """
-    with open(output_vcf_fp, 'a') as ovf:
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO"""
+    with open(output_vcf_fp, 'w') as ovf:
         ovf.write(header + "\n" + vcf_lines)
 
 
 if __name__ == '__main__':
-    convert_tsv_to_vcf("/home/avraham/MaruvkaLab/Texas/profiling_msmutect/new_vcf.partial.mut.tsv",
+    convert_tsv_to_vcf("/home/avraham/MaruvkaLab/msmutect_runs/results/mod.partial.mut.tsv",
                        "/home/avraham/MaruvkaLab/msmutect_runs/results/mod.vcf")
