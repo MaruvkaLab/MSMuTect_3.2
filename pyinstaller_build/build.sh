@@ -1,7 +1,7 @@
 
 
 
-
+# first build cython with bash build.sh
 export PYTHONPATH=/home/avraham/MaruvkaLab/MSMuTect_0.5/
 pyinstaller --onefile --name msmutect --hidden-import=tempfile --hidden-import=json --hidden-import=ctypes --hidden-import=platform \
     -p=/home/avraham/MaruvkaLab/MSMuTect_0.5/ \
