@@ -3,7 +3,7 @@ Indel, Allele and Mutation caller, specifically designed to call mutations in mi
 
 # Installation
 ### Binary
-There is a prebuilt binary available in releases.  
+There is a prebuilt x86_64 linux binary available in releases.  
 Note: The binary is slightly slower than the 'Local' option.   
 Download the binary from the following link:
 [fill in link]
@@ -35,7 +35,7 @@ msmutect -S [sequence_file.bam] -l [loci_file.phobos] -O [output_prefix] -c [num
 
 To see all flags, such as running with multiple cores, using integer indels only, outputting vcf files, etc., run 'msmutect --help'
 
-MSMuTect will create temporary files when running with names like tmp_10242_1721809243.1243694_25529.  
+MSMuTect will create temporary files when running, with names like tmp_10242_1721809243.1243694_25529.  
 It deletes them at the end. If, for some reason, msmutect is interrupted, these files will not be deleted. They can be safely removed 
 
 ### Understanding the 'Call' Column
@@ -49,7 +49,7 @@ TMA = Too Many Alleles. Normal sample has too many alleles, and hence the locus 
 
 MSMuTect can generate a vcf file with the results in addition to the regular output (a tsv file).   
 The vcf file will include every locus that had an alternate allele in either the tumor or the normal sample.   
-However, every locus that is not called as a mutation will be marked as filtered in the filter column of the vcf file, with the resulting call (ex. NM, INS, AN, etc)
+However, every locus that is not called as a mutation will be marked as filtered in the filter column of the vcf file, with the resulting call (ex. NM, INS, AN, etc.) as the filter
 
 # Publication and Citation
 For orginal paper, see 
