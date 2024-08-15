@@ -1,10 +1,10 @@
 # MSMuTect_0.5
-Indel, Allele and Mutation caller, specifically designed to call mutations in microsatellite regions using a pair of sequencing files (normal and tumor)
+Indel, Allele and Mutation caller, specifically designed to call mutations in microsatellite regions using a pair of sequencing files (normal and tumor samples)
 
 # Installation
 ### Binary
 There is a prebuilt binary available in releases.  
-Note: The binary is slightly slower than the 'Local' option   
+Note: The binary is slightly slower than the 'Local' option.   
 Download the binary from the following link:
 [fill in link]
 ### Local
@@ -16,8 +16,7 @@ bash build.sh
 When running, use MSMuTect_0.5/msmutect.sh everywhere the documentation says 'msmutect'
 
 # Usage
-First, the loci file must be sorted properly:
-This should work on all unix systems:   
+First, the loci file must be sorted properly. This should work on all unix systems:   
 sort -t $'\t' -k1,1 -k5n,5 -k4nr,4 -V [original loci file] > [new loci file]    
 Then: 
 msmutect [flags]  
@@ -36,17 +35,17 @@ msmutect -S [sequence_file.bam] -l [loci_file.phobos] -O [output_prefix] -c [num
 
 To see all flags, such as running with multiple cores, using integer indels only, outputting vcf files, etc., run 'msmutect --help'
 
-msmutect will create temporary files when running with names like tmp_10242_1721809243.1243694_25529.  
-It deletes them at the end. If, for some reason, msmutect is interrupted, they will persist. They can be safely removed
+MSMuTect will create temporary files when running with names like tmp_10242_1721809243.1243694_25529.  
+It deletes them at the end. If, for some reason, msmutect is interrupted, these files will not be deleted. They can be safely removed 
 
 ### Understanding the 'Call' Column
 M = Mutation  
 NM = Not Mutation   
-AN = No Alleles. Either tumor or normal lacks alleles  
-RR = Reversion to Reference. The normal held an alternative allele, and the tumor had a mutation of the reference allele  
+AN = No Alleles. Either the tumor sample or the normal sample lacks alleles  
+RR = Reversion to Reference. The normal sample held an alternative allele, and the tumor had a mutation of the reference allele  
 FFT = Failed Fisher Test. Passed other tests to be called a mutation, but failed the Fisher's exact test of significance      
 INS = Insufficient Support. The normal sample has multiple alleles, but one of them has insufficient support, indicating a noisy locus  
-TMA = Too Many Alleles. Normal has too many alleles, and hence the locus is too noisy to call    
+TMA = Too Many Alleles. Normal sample has too many alleles, and hence the locus is too noisy to call    
 
 MSMuTect can generate a vcf file with the results in addition to the regular output (a tsv file).   
 The vcf file will include every locus that had an alternate allele in either the tumor or the normal sample.   
