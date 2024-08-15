@@ -1,4 +1,4 @@
-# MSMuTect_0.5
+# MSMuTect
 Indel, Allele and Mutation caller, specifically designed to call mutations in microsatellite regions using a pair of sequencing files (normal and tumor samples)
 
 # Installation
@@ -6,14 +6,15 @@ Indel, Allele and Mutation caller, specifically designed to call mutations in mi
 There is a prebuilt x86_64 linux binary available in releases.  
 Note: The binary is slightly slower than the 'Local' option.   
 Download the binary from the following link:
-[fill in link]
+https://github.com/MaruvkaLab/MSMuTect_4/releases/tag/v4.0
+
 ### Local
 To achieve maximum performance, do the following:  
-git clone https://github.com/MaruvkaLab/MSMuTect_0.5  
-cd MSMuTect_0.5  
+git clone https://github.com/MaruvkaLab/MSMuTect_4  
+cd MSMuTect_4  
 pip3 install -r requirements.txt  
 bash build.sh  
-When running, use MSMuTect_0.5/msmutect.sh everywhere the documentation says 'msmutect'
+When running, use MSMuTect_4/msmutect.sh everywhere the documentation says 'msmutect'
 
 # Usage
 First, the loci file must be sorted properly. This should work on all unix systems:   
