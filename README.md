@@ -8,7 +8,7 @@ Note: The binary is slightly slower the 'Local' option
 Download the binary from the following link:
 [fill in link]
 ### Local
-To achieve maximum performance, do the following instead:
+To achieve maximum performance, do the following instead:  
 git clone https://github.com/MaruvkaLab/MSMuTect_0.5  
 cd MSMuTect_0.5  
 pip3 install -r requirements.txt  
