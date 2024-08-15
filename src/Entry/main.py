@@ -3,6 +3,7 @@ import argparse
 from src.Entry.SingleFileBatches import run_single_allelic, run_single_histogram
 from src.Entry.PairFileBatches import run_full_pair, run_mutations_pair
 from src.Entry.InputHandler import create_parser, validate_input
+from src.Entry.convert_tsv_to_vcf import convert_tsv_to_vcf
 
 
 def count_lines(file: str):
@@ -18,29 +19,32 @@ def run_msmutect(args: argparse.Namespace):
     if args.single_file:
         if args.allele or not args.histogram:
             run_single_allelic(args.single_file, args.loci_file, args.batch_start - 1,
-                               batch_end, args.cores, args.flanking, args.read_level, args.output_prefix)
+                               batch_end, args.cores, args.flanking, args.read_level, args.integer, args.output_prefix)
         else:
             run_single_histogram(args.single_file, args.loci_file, args.batch_start - 1,
-                                 batch_end, args.cores, args.flanking, args.output_prefix)
+                                 batch_end, args.cores, args.flanking, args.integer, args.output_prefix)
 
     else:
         if args.histogram and not args.mutation:
             run_single_histogram(args.normal_file, args.loci_file, args.batch_start - 1,
-                                 batch_end, args.cores, args.flanking, args.output_prefix + ".normal")
+                                 batch_end, args.cores, args.flanking, args.integer, args.output_prefix + ".normal")
             run_single_histogram(args.tumor_file, args.loci_file, args.batch_start - 1,
-                                 batch_end, args.cores, args.flanking, args.output_prefix + ".tumor")
+                                 batch_end, args.cores, args.flanking, args.integer, args.output_prefix + ".tumor")
         elif args.allele and not args.mutation:
             run_single_allelic(args.normal_file, args.loci_file, args.batch_start - 1,
-                               batch_end, args.cores, args.flanking, args.read_level, args.output_prefix + ".normal")
+                               batch_end, args.cores, args.flanking, args.read_level, args.integer, args.output_prefix + ".normal")
             run_single_allelic(args.tumor_file, args.loci_file, args.batch_start - 1,
-                               batch_end, args.cores, args.flanking, args.read_level, args.output_prefix + ".tumor")
-        else:
-            if args.histogram or args.allele:  # args.mutation=True
-                run_full_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start-1, batch_end,
-                              args.cores, args.flanking, args.read_level, args.output_prefix)
+                               batch_end, args.cores, args.flanking, args.read_level, args.integer, args.output_prefix + ".tumor")
+        else: # args.mutation=True
+            if args.histogram or args.allele:
+                mut_file = run_full_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start-1, batch_end,
+                              args.cores, args.flanking, args.read_level, args.integer, args.output_prefix)
+
             else:  # args.mutation=True, just mutations
-                run_mutations_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start-1, batch_end,
-                                args.cores, args.flanking, args.read_level, args.output_prefix)
+                mut_file = run_mutations_pair(args.normal_file, args.tumor_file, args.loci_file, args.batch_start-1, batch_end,
+                                args.cores, args.flanking, args.read_level, args.integer, args.output_prefix)
+            if args.vcf:
+                convert_tsv_to_vcf(mut_file, args.output_prefix+".vcf")
 
 
 if __name__ == "__main__":

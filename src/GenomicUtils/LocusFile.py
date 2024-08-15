@@ -7,7 +7,8 @@ from src.IndelCalling.Locus import Locus
 
 class LociManager:
     def __init__(self, loci_path: str, start: int = 0):
-        self.iterator = csv.reader(open(loci_path), dialect="excel-tab")
+        self.loci_file = open(loci_path)
+        self.iterator = csv.reader(self.loci_file, dialect="excel-tab")
         self.prime_iterator(start)
 
     def prime_iterator(self, n: int):
@@ -27,8 +28,16 @@ class LociManager:
 
         return loci
 
+    def __del__(self):
+        self.loci_file.close()
+
 
 if __name__ == '__main__':
     # test all loci
-    tst = LociManager("/home/avraham/MaruvkaLab/full_ex/probs/tmp.phobos", 0)
-    tst.get_batch(10**10) # will get everything
+    tst = LociManager("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/fake_sample_locus_sorted.tsv", 0)
+    a=tst.get_batch(1)
+    print(a[0].start)
+    print(a[0].end)
+    print(a[0].repeats)
+    print(a[0].sequence)
+    # tst.get_batch(10**10) # will get everything
