@@ -9,7 +9,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-T", "--tumor_file", help="Tumor BAM file")
     parser.add_argument("-N", "--normal_file", help="Non-tumor BAM file")
     parser.add_argument("-S", "--single_file", help="Analyze a single file for histogram and/or alleles")
-    parser.add_argument("-l", "--loci_file", help="File of loci to be processed and included in the output", required=True)
+    parser.add_argument("-l", "--loci_file", help="File of loci to be processed and included in the output", required=False)
     parser.add_argument("-O", "--output_prefix", help="prefix for all output files", required=True)
     parser.add_argument("-c", "--cores", help="Number of cores to run MSMuTect on", type=int, default=1)
     parser.add_argument("-b", "--batch_start", help="1-indexed number locus to begin analyzing at (Inclusive)", default=1, type=int)
@@ -22,6 +22,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-f", "--force", help="Overwrite pre-existing files", action='store_true')
     parser.add_argument("--integer", help="Only use indels of integer deletions/insertions of the repeat unit when calling alleles", action='store_true')
     parser.add_argument("--vcf", help="Output VCF file in addition to TSV file. IMPORTANT NOTE: the location of the indel may be anywhere in the locus, but the VCF will always have it at the beginning of the locus. In addition, all loci with non-reference alleles are listed but only mutations are listed as 'PASS'", action='store_true')
+    parser.add_argument("--from_file", help="call alleles mutations on previously called indels (histograms). Only single core runs are supported", action='store_true')
     return parser
 
 
@@ -109,23 +110,40 @@ def validate_output_files(arguments: argparse.Namespace):
             exit_on(overwrite_files_mssg)
 
 
+def from_file_file_verification(arguments):
+    if not (bool(arguments.tumor_file) and bool(arguments.normal_file)):
+        exit_on("Provide both Normal and Tumor file for 'from_file' run")
+    if not os.path.exists(arguments.tumor_file) or not os.path.exists(arguments.normal_file):
+        exit_on("Provided Normal or Tumor BAM path does not exist")
+    if not arguments.tumor_file.endswith(".hist.tsv") or not arguments.normal_file.endswith(".hist.tsv"):
+        exit_on("'from_file' requires precompiled histograms")
+
+
 def validate_input(arguments: argparse.Namespace):
-    validate_bams(arguments)
-    validate_output_files(arguments)
-    if not os.path.exists(arguments.loci_file):
-        exit_on("Provided loci file does not exist")
-    if arguments.mutation and arguments.single_file:
-        exit_on("Pair of files must be provided to call mutations")
-    elif arguments.batch_start <= 0:
-        exit_on("Batch Start must be equal to or greater than 1")
-    elif arguments.cores <= 0:
-        exit_on("Cores must be equal to or greater than 1")
-    elif arguments.flanking < 0:
-        exit_on("Flanking must be equal to or greater than 0")
-    elif arguments.read_level < 1:
-        exit_on("Minimum Read Level for calling alleles must be equal to or greater than 1")
-    elif not os.path.exists(arguments.loci_file):
-        exit_on("Loci file path does not exist")
-    elif arguments.vcf and not arguments.mutation:
-        exit_on("VCF file can only be generated for mutation calls")
+    if arguments.from_file:
+        if not arguments.mutation or arguments.single_file:
+            exit_on("'from_file' option only supports calling mutations")
+        validate_output_files(arguments)
+        from_file_file_verification(arguments)
+    else:
+        if not arguments.loci_file:
+            exit_on("Loci file must be provided")
+        validate_bams(arguments)
+        validate_output_files(arguments)
+        if not os.path.exists(arguments.loci_file):
+            exit_on("Provided loci file does not exist")
+        if arguments.mutation and arguments.single_file:
+            exit_on("Pair of files must be provided to call mutations")
+        elif arguments.batch_start <= 0:
+            exit_on("Batch Start must be equal to or greater than 1")
+        elif arguments.cores <= 0:
+            exit_on("Cores must be equal to or greater than 1")
+        elif arguments.flanking < 0:
+            exit_on("Flanking must be equal to or greater than 0")
+        elif arguments.read_level < 1:
+            exit_on("Minimum Read Level for calling alleles must be equal to or greater than 1")
+        elif not os.path.exists(arguments.loci_file):
+            exit_on("Loci file path does not exist")
+        elif arguments.vcf and not arguments.mutation:
+            exit_on("VCF file can only be generated for mutation calls")
 

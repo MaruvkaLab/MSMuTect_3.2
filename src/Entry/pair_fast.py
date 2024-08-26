@@ -145,6 +145,7 @@ def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: in
         tumor_file.readline()
         normal_file.readline()
     for i in range(batch_end - batch_start):
+        print(i)
         try:
             tumor_histogram = construct_histogram_from_tsv(tumor_file.readline(), integer_indels_only)
         except StopIteration:
@@ -157,7 +158,6 @@ def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: in
         tumor_alleles = CallAllelesFast.calculate_alleles(tumor_histogram, noise_table, required_read_support=required_reads)
         normal_alleles = CallAllelesFast.calculate_alleles(normal_histogram, noise_table, required_read_support=required_reads)
         mutation_calls.append(format_mutation_call(call_mutations(normal_alleles, tumor_alleles, noise_table, fisher)))
-        # exit()
     mutation_calls.close()
     mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}"
     output_file = output_prefix + ".full.mut"

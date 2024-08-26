@@ -73,6 +73,7 @@ def partial_single_histogram(loci: List[Locus], BAM: str, flanking: int, integer
     return histograms
 
 
+
 if __name__ == '__main__':
     # run_single_histogram(BAM: str, loci_file: str, batch_start: int,
     #                          batch_end: int, cores: int, flanking: int, output_prefix: str) -> None:
