@@ -164,11 +164,14 @@ def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: in
     BatchUtil.write_queues_results(output_file, [mutation_calls], mutation_header)
     tumor_file.close()
     normal_file.close()
-    output_file = "croc trap"
+    # output_file = "croc trap"
     return output_file + ".tsv"
 
 
 if __name__ == '__main__':
     run_from_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/098698a0-3107-49e3-9226-d6d105f195a1.hist.tsv",
                   "/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/009dcaf2-f6bb-415e-b088-6e852853b1a2.hist.tsv",
-                  8209, 100_000, 5, True, "/home/avraham/MaruvkaLab/msmutect_runs/results/frf")
+                  0, 100_000, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/n")
+    # run_from_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/098698a0-3107-49e3-9226-d6d105f195a1.hist.tsv",
+    #               "/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/009dcaf2-f6bb-415e-b088-6e852853b1a2.hist.tsv",
+    #               35_456, 35_457, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/n16b")
