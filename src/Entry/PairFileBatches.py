@@ -145,7 +145,6 @@ def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: in
         tumor_file.readline()
         normal_file.readline()
     for i in range(batch_end - batch_start):
-        print(i)
         try:
             tumor_histogram = construct_histogram_from_tsv(tumor_file.readline(), integer_indels_only)
         except StopIteration:
@@ -165,7 +164,6 @@ def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: in
     BatchUtil.write_queues_results(output_file, [mutation_calls], mutation_header)
     tumor_file.close()
     normal_file.close()
-    output_file = "croc trap"
     return output_file + ".tsv"
 
 
