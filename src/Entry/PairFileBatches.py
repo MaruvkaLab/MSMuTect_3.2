@@ -145,17 +145,18 @@ def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: in
         tumor_file.readline()
         normal_file.readline()
     for i in range(batch_end - batch_start):
+        print(i)
         try:
             tumor_histogram = construct_histogram_from_tsv(tumor_file.readline(), integer_indels_only)
         except StopIteration:
             break # finished consuming file. batch end could be malformed
         normal_histogram = construct_histogram_from_tsv(normal_file.readline(), integer_indels_only)
-        # tumor_alleles = calculate_alleles(tumor_histogram, noise_table,
-        #                                                   required_read_support=required_reads)
-        # normal_alleles = calculate_alleles(normal_histogram, noise_table,
-        #                                                    required_read_support=required_reads)
-        tumor_alleles = CallAllelesFast.calculate_alleles(tumor_histogram, noise_table, required_read_support=required_reads)
-        normal_alleles = CallAllelesFast.calculate_alleles(normal_histogram, noise_table, required_read_support=required_reads)
+        tumor_alleles = calculate_alleles(tumor_histogram, noise_table,
+                                                          required_read_support=required_reads)
+        normal_alleles = calculate_alleles(normal_histogram, noise_table,
+                                                           required_read_support=required_reads)
+        # tumor_alleles = CallAllelesFast.calculate_alleles(tumor_histogram, noise_table, required_read_support=required_reads)
+        # normal_alleles = CallAllelesFast.calculate_alleles(normal_histogram, noise_table, required_read_support=required_reads)
         mutation_calls.append(format_mutation_call(call_mutations(normal_alleles, tumor_alleles, noise_table, fisher)))
         # exit()
     mutation_calls.close()
@@ -171,13 +172,13 @@ def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: in
 if __name__ == '__main__':
     run_from_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/098698a0-3107-49e3-9226-d6d105f195a1.hist.tsv",
                   "/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/009dcaf2-f6bb-415e-b088-6e852853b1a2.hist.tsv",
-                  35_456, 35_457, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/o16a")
-    run_from_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/098698a0-3107-49e3-9226-d6d105f195a1.hist.tsv",
-                  "/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/009dcaf2-f6bb-415e-b088-6e852853b1a2.hist.tsv",
-                  16697, 16698, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/o16b")
-    run_from_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/098698a0-3107-49e3-9226-d6d105f195a1.hist.tsv",
-                  "/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/009dcaf2-f6bb-415e-b088-6e852853b1a2.hist.tsv",
-                  16697, 16698, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/o16c")
-    run_from_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/098698a0-3107-49e3-9226-d6d105f195a1.hist.tsv",
-                  "/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/009dcaf2-f6bb-415e-b088-6e852853b1a2.hist.tsv",
-                  16697, 16698, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/o16d")
+                  44_347, 44_348, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/o151")
+    # run_from_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/098698a0-3107-49e3-9226-d6d105f195a1.hist.tsv",
+    #               "/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/009dcaf2-f6bb-415e-b088-6e852853b1a2.hist.tsv",
+    #               16697, 16698, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/o16b")
+    # run_from_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/098698a0-3107-49e3-9226-d6d105f195a1.hist.tsv",
+    #               "/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/009dcaf2-f6bb-415e-b088-6e852853b1a2.hist.tsv",
+    #               16697, 16698, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/o16c")
+    # run_from_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/098698a0-3107-49e3-9226-d6d105f195a1.hist.tsv",
+    #               "/home/avraham/MaruvkaLab/Texas/texas_stad_run/tst/009dcaf2-f6bb-415e-b088-6e852853b1a2.hist.tsv",
+    #               16697, 16698, 5, True, "/home/avraham/MaruvkaLab/Texas/efficient_run/o16d")

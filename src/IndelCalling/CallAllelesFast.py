@@ -11,6 +11,8 @@ from src.IndelCalling.Histogram import Histogram
 # import warnings
 # warnings.filterwarnings("error")
 
+random.seed(402)
+
 
 class AllelesMaximumLikelihood:
     def __init__(self, histogram: Histogram, proper_lengths: List[int], supported_lengths: List[int],
