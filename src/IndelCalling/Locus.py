@@ -11,6 +11,10 @@ class Locus:
         self.sequence = sequence
         self.repeats = repeats
 
+    @property
+    def repeat_length(self):
+        return len(self.pattern)
+
     @staticmethod
     def parse_chromosome(chromosome: str) -> str:
         if len(chromosome) < 3:
