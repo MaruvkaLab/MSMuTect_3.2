@@ -1,7 +1,7 @@
 # cython: language_level=3
 import csv
 import time
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 from src.IndelCalling.AnnotatedLocus import AnnotatedLocus
 from src.GenomicUtils.MSMuLIFOqueue import MSMuLIFOqueue as LIFO
@@ -57,9 +57,12 @@ class LociManager:
     def get_chromosome_batch(self) -> Tuple[List[LocusClump], List[AnnotatedLocus]]:
         # will only return chromosome scale batches so it doesn't return a partial clump
         # also simply returns the list of loci
+        # returns None if exhausted
         loci_queue = LIFO()
         next_id=0
         current_locus = self.next_mono_locus_clump(next_id)
+        if current_locus is None:
+            return None, None
         next_id+=1
         chromosome = current_locus.chromosome
         loci = []
@@ -83,9 +86,13 @@ class LociManager:
 
         return  list(loci_queue), loci
 
-    def whole_chromosome_annotated_loci(self) -> List[AnnotatedLocus]:
+    def whole_chromosome_annotated_loci(self) -> Tuple[List[AnnotatedLocus], Set[int]]:
+        # returns all loci, and a set of all the loci that are superior to at least one locus
+        # returns None if exhausted
         clumps, all_loci = self.get_chromosome_batch()
-
+        if clumps is None:
+            return None, None
+        superior_clumped_loci_idxs = set()
         # now assign superior loci to all clumped loci
         for clump in clumps:
             if len(clump)!=1:
@@ -98,8 +105,10 @@ class LociManager:
                         # print(locus.start)
                         # print(locus.superior_loci)
                         # croc=1
+                for locus in sorted_constituent_loci[1:]:
+                    superior_clumped_loci_idxs.add(locus.id)
 
-        return all_loci
+        return all_loci, superior_clumped_loci_idxs
 
     def __del__(self):
         self.loci_file.close()
@@ -107,7 +116,7 @@ class LociManager:
 if __name__ == '__main__':
     lm = LociManager("/home/avraham/MaruvkaLab/Texas/texas_stad_run/hg38_1to15_95_sorted")
     a=time.time()
-    loci = lm.whole_chromosome_annotated_loci()
+    loci, clumped_set = lm.whole_chromosome_annotated_loci()
     b=time.time()
     print(b-a)
 

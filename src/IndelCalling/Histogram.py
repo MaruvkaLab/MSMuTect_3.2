@@ -20,26 +20,6 @@ class Histogram:
         read_position = read.reference_start+1
         indel_bases = 0 # number of added/deleted bases in MS locus
         for cigar_op in read.cigartuples:
-            # current_cig_op = cigar_op[0]
-            # num_bases = cigar_op[1]
-            # deletion_bool = int(cigar_op==CIGAR_OPTIONS.DELETION and read_position <= self.locus.end)
-            # pre_locus_deletion = read_position < self.locus.start
-            # deletion_that_leaks_over = int(pre_locus_deletion)*max(num_bases + read_position - self.locus.start, 0)
-            # deletion_in_middle = int(not pre_locus_deletion) * num_bases
-            # deletion_length = deletion_bool*(deletion_that_leaks_over+deletion_in_middle)
-            # true_deletion_length = min((self.locus.end - read_position + 1)*int(deletion_length!=0), deletion_length)
-            # insertion_length = int(cigar_op==CIGAR_OPTIONS.INSERTION and self.locus.start <= read_position <= self.locus.end)*num_bases
-            # indel_bases += (insertion_length-true_deletion_length)
-            #
-            # # maybe optimize order of ORs for most common first?
-            # read_position+=(int(current_cig_op==CIGAR_OPTIONS.SEQ_MATCH or current_cig_op==CIGAR_OPTIONS.ALG_MATCH or
-            #                     current_cig_op==CIGAR_OPTIONS.SEQ_MISMATCH or current_cig_op==CIGAR_OPTIONS.DELETION) * num_bases)
-            #
-            # is_deletion =
-            # pre_read_deletion = max(num_bases + read_position - self.locus.start, 0)*(int(read_position < self.locus.start))*int(current_cig_op==CIGAR_OPTIONS.DELETION)
-            # inread_deletion = num_bases
-            #
-            # indel_bases+= int(cigar_op[0] == CIGAR_OPTIONS.INSERTION)+(-1*int(cigar_op[0] == CIGAR_OPTIONS.DELETION))
 
             if cigar_op[0] in [CIGAR_OPTIONS.ALG_MATCH, CIGAR_OPTIONS.SEQ_MATCH, CIGAR_OPTIONS.SEQ_MISMATCH]:
                 read_position += cigar_op[1]

@@ -4,6 +4,8 @@ from pysam import AlignedSegment
 from pysam.libcvcf import defaultdict
 
 from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
+from src.GenomicUtils.char_counts import char_count, num_repeats_pre_compiled_locus, \
+    num_repeats_compiled_locus_and_repeat_unit
 from src.IndelCalling.Locus import Locus
 
 
@@ -15,20 +17,16 @@ class AnnotatedLocus(Locus):
     def __init__(self, chromosome: str, start: int, end: int, pattern: str, repeats: float, sequence: str, id: int,
                  superior_loci: List[int] = None):
         super().__init__(chromosome, start, end, pattern, repeats, sequence)
-        self.base_char_counts = self.char_count(sequence)
+        self.base_char_counts = char_count(sequence)
+        self.pattern_base_count = char_count(self.pattern)
+        self.repeats = num_repeats_pre_compiled_locus(self.base_char_counts, self.pattern)
         # self.base_dict_rep: Dict[str, List] = {}
         self.id = id
         if superior_loci is None:
             self.superior_loci = []
         else:
-            self.superior_loci = superior_loci # these loci overlap, but are longer repeat lengths
+            self.superior_loci = superior_loci # these loci overlap, but are longer repeat lengths. MUST BE IN SORTED ORDER (LONGEST REPEAT LENGTH AT END)
 
-    def char_count(self, seq: str) -> List[int]:
-        counts = [0, 0, 0, 0]
-        for c in seq:
-            idx = int(c == "C") + 2 * int(c == "G") + 3 * int(c == "T")
-            counts[idx] += 1
-        return counts
 
     def str_rep_char_count(self, char_count: List[int]):
         return "_".join([str(a) for a in char_count])
@@ -38,14 +36,14 @@ class AnnotatedLocus(Locus):
         consensus_building_reads = self.relevant_consensus_reads(reads)
         if len(consensus_building_reads)!=0: # there is something to go on
             for r in consensus_building_reads:
-                relevant_seq = r.seq[self.start - r.reference_start: self.end - r.reference_end]
-                char_count = self.char_count(relevant_seq)
-                str_rep_count = self.str_rep_char_count(char_count)
+                relevant_seq = r.query_sequence[self.start - r.reference_start: self.end - r.reference_end]
+                read_char_count = char_count(relevant_seq)
+                str_rep_count = self.str_rep_char_count(read_char_count)
                 consensus_char_counter[str_rep_count]+=1
         max_support = max(consensus_char_counter.values())
         if max_support > min_support and max_support > (0.3 * len(reads)):
             self.base_char_counts = max(consensus_char_counter, key=consensus_char_counter.get)
-
+            self.repeats = num_repeats_compiled_locus_and_repeat_unit(self.base_char_counts, self.pattern_base_count)
 
     def relevant_consensus_reads(self, reads: List[AlignedSegment]) -> List[AlignedSegment]:
         ret = []

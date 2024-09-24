@@ -15,6 +15,10 @@ class Locus:
     def repeat_length(self):
         return len(self.pattern)
 
+    @property
+    def locus_length(self):
+        return len(self.sequence)
+
     @staticmethod
     def parse_chromosome(chromosome: str) -> str:
         if len(chromosome) < 3:
