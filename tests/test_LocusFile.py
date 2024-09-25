@@ -3,7 +3,7 @@ from tests.testing_utils.self_contained_utils import locus_file_path
 from src.GenomicUtils.LocusFile import LociManager
 
 
-class TestHistogram(unittest.TestCase):
+class TestLociManager(unittest.TestCase):
 
     def test_locus_load(self):
         init_start = time.process_time()

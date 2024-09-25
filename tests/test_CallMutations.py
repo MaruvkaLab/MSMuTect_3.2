@@ -4,7 +4,7 @@ from tests.testing_utils.generate_histograms import get_allele_histograms
 from src.IndelCalling.CallMutations import *
 
 
-class TestCalcAlleles(unittest.TestCase):
+class TestCallMutations(unittest.TestCase):
 
     def test_hist2vec(self):
         histograms = get_allele_histograms()

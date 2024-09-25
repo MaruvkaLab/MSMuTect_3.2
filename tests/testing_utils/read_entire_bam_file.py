@@ -14,7 +14,8 @@ def all_reads_from_bam_file(bam_file_fp: str):
 
 def main():
     a = all_reads_from_bam_file("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/indels.bam")
-    print(len(a))
+    for j in a:
+        print(j.reference_start)
 
 if __name__ == '__main__':
     main()

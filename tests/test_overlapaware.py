@@ -4,7 +4,7 @@ from src.GenomicUtils.LocusFileOverlapAware import LociManager
 
 
 
-class TestHistogram(unittest.TestCase):
+class TestOverlapAwareLociManager(unittest.TestCase):
 
     def test_locus_load(self):
         lm = LociManager("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/fake_sample_loci.tsv")

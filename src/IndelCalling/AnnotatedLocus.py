@@ -27,25 +27,30 @@ class AnnotatedLocus(Locus):
         else:
             self.superior_loci = superior_loci # these loci overlap, but are longer repeat lengths. MUST BE IN SORTED ORDER (LONGEST REPEAT LENGTH AT END)
 
-
-    def str_rep_char_count(self, char_count: List[int]):
+    @staticmethod
+    def str_rep_char_count(char_count: List[int]):
         return "_".join([str(a) for a in char_count])
 
     def create_consensus_char_count(self, reads: List[AlignedSegment], min_support: int):
+        if len(reads) < min_support:
+            return
         consensus_char_counter = defaultdict(int)
         consensus_building_reads = self.relevant_consensus_reads(reads)
         if len(consensus_building_reads)!=0: # there is something to go on
             for r in consensus_building_reads:
-                relevant_seq = r.query_sequence[self.start - r.reference_start: self.end - r.reference_end]
+                relevant_seq = r.query_sequence[self.start - r.reference_start: self.end - r.reference_end + 1]
                 read_char_count = char_count(relevant_seq)
                 str_rep_count = self.str_rep_char_count(read_char_count)
                 consensus_char_counter[str_rep_count]+=1
-        max_support = max(consensus_char_counter.values())
-        if max_support > min_support and max_support > (0.3 * len(reads)):
-            self.base_char_counts = max(consensus_char_counter, key=consensus_char_counter.get)
-            self.repeats = num_repeats_compiled_locus_and_repeat_unit(self.base_char_counts, self.pattern_base_count)
+
+            max_support = max(consensus_char_counter.values())
+            if max_support > min_support and max_support > (0.3 * len(reads)):
+                base_char_counts = max(consensus_char_counter, key=consensus_char_counter.get)
+                self.base_char_counts = [int(b) for b in base_char_counts.split("_")]
+                self.repeats = num_repeats_compiled_locus_and_repeat_unit(self.base_char_counts, self.pattern_base_count)
 
     def relevant_consensus_reads(self, reads: List[AlignedSegment]) -> List[AlignedSegment]:
+        # find reads with subsitutions
         ret = []
         for r in reads:
             all_cigar_ops = [cigar_op[0] for cigar_op in r.cigartuples]

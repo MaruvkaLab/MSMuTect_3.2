@@ -4,7 +4,7 @@ import numpy as np
 from src.IndelCalling.FisherTest import Fisher
 
 
-class TestHistogram(unittest.TestCase):
+class TestFisher(unittest.TestCase):
 
     def test_factorial(self):
         fisher = Fisher()

@@ -1,5 +1,6 @@
 import argparse
 
+from src.Entry.RefBasedMSMuTect import base_count_based_msmutect
 from src.Entry.SingleFileBatches import run_single_allelic, run_single_histogram
 from src.Entry.PairFileBatches import run_full_pair, run_mutations_pair, run_from_file
 from src.Entry.InputHandler import create_parser, validate_input
@@ -19,6 +20,10 @@ def run_msmutect(args: argparse.Namespace):
             batch_end = count_lines(args.tumor_file)
         mut_file = run_from_file(args.tumor_file, args.normal_file, args.batch_start, batch_end, args.read_level,
                                      args.integer, args.output_prefix)
+        if args.vcf:
+            convert_tsv_to_vcf(mut_file, args.output_prefix + ".vcf")
+    elif args.char_counts:
+        mut_file = base_count_based_msmutect(args.loci_file, args.normal_file, args.tumor_file, args.cores, args.flanking, args.read_level, args.output_prefix)
         if args.vcf:
             convert_tsv_to_vcf(mut_file, args.output_prefix + ".vcf")
     else:
