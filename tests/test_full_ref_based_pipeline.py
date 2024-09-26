@@ -25,7 +25,7 @@ class TestAnnotatedLocus(unittest.TestCase):
                                   "/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/test_results/avr")
         res_reader = ResultsReaderMutationFile("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/test_results/avr.full.mut.tsv")
         ref_repeats = [5, 7, 4, 46]
-        full_match_repeat_support = [5, 5, 6, 5]
+        full_match_repeat_support = [5, 6, 6, 5]
         num_repeats = [2, 1, 1, 1]
         all_res = list(res_reader)
         for i in range(len(ref_repeats)):

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from pysam import AlignedSegment
 
 from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
@@ -32,8 +32,10 @@ class AnnotatedHistogram(Histogram):
                 match_reads.append(r)
         self.repeat_lengths[self.locus.repeats] += len(match_reads)
 
+        taken_reads = [] # these reads support indels in superior loci, BUT they can be used to confirm the reference still
         for superior_histogram_idx in reversed(self.locus.superior_loci):
-            indel_reads = self.all_histograms[superior_histogram_idx].add_reads_that_supports_ms_indel(indel_reads)
+            indel_reads, new_taken_reads = self.all_histograms[superior_histogram_idx].add_reads_that_supports_ms_indel(indel_reads)
+            taken_reads.extend(new_taken_reads)
             if len(indel_reads)==0:
                 break
 
@@ -41,6 +43,10 @@ class AnnotatedHistogram(Histogram):
             repeat_length = self.calculate_repeat_length(unused_read)
             self.repeat_lengths[repeat_length] += 1
 
+        for used_read in taken_reads:
+            repeat_length = self.calculate_repeat_length(used_read)
+            if repeat_length == self.locus.repeats: # only use it if it supports the reference
+                self.repeat_lengths[repeat_length] += 1
 
 
     def calculate_repeat_length(self, read: AlignedSegment) -> int:
@@ -49,10 +55,11 @@ class AnnotatedHistogram(Histogram):
         return seq_num_repeats
 
 
-    def add_reads_that_supports_ms_indel(self, reads: List[AlignedSegment]) -> List[AlignedSegment]:
+    def add_reads_that_supports_ms_indel(self, reads: List[AlignedSegment]) -> Tuple[List[AlignedSegment], List[AlignedSegment]]:
         # returns reads that don't map
         unmapped_reads = []
         mapped_ids = []
+        mapped_reads = []
         for r in reads:
             # if r.reference_start == 9989 and self.locus.start == 10_001:
             #     croc=1
@@ -64,13 +71,14 @@ class AnnotatedHistogram(Histogram):
                 if read_repeat_length != self.locus.repeat_length:
                     self.repeat_lengths[read_repeat_length]+=1
                     mapped_ids.append(generate_id(r))
+                    mapped_reads.append(r)
                 else:
                     unmapped_reads.append(r)
             else:
                 unmapped_reads.append(r)
         for id in mapped_ids: # added at end, so if there is a duplicate read, it doesn't get filtered
             self.accepted_reads.add(id)
-        return unmapped_reads
+        return unmapped_reads, mapped_reads
 
 
     def has_indel(self, read: AlignedSegment) -> bool:
