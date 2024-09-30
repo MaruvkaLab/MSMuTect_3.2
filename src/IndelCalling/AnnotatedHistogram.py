@@ -35,6 +35,7 @@ class AnnotatedHistogram(Histogram):
         taken_reads = [] # these reads support indels in superior loci, BUT they can be used to confirm the reference still
         for superior_histogram_idx in reversed(self.locus.superior_loci):
             indel_reads, new_taken_reads = self.all_histograms[superior_histogram_idx].add_reads_that_supports_ms_indel(indel_reads)
+            print(new_taken_reads)
             taken_reads.extend(new_taken_reads)
             if len(indel_reads)==0:
                 break
@@ -50,6 +51,7 @@ class AnnotatedHistogram(Histogram):
 
 
     def calculate_repeat_length(self, read: AlignedSegment) -> int:
+
         relevant_seq = extract_locus_segment(read, self.locus.start, self.locus.end)
         seq_num_repeats = num_repeats_pre_compiled_repeat_unit(relevant_seq, self.locus.pattern_base_count)
         return seq_num_repeats

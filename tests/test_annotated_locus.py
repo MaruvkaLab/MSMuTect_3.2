@@ -50,6 +50,19 @@ class TestAnnotatedLocus(unittest.TestCase):
         for t,l in zip(tst_lengths, proper_lengths):
             self.assertEqual(t, l)
 
+    # def test_elaborate(self):
+    #     all_reads = all_reads_from_bam_file("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/test_elaborate_ref_based.bam")
+    #     proper_lengths = [4, 4, 4, 5, 5]
+    #     tst_lengths = [extract_locus_segment(all_reads[2], 16, 21),
+    #                    extract_locus_segment(all_reads[2], 18, 23),
+    #                     extract_locus_segment(all_reads[2], 14, 19),
+    #                    extract_locus_segment(all_reads[2], 13, 18),
+    #                    extract_locus_segment(all_reads[2], 19, 24),
+    #                    ]
+    #     tst_lengths = [len(t) for t in tst_lengths]
+    #     for t,l in zip(tst_lengths, proper_lengths):
+    #         self.assertEqual(t, l)
+
 
     def test_str_rep_char_count(self):
         self.assertEqual(AnnotatedLocus.str_rep_char_count(char_count("ATACCCGT")), "2_3_1_2")

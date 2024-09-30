@@ -34,30 +34,46 @@ def char_count(seq: str) -> List[int]:
 
 def extract_locus_segment(read: AlignedSegment, locus_start: int, locus_end: int) -> str:
     # locus end is inclusive
-    start = locus_start - (read.reference_start+1)
-    end = locus_end - read.reference_start
-    read_position = read.reference_start+1
-    if start<0:
+    # read_position = read.reference_start+1
+    read_position = 0
+    relative_locus_start = locus_start-(read.reference_start+1)
+    relative_locus_end = locus_end+1-(read.reference_start+1)
+    if locus_start<(read.reference_start+1):
         raise RuntimeError("locus must include read")
 
+    segments = []
     for cigar_op in read.cigartuples:
         if cigar_op[0] in [CIGAR_OPTIONS.ALG_MATCH, CIGAR_OPTIONS.SEQ_MATCH, CIGAR_OPTIONS.SEQ_MISMATCH]:
-            read_position += cigar_op[1]
-        elif cigar_op[0] == CIGAR_OPTIONS.INSERTION:
-            if locus_start <= read_position <= locus_end:
-                end += cigar_op[1]
-        elif cigar_op[0] == CIGAR_OPTIONS.DELETION:
-            if read_position <= locus_end:
-                if read_position < locus_start:
-                    deletion_length = max(cigar_op[1] + read_position - locus_start, 0)
+            match_length = cigar_op[1]
+            new_read_position = read_position + match_length
+            if new_read_position >= relative_locus_start:
+                if read_position >= relative_locus_start:
+                    start = read_position
                 else:
-                    deletion_length = cigar_op[1]
-                end -= min(locus_end - read_position + 1, deletion_length)
-            read_position += cigar_op[1]
-    if start > end:
-        return ""
-    return read.query_sequence[start:end]
+                    start = relative_locus_start
+                end = min(new_read_position, relative_locus_end)
+                segments.append(read.query_sequence[start:end])
+            read_position = new_read_position
+        elif cigar_op[0] == CIGAR_OPTIONS.INSERTION:
+            insertion_length = cigar_op[1]
+            if relative_locus_start <= read_position <= relative_locus_end:
+                segments.append(read.query_sequence[read_position:read_position+insertion_length])
+            read_position+=insertion_length
+            relative_locus_start+=insertion_length
+            relative_locus_end+=insertion_length
+        elif cigar_op[0] == CIGAR_OPTIONS.DELETION:
+            deletion_length = cigar_op[1]
+            read_position += deletion_length
 
+        if read_position > relative_locus_end:
+            break
+
+    return "".join(segments)
+
+
+if __name__ == '__main__':
+    a="AAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAA"
+    print(char_count(a))
 # @dataclass
 # class ReadGroup:
 #     seq: str

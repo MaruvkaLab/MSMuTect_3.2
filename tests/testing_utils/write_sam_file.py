@@ -1,7 +1,10 @@
+import re
 import shutil, os
 from dataclasses import dataclass
 from typing import List
 from collections import namedtuple
+
+from Cython.Compiler.Naming import cython_runtime_cname
 
 from tests.testing_utils.self_contained_utils import sample_bams_path, header_only_sam
 
@@ -11,6 +14,7 @@ class FakeRead:
     read_start: int
     cigar_str: str
     sequence: str = None
+    subsitutions: List[str] = None
 
 
 def old():
@@ -62,8 +66,61 @@ def create_readline_custom_length(fake_reads: List[FakeRead], custom_length: int
         all_new_reads.append(new_read)
     return "\n".join(["\t".join(a) for a in all_new_reads])
 
+def create_seq(start, cigar_str: str, subsitutions: List[str]):
+    # croc = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    base = "TTTTTTTTTTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    if start < 9975 or start > 10_050:
+        raise RuntimeError
+    op_lens = [int(op_len) for op_len in re.split("[MXID]", cigar_str)[:-1]]
+    ops = [char for char in cigar_str if char in ["M", "D", "I", "X"]]
+    current_pos = start-9975
+    segments = []
+    sub_idx=0
+    for op, op_len  in zip(ops, op_lens):
+        if op == 'M':
+            segments.append(base[current_pos:current_pos+op_len])
+            current_pos+=op_len
+        elif op == 'X':
+            assert op_len==1
+            assert subsitutions[sub_idx]!=base[current_pos]
+            segments.append(subsitutions[sub_idx])
+            sub_idx+=1
+            current_pos+=1
+        elif op=='D':
+            current_pos+=op_len
+        else: # I
+            segments.append(subsitutions[sub_idx])
+            sub_idx+=1
+    return "".join(segments)
 
-def create_readline(fake_reads: List[FakeRead]):
+def create_seq_high_entrophy(start, cigar_str: str, subsitutions: List[str]):
+    # croc = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    base = "CCACGAAGCGTCCCGCCCAGGACGCGAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTCGCGCTCCTACCGTTGTTTAACGCCCGATCTTTGCGGTCTGTGTTTGGAGACACAACAATCTTAAGCCACGAAGCGTCCCGCCCAGGACGCGAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTCGCGCTCCTACCGTTGTTTAACGCCCGATCTTTGCGGTCTGTGTTTGGAGACACAACAATCTTAAG"
+    if start < 9975 or start > 10_050:
+        raise RuntimeError
+    op_lens = [int(op_len) for op_len in re.split("[MXID]", cigar_str)[:-1]]
+    ops = [char for char in cigar_str if char in ["M", "D", "I", "X"]]
+    current_pos = start-9975
+    segments = []
+    sub_idx=0
+    for op, op_len  in zip(ops, op_lens):
+        if op == 'M':
+            segments.append(base[current_pos:current_pos+op_len])
+            current_pos+=op_len
+        elif op == 'X':
+            assert op_len==1
+            assert subsitutions[sub_idx]!=base[current_pos]
+            segments.append(subsitutions[sub_idx])
+            sub_idx+=1
+            current_pos+=1
+        elif op=='D':
+            current_pos+=op_len
+        else: # I
+            segments.append(subsitutions[sub_idx])
+            sub_idx+=1
+    return "".join(segments)
+
+def create_readline(fake_reads: List[FakeRead], create_seq_func=create_seq):
     if len(fake_reads) == 0:
         return
 
@@ -101,6 +158,9 @@ def create_readline(fake_reads: List[FakeRead]):
         if fr.sequence is not None:
             new_read[9] = fr.sequence
             new_read[10] = fr.sequence
+        else:
+            new_read[9] = create_seq_func(fr.read_start, fr.cigar_str, fr.subsitutions)
+            new_read[10] = create_seq_func(fr.read_start, fr.cigar_str, fr.subsitutions)
 
         all_new_reads.append(new_read)
     return "\n".join(["\t".join(a) for a in all_new_reads])
@@ -122,18 +182,46 @@ def create_new_bam_custom_length(new_name: str, fake_reads: List[FakeRead], cust
     os.system(f"samtools index {bam_filename}")
 
 
-def create_new_bam(new_name: str, fake_reads: List[FakeRead]):
+def create_new_bam(new_name: str, fake_reads: List[FakeRead], create_seq_func = create_seq):
     header_only_file = header_only_sam()
     new_filename = os.path.join(sample_bams_path(), new_name + ".sam")
     shutil.copyfile(header_only_file, new_filename)
-    readlines = create_readline(fake_reads)
+    readlines = create_readline(fake_reads, create_seq_func)
     add_to_end_of_file(new_filename, readlines)
     bam_filename = new_filename[:-4]+".bam"
     os.system(f"samtools view -b -h {new_filename} > {bam_filename}")
     os.system(f"samtools index {bam_filename}")
 
 
+
+
 def main():
+    print(create_seq(10_025, '101M', [])[:10])
+    # for realistic loci, 25-51 is ACACACACACAAAAACGACGACGACGA
+    # base="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    # fake_read_1 = [FakeRead(9985, "41M1X1M1X57M", subsitutions=["A", "A"]) for i in range(5)] # should be single deletion in locus 3.]
+    # create_new_bam("test_elaborate_ref_based",
+    #     fake_read_1+ \
+    #     [
+    #     FakeRead(9985, "66M3D35M"), # RD 2, should be single deletion in locus 4
+    #     FakeRead(9985, "62M3D20M4D19M"), # RD 3, should be a deletion in locus 3 (and not 4)
+    #     FakeRead(9985, "41M1X1M1X5M4D53M", subsitutions=["A", "A"]), # RD 4 should be a deletion of 1 of locus 1. 48M4D53M
+    #     FakeRead(9985, "50M20D51M"), # RD 5 should wipe out entire third locus
+    #     FakeRead(9985, "14M10D87M"), # RD 6, # should delete 8 bases from last locus
+    #     FakeRead(9985, "70M20D31M"), # RD 7, should delete 6 bases from last locus
+    #     FakeRead(9992, "42M3D59M"), # RD 8, double deletion in locus 2
+    #     FakeRead(9992, "101M"), # RD 9, reference, does not support locus 1 (flanking)
+    # ])
+
+    create_new_bam("dentist",
+        [
+        FakeRead(10_000, "25M3I25M1X5D47M", subsitutions=["TTT", "A"]),
+        FakeRead(10_000, "50M20D51M"),
+        FakeRead(10_000, "21M50D79M"),
+        FakeRead(10_000, "40M2I59M", subsitutions=["TT"]),
+        FakeRead(10_000, "101M"),
+        ], create_seq_func=create_seq_high_entrophy)
+
     # create_new_bam("test_char_count_annotated", [
     #         FakeRead(1, "101M", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
     #         FakeRead(10, "13M4D88M"),
@@ -188,23 +276,22 @@ def main():
     #
     # ])
 
-    create_new_bam("test_full_pipe_complex",[
-        FakeRead(9989, "101M",
-                 "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
-        FakeRead(9990, "101M",
-                 "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
-        FakeRead(9990, "101M",
-                 "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
-        FakeRead(9990, "101M",
-                 "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
-        FakeRead(9990, "101M",
-                 "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
-        FakeRead(9990, "36M2D65M",
-                 "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), # deletion should get assigned to first locus
+    # create_new_bam("test_full_pipe_complex",[
+    #     FakeRead(9989, "101M",
+    #              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+    #     FakeRead(9990, "101M",
+    #              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+    #     FakeRead(9990, "101M",
+    #              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+    #     FakeRead(9990, "101M",
+    #              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+    #     FakeRead(9990, "101M",
+    #              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+    #     FakeRead(9990, "36M2D65M",
+    #              "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACAAAAACGACGACGACGACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"), # deletion should get assigned to first locus
+    # ]) # so it does a count for the
 
 
-
-    ]) # so it does a count for the
     # create_new_bam("mapping_small_locus", [
     #         FakeRead(9_964, "101M"),  # shouldn't map (misses on flanking)
     #         FakeRead(9_965, "101M"),  # should map
