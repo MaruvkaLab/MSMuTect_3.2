@@ -8,9 +8,16 @@ from src.IndelCalling.AnnotatedLocus import AnnotatedLocus
 from src.IndelCalling.Histogram import Histogram
 
 
+def cigartuple_str(read: AlignedSegment) -> str:
+    cigs = []
+    for c in read.cigartuples:
+        cigs.append(f"{c[0]}_{c[1]}")
+    return "^".join(cigs)
+
+
 def generate_id(read: AlignedSegment) -> str:
     # this will map multiple reads with the same coordinates! however, the code is built to handle that
-    return str(read.reference_start)+"_"+str(read.reference_end)
+    return str(read.reference_start)+"_"+str(read.reference_end)+cigartuple_str(read)
 
 class AnnotatedHistogram(Histogram):
     def __init__(self, locus: AnnotatedLocus, all_histograms: list, flanking: int):
@@ -23,6 +30,7 @@ class AnnotatedHistogram(Histogram):
 
     def add_reads(self, reads: List[AlignedSegment]) -> None:
         non_used_reads = [read for read in reads if not generate_id(read) in self.accepted_reads]
+        newly_used_reads = []
         indel_reads = []
         match_reads = []
         for r in non_used_reads:
@@ -33,27 +41,38 @@ class AnnotatedHistogram(Histogram):
         self.repeat_lengths[self.locus.repeats] += len(match_reads)
 
         taken_reads = [] # these reads support indels in superior loci, BUT they can be used to confirm the reference still
+        orig_indels_reads = indel_reads
         for superior_histogram_idx in reversed(self.locus.superior_loci):
             indel_reads, new_taken_reads = self.all_histograms[superior_histogram_idx].add_reads_that_supports_ms_indel(indel_reads)
-            print(new_taken_reads)
             taken_reads.extend(new_taken_reads)
+            if self.locus.start == 10_001:
+                croc=1
             if len(indel_reads)==0:
                 break
 
+        print(self.locus.start)
+
         for unused_read in indel_reads:
             repeat_length = self.calculate_repeat_length(unused_read)
+            newly_used_reads.append(unused_read)
             self.repeat_lengths[repeat_length] += 1
 
         for used_read in taken_reads:
             repeat_length = self.calculate_repeat_length(used_read)
+            # newly_used_reads.append(used_read)
             if repeat_length == self.locus.repeats: # only use it if it supports the reference
                 self.repeat_lengths[repeat_length] += 1
+
+        for r in newly_used_reads:
+            self.accepted_reads.add(generate_id(r))
 
 
     def calculate_repeat_length(self, read: AlignedSegment) -> int:
 
         relevant_seq = extract_locus_segment(read, self.locus.start, self.locus.end)
         seq_num_repeats = num_repeats_pre_compiled_repeat_unit(relevant_seq, self.locus.pattern_base_count)
+        if seq_num_repeats==4:
+            croc=1
         return seq_num_repeats
 
 
@@ -63,11 +82,14 @@ class AnnotatedHistogram(Histogram):
         mapped_ids = []
         mapped_reads = []
         for r in reads:
+            # if r.cigartuples[0][1]==50:
+            #     croc=1
             # if r.reference_start == 9989 and self.locus.start == 10_001:
             #     croc=1
 
             if r.reference_start <= self.locus.start - 1 - self.flanking and (self.locus.end+self.flanking) <=  (r.reference_end+1)  : # does not fit flanking
                 if generate_id(r) in self.accepted_reads:
+                    mapped_reads.append(r)
                     continue
                 read_repeat_length = self.calculate_repeat_length(r)
                 if read_repeat_length != self.locus.repeat_length:

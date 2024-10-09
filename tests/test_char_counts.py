@@ -21,9 +21,9 @@ class TestCharCounts(unittest.TestCase):
     def test_extract_correct_part_of_str(self):
         elaborate_reads = all_reads_from_bam_file("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/dentist.bam")
         segments = [extract_locus_segment(elaborate_reads[i], locus_start=10_040, locus_end=10_070) for i in range(len(elaborate_reads))]
-        correct_segments = ["ACGTCTCCGA"+"A"+"CCTCGCGCTCCTAC", "ACGTCTCCGA"+'T', "", "TT"+"ACGTCTCCGAGGTTATCCTCGCGCTCCTACC",
+        correct_segments = ["ACGTCTCCGA"+"A"+"CCTCGCGCTCCTACC", "ACGTCTCCGA"+'C', "", "TT"+"ACGTCTCCGAGGTTATCCTCGCGCTCCTACC",
                             "ACGTCTCCGAGGTTATCCTCGCGCTCCTACC"]
-        for i in range(1, len(correct_segments)):
+        for i in range(len(correct_segments)):
             self.assertEqual(correct_segments[i], segments[i])
 
 

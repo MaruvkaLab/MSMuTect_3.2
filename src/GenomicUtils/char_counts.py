@@ -63,8 +63,10 @@ def extract_locus_segment(read: AlignedSegment, locus_start: int, locus_end: int
             relative_locus_end+=insertion_length
         elif cigar_op[0] == CIGAR_OPTIONS.DELETION:
             deletion_length = cigar_op[1]
-            read_position += deletion_length
-
+            # read_position += deletion_length
+            relative_locus_start-=deletion_length
+            relative_locus_end-=deletion_length
+            # pass
         if read_position > relative_locus_end:
             break
 

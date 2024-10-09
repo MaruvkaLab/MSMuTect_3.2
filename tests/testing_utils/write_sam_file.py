@@ -199,28 +199,28 @@ def main():
     print(create_seq(10_025, '101M', [])[:10])
     # for realistic loci, 25-51 is ACACACACACAAAAACGACGACGACGA
     # base="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-    # fake_read_1 = [FakeRead(9985, "41M1X1M1X57M", subsitutions=["A", "A"]) for i in range(5)] # should be single deletion in locus 3.]
-    # create_new_bam("test_elaborate_ref_based",
-    #     fake_read_1+ \
-    #     [
-    #     FakeRead(9985, "66M3D35M"), # RD 2, should be single deletion in locus 4
-    #     FakeRead(9985, "62M3D20M4D19M"), # RD 3, should be a deletion in locus 3 (and not 4)
-    #     FakeRead(9985, "41M1X1M1X5M4D53M", subsitutions=["A", "A"]), # RD 4 should be a deletion of 1 of locus 1. 48M4D53M
-    #     FakeRead(9985, "50M20D51M"), # RD 5 should wipe out entire third locus
-    #     FakeRead(9985, "14M10D87M"), # RD 6, # should delete 8 bases from last locus
-    #     FakeRead(9985, "70M20D31M"), # RD 7, should delete 6 bases from last locus
-    #     FakeRead(9992, "42M3D59M"), # RD 8, double deletion in locus 2
-    #     FakeRead(9992, "101M"), # RD 9, reference, does not support locus 1 (flanking)
-    # ])
-
-    create_new_bam("dentist",
+    fake_read_1 = [FakeRead(9985, "41M1X1M1X57M", subsitutions=["A", "A"]) for i in range(5)] # should be single deletion in locus 3.]
+    create_new_bam("test_elaborate_ref_based",
+        fake_read_1+ \
         [
-        FakeRead(10_000, "25M3I25M1X5D47M", subsitutions=["TTT", "A"]),
-        FakeRead(10_000, "50M20D51M"),
-        FakeRead(10_000, "21M50D79M"),
-        FakeRead(10_000, "40M2I59M", subsitutions=["TT"]),
-        FakeRead(10_000, "101M"),
-        ], create_seq_func=create_seq_high_entrophy)
+        FakeRead(9985, "66M3D35M"), # RD 2, should be single deletion in locus 4
+        FakeRead(9985, "62M3D20M4D19M"), # RD 3, should be a deletion in locus 3 (and not 4)
+        FakeRead(9985, "41M1X1M1X5M4D53M", subsitutions=["A", "A"]), # RD 4 should be a deletion of 1 of locus 1. 48M4D53M
+        FakeRead(9985, "50M20D51M"), # RD 5 should wipe out entire third locus
+        FakeRead(9985, "14M10D87M"), # RD 6, # should delete 8 bases from last locus
+        FakeRead(9985, "70M20D31M"), # RD 7, should delete 6 bases from last locus
+        FakeRead(9992, "42M3D59M"), # RD 8, double deletion in locus 2
+        FakeRead(9992, "101M"), # RD 9, reference, does not support locus 1 (flanking)
+    ])
+
+    # create_new_bam("dentist",
+    #     [
+    #     FakeRead(10_000, "25M3I25M1X5D47M", subsitutions=["TTT", "A"]),
+    #     FakeRead(10_000, "50M20D51M"),
+    #     FakeRead(10_000, "21M50D79M"),
+    #     FakeRead(10_000, "40M2I59M", subsitutions=["TT"]),
+    #     FakeRead(10_000, "101M"),
+    #     ], create_seq_func=create_seq_high_entrophy)
 
     # create_new_bam("test_char_count_annotated", [
     #         FakeRead(1, "101M", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
