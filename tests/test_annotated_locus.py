@@ -9,6 +9,16 @@ from tests.testing_utils.read_entire_bam_file import all_reads_from_bam_file
 
 class TestAnnotatedLocus(unittest.TestCase):
 
+    def test_building_ref(self):
+        lm = LociManager("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/fake_sample_loci.tsv")
+        loci, clumped_loci_idxs = lm.whole_chromosome_annotated_loci()
+        all_reads = all_reads_from_bam_file(
+            "/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/test_annotated_locus.bam")
+        first_locus = loci[0]
+        first_locus.create_consensus_ref(all_reads, 5)
+        self.assertEqual(first_locus.reference_sequence, "AAACACACAC") # second A is changed
+
+
     def test_relevant_consensus_reads(self):
         lm = LociManager("/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/fake_sample_loci.tsv")
         loci, clumped_loci_idxs = lm.whole_chromosome_annotated_loci()

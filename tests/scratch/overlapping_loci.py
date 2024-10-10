@@ -25,13 +25,18 @@ def main():
             if len(cl)==0:
                 break
             current_locus = cl[0]
-            if last_locus.end > current_locus.start and last_locus.chromosome==current_locus.chromosome:
-                if last_locus.repeat_length != 1 and current_locus.repeat_length != 1:
-                    problem_loci+=1
-                    # print(last_locus)
-                    # print(current_locus)
-                    # print("**************")
-                overlapping_loci += 1
+
+            if len(current_locus.sequence)>500:
+                croc=1
+            if (current_locus.start - last_locus.end) > 500:
+                overlapping_loci+=1
+            # if last_locus.end > current_locus.start and last_locus.chromosome==current_locus.chromosome:
+            #     if last_locus.repeat_length != 1 and current_locus.repeat_length != 1:
+            #         problem_loci+=1
+            #         # print(last_locus)
+            #         # print(current_locus)
+            #         # print("**************")
+            #     overlapping_loci += 1
             last_locus=current_locus
         except:
             croc=1

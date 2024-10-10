@@ -3,7 +3,7 @@ import csv
 import time
 from typing import List, Tuple, Set
 
-from src.IndelCalling.AnnotatedLocus import AnnotatedLocus
+from src.IndelCalling.AnntdLocus import AnnotatedLocus
 from src.GenomicUtils.MSMuLIFOqueue import MSMuLIFOqueue as LIFO
 from src.IndelCalling.LocusClump import LocusClump
 

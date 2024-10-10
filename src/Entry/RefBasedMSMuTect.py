@@ -101,7 +101,47 @@ def base_count_based_msmutect(loci_fp: str, normal_fp: str, tumor_fp: str, cores
 
     return output_fp
 
+def combine_files_to_results_file(output_fp: str, subfiles: List[str]):
+    with open(output_fp, 'w') as results_file:
+        mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}\n"
+        results_file.write(mutation_header)
+        for s in subfiles:
+            with open(s, 'r') as sr:
+                shutil.copyfileobj(sr, results_file)
+            os.remove(s)
+            results_file.write("\n")
 
 
+def strict_base_count_based_msmutect(loci_fp: str, normal_fp: str, tumor_fp: str, cores: int, flanking: int, required_reads: int, output_prefix: str) -> str:
+    results = []
+    subfiles = []
+    noise_table = get_noise_table()
+    loci_manager = LociManager(loci_fp)
+    loci, superior_loci_idxs = loci_manager.whole_chromosome_annotated_loci()
+    if cores == 1:
+        while loci is not None:
+            formatted_calls_file = partial_full_pair(loci, superior_loci_idxs, normal_fp, tumor_fp, flanking, noise_table, required_reads, output_prefix)
+            loci, superior_loci_idxs = loci_manager.whole_chromosome_annotated_loci()
+            subfiles.append(formatted_calls_file)
+    else:
+
+        with Pool(processes=cores) as threads:
+            while loci is not None:
+                results.append(threads.apply_async(partial_full_pair,
+                                                   args=([loci, superior_loci_idxs, normal_fp, tumor_fp, flanking, noise_table, required_reads])))
+
+                num_active_processes = sum([1 for p in results if not p.ready()]) # how many processes are actually running
+                while num_active_processes == cores-1:
+                    time.sleep(1)  # long wait time to avoid wasting processing power
+                    num_active_processes = sum([1 for p in results if not p.ready()])
+                loci, superior_loci_idxs = loci_manager.whole_chromosome_annotated_loci()
+
+        threads.close()
+        threads.join()
+        subfiles = [r.get() for r in results]
+
+    output_fp = output_prefix+".full.mut.tsv"
+    combine_files_to_results_file(output_fp, subfiles)
+    return output_fp
 
 

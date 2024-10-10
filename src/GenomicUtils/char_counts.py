@@ -72,10 +72,19 @@ def extract_locus_segment(read: AlignedSegment, locus_start: int, locus_end: int
 
     return "".join(segments)
 
+def sort_str(a: str):
+    return "".join(sorted(a))
+
+
+def equivalent_strs_order_irrelevant(a: str, b: str):
+    sorted_a = sort_str(a)
+    sorted_b = sort_str(b)
+    return sorted_a==sorted_b
 
 if __name__ == '__main__':
     a="AAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAA"
     print(char_count(a))
+    print(equivalent_strs_order_irrelevant("ACCT", "TCCDA"))
 # @dataclass
 # class ReadGroup:
 #     seq: str
