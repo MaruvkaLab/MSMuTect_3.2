@@ -1,6 +1,6 @@
 import unittest, time
 from src.GenomicUtils.LocusFileOverlapAware import LociManager
-from src.GenomicUtils.char_counts import extract_locus_segment
+from src.GenomicUtils.reference_locus_comparer import extract_locus_segment
 from src.IndelCalling.AnnotatedHistogram import AnnotatedHistogram
 from tests.testing_utils.read_entire_bam_file import all_reads_from_bam_file
 

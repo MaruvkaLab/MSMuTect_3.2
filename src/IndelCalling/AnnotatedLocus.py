@@ -4,8 +4,6 @@ from pysam import AlignedSegment
 from pysam.libcvcf import defaultdict
 
 from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
-from src.GenomicUtils.char_counts import char_count, num_repeats_pre_compiled_locus, \
-    num_repeats_compiled_locus_and_repeat_unit
 from src.IndelCalling.Locus import Locus
 
 
@@ -17,10 +15,6 @@ class AnnotatedLocus(Locus):
     def __init__(self, chromosome: str, start: int, end: int, pattern: str, repeats: float, sequence: str, id: int,
                  superior_loci: List[int] = None):
         super().__init__(chromosome, start, end, pattern, repeats, sequence)
-        self.base_char_counts = char_count(sequence)
-        self.pattern_base_count = char_count(self.pattern)
-        self.repeats = num_repeats_pre_compiled_locus(self.base_char_counts, self.pattern)
-        # self.base_dict_rep: Dict[str, List] = {}
         self.id = id
         self.edited_reference = False
         if superior_loci is None:

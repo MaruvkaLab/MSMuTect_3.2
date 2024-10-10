@@ -1,6 +1,6 @@
 from typing import List
 
-from src.IndelCalling.AnnotatedLocus import AnnotatedLocus
+from src.IndelCalling.AnntdLocus import AnnotatedLocus
 
 
 class LocusClump:

@@ -3,7 +3,7 @@ from typing import List, Tuple
 from collections import defaultdict
 
 from src.Entry.RefBasedMSMuTect import base_count_based_msmutect
-from src.GenomicUtils.char_counts import num_repeats
+from src.GenomicUtils.reference_locus_comparer import num_repeats
 from tests.testing_utils.list_comparisons import list_in_order, equivalent_lists
 from tests.testing_utils.read_results import ResultsReaderMutationFile
 

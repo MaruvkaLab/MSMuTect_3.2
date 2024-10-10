@@ -10,7 +10,7 @@ from src.GenomicUtils.NoiseTable import get_noise_table
 from src.GenomicUtils.ReadsFetcher import ReadsFetcher
 from src.IndelCalling.AlleleSet import AlleleSet
 from src.IndelCalling.AnnotatedHistogram import AnnotatedHistogram
-from src.IndelCalling.AnnotatedLocus import AnnotatedLocus
+from src.IndelCalling.AnntdLocus import AnnotatedLocus
 from src.IndelCalling.CallAllelesFast import calculate_alleles
 from src.IndelCalling.CallMutations import call_mutations
 from src.IndelCalling.FisherTest import Fisher
