@@ -20,8 +20,6 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("-F", "--flanking", help="Length of flanking on both sides of an accepted read", type=int, default=10)
     parser.add_argument("-r", "--read_level", help="Minimum number of reads to call allele", type=int, default=5)
     parser.add_argument("-f", "--force", help="Overwrite pre-existing files", action='store_true')
-    parser.add_argument("--char_counts", help="uses base counts within microsatellite loci to call mutations. Helps mitigate mono-repeat deletions acting as longer motif deletions", action='store_true')
-    parser.add_argument("--integer", help="Only use indels of integer deletions/insertions of the repeat unit when calling alleles", action='store_true')
     parser.add_argument("--vcf", help="Output VCF file in addition to TSV file. IMPORTANT NOTE: the location of the indel may be anywhere in the locus, but the VCF will always have it at the beginning of the locus. In addition, all loci with non-reference alleles are listed but only mutations are listed as 'PASS'", action='store_true')
     parser.add_argument("--from_file", help="call alleles mutations on previously called indels (histograms). Only single core runs are supported", action='store_true')
     return parser
@@ -122,24 +120,10 @@ def from_file_file_verification(arguments):
 
 def validate_input(arguments: argparse.Namespace):
     if arguments.from_file:
-        if not arguments.mutation or arguments.single_file or arguments.char_counts:
-            exit_on("'from_file' option only supports calling mutations, and does not support char_counts (since histograms were alreay called)")
+        if not arguments.mutation or arguments.single_file:
+            exit_on("'from_file' option only supports calling mutations (since histograms were alreay called)")
         validate_output_files(arguments)
         from_file_file_verification(arguments)
-    elif arguments.char_counts:
-        if arguments.single_file:
-            exit_on("char_counts option only is for calling mutations for now. single_file is therefore useless")
-        arguments.allele = True # forcing this
-        validate_bams(arguments)
-        validate_output_files(arguments)
-        if arguments.batch_start != 1 or arguments.batch_end:
-            exit_on("Batch Start/End not supported for char_counts, since it works per chromosome")
-        elif arguments.flanking < 0:
-            exit_on("Flanking must be equal to or greater than 0")
-        elif arguments.read_level < 1:
-            exit_on("Minimum Read Level for calling alleles must be equal to or greater than 1")
-        elif not os.path.exists(arguments.loci_file):
-            exit_on("Loci file path does not exist")
     else:
         if not arguments.loci_file:
             exit_on("Loci file must be provided")

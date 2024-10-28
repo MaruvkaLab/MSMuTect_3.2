@@ -28,11 +28,11 @@ def format_mutation_call(decision: MutationCall):
 
 
 def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
-                       batch_end: int, cores: int, flanking: int, required_reads: int, integer_indels_only, output_prefix: str) -> str:
+                       batch_end: int, cores: int, flanking: int, required_reads: int, output_prefix: str) -> str:
     # returns path of output file
     loci_iterator = LociManager(loci_file, batch_start)
     noise_table = get_noise_table()
-    results: List[FileBackedQueue] = BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table, required_reads, integer_indels_only], loci_iterator,
+    results: List[FileBackedQueue] = BatchUtil.run_batch(partial_full_pair, [normal, tumor, flanking, noise_table, required_reads], loci_iterator,
                                   (batch_end - batch_start), cores, os.path.dirname(output_prefix))
     mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}"
     output_file = output_prefix + ".full.mut"
@@ -40,8 +40,8 @@ def run_full_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
     return output_file+".tsv"
 
 
-def get_alleles(locus: Locus, reads_fetcher: ReadsFetcher, flanking: int, noise_table, required_reads: int, integer_indels_only: bool) -> AlleleSet:
-    histogram = Histogram(locus, integer_indels_only)
+def get_alleles(locus: Locus, reads_fetcher: ReadsFetcher, flanking: int, noise_table, required_reads: int) -> AlleleSet:
+    histogram = Histogram(locus)
     reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
     histogram.add_reads(reads)
     alleles = calculate_alleles(histogram, noise_table, required_read_support=required_reads)
@@ -49,27 +49,27 @@ def get_alleles(locus: Locus, reads_fetcher: ReadsFetcher, flanking: int, noise_
 
 
 def partial_full_pair(loci: List[Locus], normal: str, tumor: str, flanking: int, noise_table, required_reads: int,
-                      integer_indels_only: bool, results_dir: str) -> FileBackedQueue:
+                      results_dir: str) -> FileBackedQueue:
     calls = FileBackedQueue(out_file_dir=results_dir, max_memory=10**7)  # 10MB
     if len(loci) != 0:
         normal_fetcher = ReadsFetcher(AlignmentFile(normal, "rb"), loci[0].chromosome)
         tumor_fetcher = ReadsFetcher(AlignmentFile(tumor, "rb"), loci[0].chromosome)
         fisher = Fisher()
         for locus in loci:
-            normal_alleles = get_alleles(locus, normal_fetcher, flanking, noise_table, required_reads, integer_indels_only)
-            tumor_alleles = get_alleles(locus, tumor_fetcher, flanking, noise_table, required_reads, integer_indels_only)
+            normal_alleles = get_alleles(locus, normal_fetcher, flanking, noise_table, required_reads)
+            tumor_alleles = get_alleles(locus, tumor_fetcher, flanking, noise_table, required_reads)
             calls.append(format_mutation_call(call_mutations(normal_alleles, tumor_alleles, noise_table, fisher)))
     calls.close()
     return calls
 
 
 def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int,
-                       batch_end: int, cores: int, flanking: int, required_reads: int, integer_indels_only: bool, output_prefix: str):
+                       batch_end: int, cores: int, flanking: int, required_reads: int, output_prefix: str):
     # returns output file
     loci_iterator = LociManager(loci_file, batch_start)
     noise_table = get_noise_table()
     results: List[FileBackedQueue] = BatchUtil.run_batch(partial_mutations_pair, [normal, tumor, flanking, noise_table,
-                                                                                  required_reads, integer_indels_only],
+                                                                                  required_reads],
                                                      loci_iterator,
                                                      (batch_end - batch_start), cores, result_dir=os.path.dirname(output_prefix))
     mutation_header = f"{Locus.header()}\t{Histogram.header(prefix='NORMAL_')}\t{AlleleSet.header(prefix='NORMAL_')}\t{Histogram.header(prefix='TUMOR_')}\t{AlleleSet.header(prefix='TUMOR_')}\t{MutationCall.header()}"
@@ -78,8 +78,8 @@ def run_mutations_pair(normal: str, tumor: str, loci_file: str, batch_start: int
     return output_file+".tsv"
 
 
-def get_tumor_alleles(reads_fetcher: ReadsFetcher, locus: Locus, flanking: int, noise_table, required_reads=6, integer_indels_only=False) -> AlleleSet:
-    histogram = Histogram(locus, integer_indels_only=integer_indels_only)
+def get_tumor_alleles(reads_fetcher: ReadsFetcher, locus: Locus, flanking: int, noise_table, required_reads=6) -> AlleleSet:
+    histogram = Histogram(locus)
     reads = reads_fetcher.get_reads(locus.chromosome, locus.start - flanking, locus.end + flanking)
     histogram.add_reads(reads)
     current_alleles = calculate_alleles(histogram, noise_table, required_read_support=required_reads)
@@ -87,22 +87,22 @@ def get_tumor_alleles(reads_fetcher: ReadsFetcher, locus: Locus, flanking: int, 
 
 
 def partial_mutations_pair(loci: List[Locus], normal: str, tumor: str, flanking: int, noise_table, required_reads: int,
-                           integer_indels_only: bool, results_dir: str) -> FileBackedQueue:
+                           results_dir: str) -> FileBackedQueue:
     calls = FileBackedQueue(out_file_dir=results_dir, max_memory=10**7) # 10MB
     if len(loci) != 0:
         normal_fetcher = ReadsFetcher(AlignmentFile(normal, "rb"), loci[0].chromosome)
         tumor_fetcher = ReadsFetcher(AlignmentFile(tumor, "rb"), loci[0].chromosome)
         fisher = Fisher()
         for locus in loci:
-            normal_alleles = get_alleles(locus, normal_fetcher, flanking, noise_table, required_reads, integer_indels_only)
+            normal_alleles = get_alleles(locus, normal_fetcher, flanking, noise_table, required_reads)
             if is_possible_mutation(normal_alleles):
-                tumor_alleles = get_alleles(locus, tumor_fetcher, flanking, noise_table, required_reads, integer_indels_only)
+                tumor_alleles = get_alleles(locus, tumor_fetcher, flanking, noise_table, required_reads)
                 calls.append(format_mutation_call(call_mutations(normal_alleles, tumor_alleles, noise_table, fisher)))
     calls.close()
     return calls
 
 
-def construct_histogram_from_tsv(histogram_line: str, integer_indels_only: bool) -> Histogram:
+def construct_histogram_from_tsv(histogram_line: str) -> Histogram:
     histogram_line_cleaned = histogram_line.strip()
     broken_line = histogram_line_cleaned.split("\t")
     if len(broken_line) == 1:
@@ -126,13 +126,12 @@ def construct_histogram_from_tsv(histogram_line: str, integer_indels_only: bool)
     repeat_dict = defaultdict(int)
     for repeat_length, support in zip(motif_repeats, motif_repeat_support):
         repeat_dict[float(repeat_length)] = int(support)
-    histogram = Histogram(locus=locus, integer_indels_only=integer_indels_only)
+    histogram = Histogram(locus=locus)
     histogram.repeat_lengths = repeat_dict
     return histogram
 
 
-def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: int, required_reads: int, integer_indels_only: bool,
-                  output_prefix: str):
+def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: int, required_reads: int, output_prefix: str):
     noise_table = get_noise_table()
     fisher = Fisher()
     results_dir = os.path.dirname(output_prefix)
@@ -146,10 +145,10 @@ def run_from_file(tumor_fp: str, normal_fp: str, batch_start: int, batch_end: in
         normal_file.readline()
     for i in range(batch_end - batch_start):
         try:
-            tumor_histogram = construct_histogram_from_tsv(tumor_file.readline(), integer_indels_only)
+            tumor_histogram = construct_histogram_from_tsv(tumor_file.readline())
         except StopIteration:
             break # finished consuming file. batch end could be malformed
-        normal_histogram = construct_histogram_from_tsv(normal_file.readline(), integer_indels_only)
+        normal_histogram = construct_histogram_from_tsv(normal_file.readline())
         # tumor_alleles = calculate_alleles(tumor_histogram, noise_table,
         #                                                   required_read_support=required_reads)
         # normal_alleles = calculate_alleles(normal_histogram, noise_table,

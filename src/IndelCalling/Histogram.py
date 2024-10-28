@@ -1,4 +1,5 @@
 # cython: language_level=3
+import random
 from typing import Dict, List
 from collections import defaultdict
 from pysam import AlignedSegment
@@ -9,12 +10,13 @@ from src.IndelCalling.Locus import Locus
 
 
 class Histogram:
-    def __init__(self, locus: Locus, integer_indels_only: bool):
+    def __init__(self, locus: Locus):
         self.locus = locus
         self.repeat_lengths: Dict[float, int] = defaultdict(int)  # key = repeat length; value = supporting reads
         self._rounded_repeats = defaultdict(int)  # using int is same as lambda: 0, but lambda: 0 has pickling issues with multiprocessing
         self.built_rounded = False  # whether rounded repeat lengths has been built yet
-        self.integer_indels_only = integer_indels_only
+        self.integer_indels_only = True
+        self._noisiness = None
 
     def calculate_repeat_length(self, read: AlignedSegment) -> float:
         read_position = read.reference_start+1
@@ -58,6 +60,17 @@ class Histogram:
                 self._rounded_repeats[round(length)] += self.repeat_lengths[length]
         self.built_rounded = True
 
+
+    def determine_if_locus_is_noisy(self):
+        a = random.random()
+        return a < 0.5
+
+    def is_noisy(self):
+        if self._noisiness is None:
+            self._noisiness = self.determine_if_locus_is_noisy()
+        return self._noisiness
+
+
     @property
     def rounded_repeat_lengths(self) -> defaultdict:
         # round all repeat lengths in histogram to nearest integer
@@ -67,7 +80,7 @@ class Histogram:
 
     @staticmethod
     def header(prefix=''):
-        return f"{prefix}MOTIF_REPEATS_1\t{prefix}MOTIF_REPEATS_2\t{prefix}MOTIF_REPEATS_3\t{prefix}MOTIF_REPEATS_4\t{prefix}MOTIF_REPEATS_5\t{prefix}MOTIF_REPEATS_6\t{prefix}SUPPORTING_READS_1\t{prefix}SUPPORTING_READS_2\t{prefix}SUPPORTING_READS_3\t{prefix}SUPPORTING_READS_4\t{prefix}SUPPORTING_READS_5\t{prefix}SUPPORTING_READS_6"
+        return f"{prefix}MOTIF_REPEATS_1\t{prefix}MOTIF_REPEATS_2\t{prefix}MOTIF_REPEATS_3\t{prefix}MOTIF_REPEATS_4\t{prefix}MOTIF_REPEATS_5\t{prefix}MOTIF_REPEATS_6\t{prefix}SUPPORTING_READS_1\t{prefix}SUPPORTING_READS_2\t{prefix}SUPPORTING_READS_3\t{prefix}SUPPORTING_READS_4\t{prefix}SUPPORTING_READS_5\t{prefix}SUPPORTING_READS_6\tNoisy Locus"
 
     def prune_keys(self):
         for k in list(self.repeat_lengths.keys()): # list so dictionary size of keys don't change during pruning
@@ -79,7 +92,8 @@ class Histogram:
         sorted_repeats = sorted(self.repeat_lengths, key=self.repeat_lengths.get, reverse=True)
         ordered_repeats = [str(repeat) for repeat in sorted_repeats]
         ordered_support = [str(self.repeat_lengths[repeat]) for repeat in sorted_repeats]
-        return format_list(ordered_repeats, 6) + "\t" + format_list(ordered_support, 6)
+
+        return format_list(ordered_repeats, 6) + "\t" + format_list(ordered_support, 6) + f"\t{int(self.is_noisy())}"
 
     def __eq__(self, other):
         for length in self.repeat_lengths:

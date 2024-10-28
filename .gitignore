@@ -25,3 +25,4 @@ pyinstaller_venv/
 small_venv/
 bkup_working_pysam_venv/
 msmutect_venv/
+.tmp*

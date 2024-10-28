@@ -2,10 +2,11 @@ from dataclasses import dataclass
 from typing import List, Dict
 
 from pysam.libcalignedsegment import AlignedSegment
+from collections import namedtuple
 
 from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
 from src.GenomicUtils.Indel import Indel
-
+from src.GenomicUtils.Mutation import Mutation
 
 
 def relative_read_position(read_position: int, read_start: int, indel_bases: int):
@@ -54,6 +55,60 @@ def extract_locus_indel_segments(read: AlignedSegment, locus_seq: str, locus_sta
             break
 
     return indels
+
+
+def extract_locus_mutations(read: AlignedSegment, locus_seq: str, locus_start: int, locus_end: int, snp_padding: int = 15) -> List[Mutation]:
+    # returns all indels WITHIN locus, and all snps within snp_padding bases of locus
+    # locus end is inclusive
+    locus_length = locus_end-locus_start+1
+    read_start = read.reference_start + 1
+    read_position = read_start
+    indel_bases = 0
+    if locus_end < read_position:
+        return []
+
+    mutations = []
+    for cigar in read.cigartuples:
+        cigar_op = cigar[0]
+        cigar_op_len = cigar[1]
+        if cigar_op in [CIGAR_OPTIONS.ALG_MATCH, CIGAR_OPTIONS.SEQ_MATCH]:
+            read_position += cigar_op_len
+
+        elif cigar_op == CIGAR_OPTIONS.SEQ_MISMATCH:
+            if locus_start<=read_position<=locus_end or abs(read_position-locus_start)<snp_padding or abs(read_position-locus_end)<snp_padding:
+                relative_pos = relative_read_position(read_position, read_start, indel_bases)
+                mutations.append(Mutation(read.query_sequence[relative_pos], SNP=True))
+                read_position += cigar_op_len
+
+
+        elif cigar_op == CIGAR_OPTIONS.INSERTION:
+            if locus_start<=read_position<=locus_end:
+                relative_start = relative_read_position(read_position, read_start, indel_bases)
+                new_indel = read.query_sequence[relative_start: relative_start + cigar_op_len]
+                mutations.append(Mutation(new_indel, insertion=True))
+            indel_bases+=cigar_op_len
+
+        elif cigar_op == CIGAR_OPTIONS.DELETION:
+            if read_position < locus_start:
+                n_bases_into_locus = min((read_position + cigar_op_len) - locus_start, locus_length)
+                if n_bases_into_locus > 0: # deletion goes into locus
+                    new_indel = locus_seq[:n_bases_into_locus]
+                    mutations.append(Mutation(new_indel, deletion=True))
+
+            elif locus_start <= read_position <= locus_end:
+                relative_start = read_position-locus_start
+                deleted_bases = min(cigar_op_len, locus_end-read_position+1)
+                new_indel = locus_seq[relative_start:relative_start + deleted_bases]
+                mutations.append(Mutation(new_indel, deletion=True))
+
+
+            indel_bases -= cigar_op_len
+            read_position += cigar_op_len
+
+        if read_position > locus_end+snp_padding:
+            break
+
+    return mutations
 
 def sort_str(a: str):
     return "".join(sorted(a))

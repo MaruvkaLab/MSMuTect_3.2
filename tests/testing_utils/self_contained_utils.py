@@ -25,7 +25,9 @@ def msmutect_executable_path():
 
 
 def run_msmutect_from_cmd(args: str):
-    os.system(msmutect_executable_path() + f" {args}")
+    ret_code = os.system(msmutect_executable_path() + f" {args}")
+    if ret_code != 0:
+        raise RuntimeError("MSMuTect crashed")
 
 
 def test_results_path():
