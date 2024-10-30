@@ -89,14 +89,6 @@ def equivalent_arrays(a: np.array, b: np.array) -> bool:
     return (a_sorted == b_sorted).all()
 
 
-def call_mutations(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, fisher_calculator: Fisher) -> MutationCall:
-    if len(normal_alleles) == 0 or len(tumor_alleles) == 0:
-        return MutationCall(MutationCall.NO_ALLELES, normal_alleles, tumor_alleles, AICs())
-    elif equivalent_arrays(normal_alleles.repeat_lengths, tumor_alleles.repeat_lengths):
-        return MutationCall(MutationCall.NOT_MUTATION, normal_alleles, tumor_alleles, AICs())
-    else:
-        return call_decision(normal_alleles, tumor_alleles, noise_table, fisher_calculator)
-
 
 def is_possible_mutation(normal_alleles: AlleleSet, p_equal = 0.3) -> bool:
     # checks if locus is a candidate to be called a mutation based on its normal alleles
@@ -150,9 +142,20 @@ def call_verified_locus(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noi
         if p_value < fisher_threshold:
             if reversion_to_reference(normal_alleles, tumor_alleles, noise_table, fisher_calculator, fisher_threshold, LOR_ratio):
                 return MutationCall(MutationCall.REVERTED_TO_REFERENCE, normal_alleles, tumor_alleles, aic_values, p_value)
-            else:
+            elif normal_alleles.histogram.is_noisy() or tumor_alleles.histogram.is_noisy():
+                return MutationCall(MutationCall.GERMLINE_VARIATIONS, normal_alleles, tumor_alleles, aic_values, p_value)
+            else: # everything looks mutated. not noisy. call mutation!
                 return MutationCall(MutationCall.MUTATION, normal_alleles, tumor_alleles, aic_values, p_value)
         else:
             return MutationCall(MutationCall.BORDERLINE_NONMUTATION, normal_alleles, tumor_alleles, aic_values, p_value)
     else:
         return MutationCall(MutationCall.NOT_MUTATION, normal_alleles, tumor_alleles, aic_values)
+
+
+def call_mutations(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, noise_table: np.array, fisher_calculator: Fisher) -> MutationCall:
+    if len(normal_alleles) == 0 or len(tumor_alleles) == 0:
+        return MutationCall(MutationCall.NO_ALLELES, normal_alleles, tumor_alleles, AICs())
+    elif equivalent_arrays(normal_alleles.repeat_lengths, tumor_alleles.repeat_lengths):
+        return MutationCall(MutationCall.NOT_MUTATION, normal_alleles, tumor_alleles, AICs())
+    else:
+        return call_decision(normal_alleles, tumor_alleles, noise_table, fisher_calculator)

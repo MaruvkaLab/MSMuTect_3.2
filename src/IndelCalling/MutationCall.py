@@ -8,6 +8,7 @@ from src.IndelCalling.hist2vecs import hist2samps
 
 class MutationCall:
     # pseudo enum
+    GERMLINE_VARIATIONS = -6
     REVERTED_TO_REFERENCE = -5
     NO_ALLELES = -4
     BORDERLINE_NONMUTATION = -3
@@ -31,13 +32,15 @@ class MutationCall:
 
     def call_abbreviation(self, call: int) -> str:
         abbreviations = {
+                         MutationCall.GERMLINE_VARIATIONS: "GV",
                          MutationCall.REVERTED_TO_REFERENCE: "RR",
                          MutationCall.NO_ALLELES: "AN", # either tumor or normal lacks alleles
                          MutationCall.BORDERLINE_NONMUTATION: "FFT",  # failed fisher test
                          MutationCall.TOO_MANY_ALLELES : "TMA",
                          MutationCall.INSUFFICIENT: "INS",
                          MutationCall.NOT_MUTATION: "NM",
-                         MutationCall.MUTATION: "M"}
+                         MutationCall.MUTATION: "M",
+                        }
         return abbreviations[call]
 
     def ks_test_value(self) -> Tuple[float, float]:

@@ -35,6 +35,7 @@ def select_best_pattern(sequence: str, pattern: str) -> str:
         reverse_similarity = similarity(sequence, reverse_pattern_seq)
         if max(forward_similarity, reverse_similarity) < 0.8 and 0.5 > abs(forward_similarity-reverse_similarity):
             print(f"Problem: {pattern}, {sequence}, {forward_similarity>reverse_similarity}")
+            # croc=1
         if forward_similarity > reverse_similarity:
             return pattern
         else:
@@ -55,5 +56,5 @@ def create_new_loci_file(input_fp: str, output_fp: str):
 if __name__ == '__main__':
     # print(reverse_complement("ACGGGT"))
     # print(extrapolate_pattern("ACTG", 9))
-    create_new_loci_file("/home/avraham/MaruvkaLab/Texas/texas_stad_run/hg38_1to15_95_sorted",
-                         "/home/avraham/MaruvkaLab/Texas/texas_stad_run/hg38_1to15_95_sorted_rc_corrected.tsv")
+    create_new_loci_file("/home/avraham/MaruvkaLab/msmutect_runs/data/hg19_all_loci_sorted_new",
+                         "/home/avraham/MaruvkaLab/msmutect_runs/data/hg19_all_loci_sorted_new_rc_corrected")

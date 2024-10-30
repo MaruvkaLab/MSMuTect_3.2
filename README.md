@@ -40,9 +40,10 @@ It deletes them at the end. If, for some reason, msmutect is interrupted, these 
 
 ### Understanding the 'Call' Column
 M = Mutation  
-NM = Not Mutation   
+NM = Not Mutation
 AN = No Alleles. Either the tumor sample or the normal sample lacks alleles  
 RR = Reversion to Reference. The normal sample held an alternative allele, and the tumor had a mutation of the reference allele  
+GV = Germline Variation. There are too many SNPs in the vicinity of the locus to confidently say that the indels were of the MS motif
 FFT = Failed Fisher Test. Passed other tests to be called a mutation, but failed the Fisher's exact test of significance      
 INS = Insufficient Support. The normal sample has multiple alleles, but one of them has insufficient support, indicating a noisy locus  
 TMA = Too Many Alleles. Normal sample has too many alleles, and hence the locus is too noisy to call    
