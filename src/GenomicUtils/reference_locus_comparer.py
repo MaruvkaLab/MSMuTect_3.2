@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from pysam.libcalignedsegment import AlignedSegment
 from collections import namedtuple
+
+from pysam.libcvcf import defaultdict
 
 from src.GenomicUtils.CigarOptions import CIGAR_OPTIONS
 from src.GenomicUtils.Indel import Indel
@@ -58,6 +60,8 @@ def extract_locus_indel_segments(read: AlignedSegment, locus_seq: str, locus_sta
 
 
 def extract_locus_mutations(read: AlignedSegment, locus_seq: str, locus_start: int, locus_end: int, snp_padding: int = 15) -> List[Mutation]:
+    # default is 15 since that is the longest motif length we consider
+
     # returns all indels WITHIN locus, and all snps within snp_padding bases of locus
     # locus end is inclusive
     locus_length = locus_end-locus_start+1
@@ -75,32 +79,40 @@ def extract_locus_mutations(read: AlignedSegment, locus_seq: str, locus_start: i
             read_position += cigar_op_len
 
         elif cigar_op == CIGAR_OPTIONS.SEQ_MISMATCH:
-            if locus_start<=read_position<=locus_end or abs(read_position-locus_start)<snp_padding or abs(read_position-locus_end)<snp_padding:
+            if locus_start<=read_position<=locus_end or abs(locus_start-read_position)<=snp_padding or abs(read_position-locus_end)<=snp_padding:
                 relative_pos = relative_read_position(read_position, read_start, indel_bases)
-                mutations.append(Mutation(read.query_sequence[relative_pos], SNP=True))
-                read_position += cigar_op_len
+                mutations.append(Mutation(read.query_sequence[relative_pos], position=read_position, substitution=True))
+            read_position += cigar_op_len
 
 
         elif cigar_op == CIGAR_OPTIONS.INSERTION:
             if locus_start<=read_position<=locus_end:
                 relative_start = relative_read_position(read_position, read_start, indel_bases)
                 new_indel = read.query_sequence[relative_start: relative_start + cigar_op_len]
-                mutations.append(Mutation(new_indel, insertion=True))
+                mutations.append(Mutation(new_indel, position=read_position, insertion=True))
             indel_bases+=cigar_op_len
 
         elif cigar_op == CIGAR_OPTIONS.DELETION:
-            if read_position < locus_start:
-                n_bases_into_locus = min((read_position + cigar_op_len) - locus_start, locus_length)
-                if n_bases_into_locus > 0: # deletion goes into locus
-                    new_indel = locus_seq[:n_bases_into_locus]
-                    mutations.append(Mutation(new_indel, deletion=True))
 
-            elif locus_start <= read_position <= locus_end:
-                relative_start = read_position-locus_start
-                deleted_bases = min(cigar_op_len, locus_end-read_position+1)
-                new_indel = locus_seq[relative_start:relative_start + deleted_bases]
-                mutations.append(Mutation(new_indel, deletion=True))
+            # CHANGE: indel must start and end within locus
+            # if read_position < locus_start:
+            #     n_bases_into_locus = min((read_position + cigar_op_len) - locus_start, locus_length)
+            #     if n_bases_into_locus > 0: # deletion goes into locus
+            #         new_indel = locus_seq[:n_bases_into_locus]
+            #         mutations.append(Mutation(new_indel, position=read_position, deletion=True))
 
+            if locus_start <= read_position <= locus_end:
+                # CHANGE: indel must start and end within locus
+                if locus_end-read_position+1 >= cigar_op_len: # +1 for including the start and end
+                    relative_start = read_position-locus_start
+                    # deleted_bases = min(cigar_op_len, locus_end-read_position+1)
+                    deleted_bases = cigar_op_len
+                    new_indel = locus_seq[relative_start:relative_start + deleted_bases]
+                    mutations.append(Mutation(new_indel, position=read_position, deletion=True))
+                else: # exits locus
+                    mutations.append(Mutation("IRRELEVANT", enters_or_exits_locus=True, deletion=True))
+            elif read_position <= locus_start and locus_start<=(read_position+cigar_op_len): # enters locus
+                mutations.append(Mutation("IRRELEVANT", enters_or_exits_locus=True, deletion=True))
 
             indel_bases -= cigar_op_len
             read_position += cigar_op_len
@@ -149,10 +161,71 @@ def divide_reads_into_groups(reads: List[AlignedSegment]) -> ReadContainers:
             ret.full_match_reads.append(r)
     return ret
 
+
+def char_counts(pattern: str):
+    char_count = defaultdict(int)
+    for char in pattern:
+        char_count[char]+=1
+    return char_count
+
+def equivalent_char_counts(a: str, b: str):
+    a_char_count = char_counts(a)
+    b_char_count = char_counts(b)
+    for base in ["A", "C", "G", "T"]:
+        if a_char_count[base]!=b_char_count[base]:
+            return False
+    return True
+
+def twist(pattern: str, twist_slide: int):
+    return pattern[twist_slide:] + pattern[:twist_slide]
+
+def single_ms_indel_determination(pattern: str, indel: str) -> bool:
+    if not equivalent_char_counts(pattern, indel):
+        return False
+    else:
+        for i in range(len(pattern)):
+            if twist(pattern, i) == indel:
+                return True
+        return False
+
+def microsatellite_indel(indel: Mutation, ms_motif: str) -> int: # Tuple[int, bool]:
+    # returns length of ms indel. if its not a valid ms indel, return 0
+    # also returns whether there is an indel that eats into the proper locus
+    if len(indel.seq)%len(ms_motif) != 0: # is not proper length
+        return 0
+    num_repeats = len(indel.seq)//len(ms_motif)
+    if num_repeats==1:
+        # could probably do something smarter to check (like a tree or whatever)... but not important enough to justify the effort
+        if indel.deletion:
+            factor = -1
+        else: # insertion
+            factor = 1
+        return factor * int(single_ms_indel_determination(ms_motif, indel.seq))
+    first_full_repeat_idx = indel.seq.find(ms_motif)
+    if first_full_repeat_idx == -1:
+        return 0
+    else:
+        reshuffled_locus = indel.seq[first_full_repeat_idx:]+indel.seq[:first_full_repeat_idx]
+        if reshuffled_locus == ms_motif*num_repeats:
+            length = num_repeats
+        else:
+            return 0
+
+    if indel.insertion:
+        return length
+    else:
+        return -length
+
+
 if __name__ == '__main__':
-    a="AAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAA"
+    print(twist("ACTG", 0))
+    print(twist("ACTG", 1))
+    print(twist("ACTG", 2))
+    print(twist("ACTG", 3))
+
+    # a="AAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGACAAAAAAAA"
     # print(char_count(a))
-    print(equivalent_strs_order_irrelevant("ACCT", "TCCDA"))
+    # print(equivalent_strs_order_irrelevant("ACCT", "TCCDA"))
 # @dataclass
 # class ReadGroup:
 #     seq: str

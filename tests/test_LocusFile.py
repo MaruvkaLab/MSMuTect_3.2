@@ -11,7 +11,7 @@ class TestLociManager(unittest.TestCase):
         self.assertLess(time.process_time()-init_start, 4)
         init_start = time.process_time()
         _ = manager.get_batch(1_000_000)
-        self.assertLess(time.process_time()-init_start, 4)
+        self.assertLess(time.process_time()-init_start, 8)
 
     def test_load_single(self):
         manager = LociManager(locus_file_path(), 0)

@@ -41,8 +41,9 @@ def write_queues_results(output_prefix: str, results: List[FileBackedQueue], hea
         output_file.write(header)
         output_file.write("\n")
         for r in results:
-            shutil.copyfileobj(open(r.out_file_path, 'r'), output_file)
-            # output_file.write("\n")
+            with open(r.out_file_path, 'r') as q_file:
+                shutil.copyfileobj(q_file, output_file)
+                # output_file.write("\n")
             r.delete_backing_file()
 
 

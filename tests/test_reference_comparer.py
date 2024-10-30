@@ -1,43 +1,47 @@
 import unittest, time
 
-from src.GenomicUtils.Indel import Indel
-from src.GenomicUtils.reference_locus_comparer import extract_locus_indel_segments
+from src.GenomicUtils.Mutation import Mutation
+from src.GenomicUtils.reference_locus_comparer import extract_locus_indel_segments, extract_locus_mutations, \
+    microsatellite_indel, single_ms_indel_determination
 
 from tests.testing_utils.read_entire_bam_file import all_reads_from_bam_file
 
 
 class TestAnnotatedLocus(unittest.TestCase):
 
-    def test_complex_ref_indels(self):
-        all_reads = all_reads_from_bam_file(
-            "/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/test_locating_indels.bam")
-        indel_segments = extract_locus_indel_segments(all_reads[0], "GAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTC", 10_000, 10_059)
-        self.assertEqual(indel_segments[0], Indel("ACT", True))
-        self.assertEqual(indel_segments[1], Indel("CC", False))
-        self.assertEqual(indel_segments[2], Indel("C", False))
-        self.assertEqual(indel_segments[3], Indel("T", True))
+    def test_single_ms_pattern_indel(self):
+        self.assertTrue(single_ms_indel_determination("A", "A"))
+        self.assertTrue(single_ms_indel_determination("ACT", "ACT"))
+        self.assertTrue(single_ms_indel_determination("CAC", "CCA"))
+        self.assertTrue(single_ms_indel_determination("CAC", "ACC"))
 
-    def test_building_ref_del_reads_that_cross_into_or_out_of_ref(self):
-        all_reads = all_reads_from_bam_file(
-            "/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/test_locating_indels.bam")
-        indel_segments_read_1 = extract_locus_indel_segments(all_reads[1], "GAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTC", 10_000, 10_059)
-        self.assertEqual(indel_segments_read_1[0], Indel("G", False))
+        self.assertFalse(single_ms_indel_determination("ACT", "ATC"))
+        self.assertFalse(single_ms_indel_determination("CCT", "ATC"))
 
-        indel_segments_read_2 = extract_locus_indel_segments(all_reads[2],
-                                                             "GAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTC",
-                                                             10_000, 10_059)
-        self.assertEqual(indel_segments_read_2[0], Indel("C", False))
 
-    def test_fully_overlapping_deletions(self):
-        all_reads = all_reads_from_bam_file(
-            "/home/avraham/MaruvkaLab/MSMuTect_0.5/tests/sample_bams/test_locating_indels.bam")
-        indel_segments_read_3 = extract_locus_indel_segments(all_reads[3], "GAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTC", 10_000, 10_059)
-        self.assertEqual(indel_segments_read_3[0], Indel("GAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTC", False))
+    def test_ms_indel(self):
+        # mono_repeat_1 = Mutation("A", insertion=True)
+        # self.assertEqual(microsatellite_indel(mono_repeat_1, "A"), 1)
+        #
+        # mono_repeat_3 = Mutation("AAA", deletion=True)
+        # self.assertEqual(microsatellite_indel(mono_repeat_3, "A"), -3)
+        #
+        # quad_repeat_2 = Mutation("ACTGACTG", insertion=True)
+        # self.assertEqual(microsatellite_indel(quad_repeat_2, "ACTG"), 2)
+        #
+        # tri_repeat_complex = Mutation("CCACCACCACCA", insertion=True)
+        # self.assertEqual(microsatellite_indel(tri_repeat_complex, "CAC"), 4)
+        #
+        # problematic_incomplete = Mutation("ACTGACT", insertion=True)
+        # self.assertEqual(microsatellite_indel(problematic_incomplete, "ACTG"), 0)
+        #
+        # problematic_incomplete_2 = Mutation("AACAA", deletion=True)
+        # self.assertEqual(microsatellite_indel(problematic_incomplete_2, "A"), 0)
 
-        indel_segments_read_4 = extract_locus_indel_segments(all_reads[4],
-                                                             "GAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTC",
-                                                             10_000, 10_059)
-        self.assertEqual(indel_segments_read_4[0], Indel("GAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTC", False))
+        problematic_incomplete_2 = Mutation("TCA", deletion=True)
+        self.assertEqual(microsatellite_indel(problematic_incomplete_2, "ATC"), -1)
+
+
 
 
 if __name__ == '__main__':

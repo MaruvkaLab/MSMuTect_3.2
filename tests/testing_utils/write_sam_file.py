@@ -66,9 +66,7 @@ def create_readline_custom_length(fake_reads: List[FakeRead], custom_length: int
         all_new_reads.append(new_read)
     return "\n".join(["\t".join(a) for a in all_new_reads])
 
-def create_seq(start, cigar_str: str, subsitutions: List[str]):
-    # croc = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-    base = "TTTTTTTTTTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+def write_seq(start, cigar_str: str, subsitutions: List[str], base: str):
     if start < 9975 or start > 10_050:
         raise RuntimeError
     op_lens = [int(op_len) for op_len in re.split("[MXID]", cigar_str)[:-1]]
@@ -81,6 +79,11 @@ def create_seq(start, cigar_str: str, subsitutions: List[str]):
             segments.append(base[current_pos:current_pos+op_len])
             current_pos+=op_len
         elif op == 'X':
+            if subsitutions[sub_idx] == "N": # correct if user doesnt bother setting
+                if base[current_pos]=="G":
+                    subsitutions[sub_idx] = "T"
+                else:
+                    subsitutions[sub_idx] = "G"
             assert op_len==1
             assert subsitutions[sub_idx]!=base[current_pos]
             segments.append(subsitutions[sub_idx])
@@ -93,32 +96,23 @@ def create_seq(start, cigar_str: str, subsitutions: List[str]):
             sub_idx+=1
     return "".join(segments)
 
+def create_seq(start, cigar_str: str, subsitutions: List[str]):
+    # croc = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    base = "TTTTTTTTTTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+    return write_seq(start, cigar_str, subsitutions, base)
+
 def create_seq_high_entrophy(start, cigar_str: str, subsitutions: List[str]):
     # croc = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
     base = "CCACGAAGCGTCCCGCCCAGGACGCGAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTCGCGCTCCTACCGTTGTTTAACGCCCGATCTTTGCGGTCTGTGTTTGGAGACACAACAATCTTAAGCCACGAAGCGTCCCGCCCAGGACGCGAGCATGGTCTTGGTTCGAGCCATTCGCGGGTCTGGTCGTACGTCTCCGAGGTTATCCTCGCGCTCCTACCGTTGTTTAACGCCCGATCTTTGCGGTCTGTGTTTGGAGACACAACAATCTTAAG"
-    if start < 9975 or start > 10_050:
-        raise RuntimeError
-    op_lens = [int(op_len) for op_len in re.split("[MXID]", cigar_str)[:-1]]
-    ops = [char for char in cigar_str if char in ["M", "D", "I", "X"]]
-    current_pos = start-9975
-    segments = []
-    sub_idx=0
-    for op, op_len  in zip(ops, op_lens):
-        if op == 'M':
-            segments.append(base[current_pos:current_pos+op_len])
-            current_pos+=op_len
-        elif op == 'X':
-            assert op_len==1
-            assert subsitutions[sub_idx]!=base[current_pos]
-            segments.append(subsitutions[sub_idx])
-            sub_idx+=1
-            current_pos+=1
-        elif op=='D':
-            current_pos+=op_len
-        else: # I
-            segments.append(subsitutions[sub_idx])
-            sub_idx+=1
-    return "".join(segments)
+    return write_seq(start, cigar_str, subsitutions, base)
+
+def create_seq_mono_repeat_wone_impurity(start, cigar_str: str, subsitutions: List[str]):
+    base = "CCACGAAGCGTCCCGCCCAGGACGC"+"A"*30+"C"+"A"*29+"CCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGC"
+    return write_seq(start, cigar_str, subsitutions, base)
+
+def create_seq_tri_repeat_full_purity(start, cigar_str: str, subsitutions: List[str]):
+    base = "CCACGAAGCGTCCCGCCCAGGACGC"+"ACT"*4+"CCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGC"
+    return write_seq(start, cigar_str, subsitutions, base)
 
 def create_readline(fake_reads: List[FakeRead], create_seq_func=create_seq):
     if len(fake_reads) == 0:
@@ -200,21 +194,49 @@ def main():
     # for realistic loci, 25-51 is ACACACACACAAAAACGACGACGACGA
     # base="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 
+    snp_read = [FakeRead(9985, "15M1X6D85M", subsitutions=["N"]) for i in range(5)]
+    create_new_bam("strict_test_1", [
+        FakeRead(9985, "15M3D86M"),
+        FakeRead(9985, "16M3D85M"),
+        FakeRead(9985, "16M3I83M", subsitutions=["CTA"]),
+        FakeRead(9985, "16M3I83M", subsitutions=["CAT"]),
+        FakeRead(9985, "16M6D85M"),
 
-    create_new_bam("test_locating_indels", [
-        FakeRead(9985, "15M3I20M2D5M1D1I62M", subsitutions=["ACT", "T"]),
-        FakeRead(9985, "14M2D87M"),
-        FakeRead(9985, "74M2D27M"),
-        FakeRead(9985, "15M60D86M"),
-        FakeRead(9985, "10M70D91M"),
+    ]+snp_read, create_seq_func=create_seq_tri_repeat_full_purity)
 
-        FakeRead(9985, "101M") # just to make it easier to compare
-    ], create_seq_func=create_seq_high_entrophy)
 
-    fake_read_1 = [FakeRead(9985, "45M1X55M", subsitutions=["C"]) for i in range(3)] # snp at 10_031
-    fake_read_2 = [FakeRead(9986, "44M1X56M", subsitutions=["C"]) for i in range(2)] # should be single deletion in locus 3.]
+    create_new_bam("strict_test_2", [
+        # these reads wont count for various reasons listed in the reads table
+        FakeRead(9985, "14M3D87M"),
+        FakeRead(9985, "70M15D31M"),
+        FakeRead(9985, "13M90D88M"),
+        FakeRead(9985, "12M1X88M", subsitutions=["N"]),
+        FakeRead(9985, "40M10D71M"),
+        FakeRead(9985, "40M5I71M", subsitutions=["AAAGA"]),
 
-    create_new_bam("test_edited_ref", fake_read_1+fake_read_2, create_seq_func=create_seq_high_entrophy)
+        # these reads will count. see reads table
+        FakeRead(9985, "90M1X10M", subsitutions=["N"]),
+        FakeRead(9985, "72M2D29M", subsitutions=["N"])
+    ], create_seq_func=create_seq_mono_repeat_wone_impurity)
+
+
+
+
+    # create_new_bam("test_locating_indels", [
+    #     FakeRead(9985, "15M3I20M2D5M1D1I62M", subsitutions=["ACT", "T"]),
+    #     FakeRead(9985, "14M2D87M"),
+    #     FakeRead(9985, "74M2D27M"),
+    #     FakeRead(9985, "15M60D86M"),
+    #     FakeRead(9985, "10M70D91M"),
+    #     FakeRead(9985, "1X1X87M1X1X10M", subsitutions=["N", "N", "N", "N"]),
+    #
+    #     FakeRead(9985, "101M") # just to make it easier to compare
+    # ], create_seq_func=create_seq_high_entrophy)
+
+    # fake_read_1 = [FakeRead(9985, "45M1X55M", subsitutions=["C"]) for i in range(3)] # snp at 10_031
+    # fake_read_2 = [FakeRead(9986, "44M1X56M", subsitutions=["C"]) for i in range(2)] # should be single deletion in locus 3.]
+    #
+    # create_new_bam("test_edited_ref", fake_read_1+fake_read_2, create_seq_func=create_seq_high_entrophy)
 
     # fake_read_1 = [FakeRead(9985, "41M1X1M1X57M", subsitutions=["A", "A"]) for i in range(5)] # should be single deletion in locus 3.]
     # create_new_bam("test_elaborate_ref_based",

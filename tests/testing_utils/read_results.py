@@ -1,19 +1,18 @@
 from typing import List
 from dataclasses import dataclass
 
-
+@dataclass
 class ResultsLine:
-    def __init__(self, chromosome: str, start: int, end: int, pattern: str, ref_seq: str, num_ref_repeats: float,
-                 motif_repeats: List[float], motif_repeat_support: List[int]):
-        # CHROMOSOME	START	END	PATTERN	REFERENCE_SEQUENCE	REFERENCE_REPEATS	MOTIF_REPEATS_1	MOTIF_REPEATS_2	MOTIF_REPEATS_3	MOTIF_REPEATS_4	MOTIF_REPEATS_5	MOTIF_REPEATS_6	SUPPORTING_READS_1	SUPPORTING_READS_2	SUPPORTING_READS_3	SUPPORTING_READS_4	SUPPORTING_READS_5	SUPPORTING_READS_6
-        self.chromosome = chromosome
-        self.start = start
-        self.end = end
-        self.pattern = pattern
-        self.ref_seq = ref_seq
-        self.num_ref_repeats = num_ref_repeats
-        self.motif_repeats = motif_repeats
-        self.motif_repeat_support = motif_repeat_support
+    chromosome: str
+    start: int
+    end: int
+    pattern: str
+    ref_seq: str
+    num_ref_repeats: float
+    motif_repeats: List[float]
+    motif_repeat_support: List[int]
+    noisy: bool
+
 
 
 class ResultsReader:
@@ -46,7 +45,8 @@ class ResultsReader:
                     break
                 else:
                     motif_repeat_support.append(int(broken_line[i]))
-            return ResultsLine(chromosome, start, end, pattern, ref_seq, num_ref_repeats, motif_repeats, motif_repeat_support)
+            noisy = bool(int(broken_line[18]))
+            return ResultsLine(chromosome, start, end, pattern, ref_seq, num_ref_repeats, motif_repeats, motif_repeat_support, noisy)
 
     def __del__(self):
         self.results_file.close()
