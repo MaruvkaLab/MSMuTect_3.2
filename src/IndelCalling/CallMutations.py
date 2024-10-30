@@ -1,5 +1,6 @@
 # cython: language_level=3
 import numpy as np
+from pysam.libcvcf import defaultdict
 from scipy.stats import binom
 
 from src.IndelCalling.CallAlleles import calculate_alleles
@@ -99,7 +100,7 @@ def reconstruct_tumor_alleles_without_reference_length(tumor_alleles: AlleleSet,
         new_locus = tumor_alleles.histogram.locus
         ref_length = new_locus.repeats
         new_histogram = Histogram(new_locus)
-        new_histo_dict = dict()
+        new_histo_dict = defaultdict(int)
         for repeat in tumor_alleles.histogram.rounded_repeat_lengths.keys():
             new_histo_dict[repeat] = tumor_alleles.histogram.rounded_repeat_lengths[repeat]
         if ref_length in new_histo_dict.keys():

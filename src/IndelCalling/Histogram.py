@@ -15,7 +15,7 @@ from src.IndelCalling.Locus import Locus
 class Histogram:
     def __init__(self, locus: Locus):
         self.locus = locus
-        self.repeat_lengths: defaultdict = defaultdict(int)  # key = repeat length; value = supporting reads
+        self.repeat_lengths = defaultdict(int)  # key = repeat length; value = supporting reads
         self.noise_dict = defaultdict(int)
         self._noisiness = None
 
