@@ -95,10 +95,10 @@ def is_possible_mutation(normal_alleles: AlleleSet, p_equal = 0.3) -> bool:
     return check_normal_alleles(normal_alleles, p_equal) == MutationCall.MUTATION
 
 
-def reconstruct_tumor_alleles_without_reference_length(tumor_alleles: AlleleSet, noise_table, integer_indels_only: bool) -> AlleleSet:
+def reconstruct_tumor_alleles_without_reference_length(tumor_alleles: AlleleSet, noise_table) -> AlleleSet:
         new_locus = tumor_alleles.histogram.locus
         ref_length = new_locus.repeats
-        new_histogram = Histogram(new_locus, integer_indels_only)
+        new_histogram = Histogram(new_locus)
         new_histo_dict = dict()
         for repeat in tumor_alleles.histogram.rounded_repeat_lengths.keys():
             new_histo_dict[repeat] = tumor_alleles.histogram.rounded_repeat_lengths[repeat]
@@ -119,7 +119,7 @@ def reversion_to_reference(normal_alleles: AlleleSet, tumor_alleles: AlleleSet, 
     reference_length = normal_alleles.histogram.locus.repeats
     if reference_length not in tumor_alleles.repeat_lengths:
         return False
-    tumor_alleles_ref_removed = reconstruct_tumor_alleles_without_reference_length(tumor_alleles, noise_table, tumor_alleles.histogram.integer_indels_only)
+    tumor_alleles_ref_removed = reconstruct_tumor_alleles_without_reference_length(tumor_alleles, noise_table)
     if equivalent_arrays(normal_alleles.repeat_lengths, tumor_alleles_ref_removed.repeat_lengths):
         return True
     aic_values = calculate_AICs(normal_alleles, tumor_alleles_ref_removed, noise_table)
