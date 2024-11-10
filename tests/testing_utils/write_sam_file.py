@@ -73,6 +73,9 @@ def write_seq(start, cigar_str: str, subsitutions: List[str], base: str):
     ops = [char for char in cigar_str if char in ["M", "D", "I", "X"]]
     current_pos = start-9975
     segments = []
+    if subsitutions is None:
+        subsitutions = []
+    subsitutions = subsitutions.copy()
     sub_idx=0
     for op, op_len  in zip(ops, op_lens):
         if op == 'M':
@@ -90,11 +93,12 @@ def write_seq(start, cigar_str: str, subsitutions: List[str], base: str):
             sub_idx+=1
             current_pos+=1
         elif op=='D':
+            subsitutions.insert(0, base[current_pos:current_pos+op_len])
             current_pos+=op_len
         else: # I
             segments.append(subsitutions[sub_idx])
             sub_idx+=1
-    return "".join(segments)
+    return "".join(segments), subsitutions
 
 def create_seq(start, cigar_str: str, subsitutions: List[str]):
     # croc = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -113,6 +117,46 @@ def create_seq_mono_repeat_wone_impurity(start, cigar_str: str, subsitutions: Li
 def create_seq_tri_repeat_full_purity(start, cigar_str: str, subsitutions: List[str]):
     base = "CCACGAAGCGTCCCGCCCAGGACGC"+"ACT"*4+"CCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGCCCACGAAGCGTCCCGCCCAGGACGC"
     return write_seq(start, cigar_str, subsitutions, base)
+
+
+def split_cigar(cigar: str):
+    type_idxs = []
+    for i, c in enumerate(cigar):
+        if c.isalpha():
+            type_idxs.append(i)
+    last_idx = 0
+    ret = []
+    for t in type_idxs:
+        ret.append(cigar[last_idx:t+1])
+        last_idx=t+1
+    return ret
+
+def create_MD_string(read: FakeRead, subsitutions: List[str]):
+    cigar_split = split_cigar(read.cigar_str)
+    ret = []
+    sub_idx = 0
+    current_match = 0
+    for cig in cigar_split:
+        if cig[-1]=="M":
+            current_match+=int(cig[:-1])
+            continue
+        else:
+            if current_match!=0:
+                ret.append(str(current_match))
+            current_match=0
+
+        if cig[-1]=="X":
+            ret.append(subsitutions[sub_idx])
+            sub_idx+=1
+        elif cig[-1] == "D":
+            ret.append(f"^{subsitutions[sub_idx]}")
+            sub_idx+=1
+
+    if current_match!=0:
+        ret.append(str(current_match))
+    return "MD:Z:"+"".join(ret)
+        # ret.append()
+
 
 def create_readline(fake_reads: List[FakeRead], create_seq_func=create_seq):
     if len(fake_reads) == 0:
@@ -153,8 +197,10 @@ def create_readline(fake_reads: List[FakeRead], create_seq_func=create_seq):
             new_read[9] = fr.sequence
             new_read[10] = fr.sequence
         else:
-            new_read[9] = create_seq_func(fr.read_start, fr.cigar_str, fr.subsitutions)
-            new_read[10] = create_seq_func(fr.read_start, fr.cigar_str, fr.subsitutions)
+            new_read[9], updated_subsitutions = create_seq_func(fr.read_start, fr.cigar_str, fr.subsitutions)
+            new_read[10], _ = create_seq_func(fr.read_start, fr.cigar_str, fr.subsitutions)
+
+        new_read[12] = create_MD_string(fr, updated_subsitutions)
 
         all_new_reads.append(new_read)
     return "\n".join(["\t".join(a) for a in all_new_reads])
@@ -193,6 +239,7 @@ def main():
     print(create_seq(10_025, '101M', [])[:10])
     # for realistic loci, 25-51 is ACACACACACAAAAACGACGACGACGA
     # base="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACACACACAAAAACGACGACGACGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
 
     snp_read = [FakeRead(9985, "15M1X6D85M", subsitutions=["N"]) for i in range(5)]
     create_new_bam("strict_test_1", [

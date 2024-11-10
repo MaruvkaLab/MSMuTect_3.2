@@ -31,14 +31,16 @@ class Histogram:
         return has_snp, has_indel
 
     def add_read_to_repeat_length_dict(self, read: AlignedSegment) -> int:
-        mutations = extract_locus_mutations(read, self.locus.sequence, self.locus.start, self.locus.end)
+        mutations = extract_locus_mutations(read, self.locus.start, self.locus.end)
         # if mutations[0].insertion:
         #     croc=1
         # print(mutations)
         has_snp, has_indel = self.mutation_types(mutations)
         current_repeat_length = 0
         if has_snp:
-            self.noise_dict[read.reference_start]+=1 # tracks how many snps there are at each location
+            for m in mutations:
+                if m.substitution:
+                    self.noise_dict[m.position]+=1 # tracks how many snps there are at each location
             return # cannot support anything since it has a snp close to the locus
         elif has_indel:
             for mutation in mutations:
@@ -96,5 +98,4 @@ class Histogram:
             if not self.repeat_lengths[length] == other.repeat_lengths[length]:
                 return False
         return len(self.repeat_lengths.keys()) == len(self.repeat_lengths.keys())
-
 

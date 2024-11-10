@@ -1,7 +1,7 @@
 import unittest, time
 
 from src.GenomicUtils.Mutation import Mutation
-from src.GenomicUtils.reference_locus_comparer import extract_locus_indel_segments, extract_locus_mutations, \
+from src.GenomicUtils.reference_locus_comparer import extract_locus_mutations, \
     microsatellite_indel, single_ms_indel_determination
 
 from tests.testing_utils.read_entire_bam_file import all_reads_from_bam_file
